@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center">
+
+    <Button
+        android:id="@+id/account_info"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Account Info"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="20dp"
+        android:textSize="25sp" />
+
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/transfer"
+        android:layout_gravity="center_horizontal"
+        android:text="Transfer"
+        android:textSize="30sp"
+        android:layout_margin="20dp" />
+
+    <Button
+        android:id="@+id/qrscan"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="QRscan"
+        android:layout_gravity="center_horizontal"
+        android:textSize="30sp" >
+    </Button>
+
+    <EditText
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/scan_result"
+        android:hint="Scan result will be displayed here"
+        android:layout_margin="10dp" >
+
+    </EditText>
+    <Button
+        android:id="@+id/print"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="print"
+        android:layout_gravity="center_horizontal"
+        android:textSize="30sp" >
+    </Button>
+</LinearLayout>
