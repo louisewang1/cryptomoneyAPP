@@ -1,65 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="center">
+    android:layout_gravity="center"
+    android:orientation="vertical">
 
     <Button
         android:id="@+id/account_info"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:text="Account Info"
         android:layout_gravity="center_horizontal"
         android:layout_margin="20dp"
+        android:text="Account Info"
         android:textSize="25sp" />
 
     <Button
+        android:id="@+id/transfer"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:id="@+id/transfer"
         android:layout_gravity="center_horizontal"
+        android:layout_margin="20dp"
         android:text="Transfer"
-        android:textSize="30sp"
-        android:layout_margin="20dp" />
+        android:textSize="30sp" />
 
     <Button
         android:id="@+id/qrscan"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:layout_margin="20dp"
         android:text="QRscan"
-        android:layout_gravity="center_horizontal"
-        android:textSize="30sp" >
-    </Button>
+        android:textSize="30sp"></Button>
 
     <EditText
+        android:id="@+id/scan_result"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:id="@+id/scan_result"
-        android:hint="Scan result will be displayed here"
-        android:layout_margin="10dp" >
+        android:layout_margin="10dp"
+        android:hint="Scan result will be displayed here">
 
     </EditText>
+
     <Button
         android:id="@+id/print"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:layout_margin="20dp"
         android:text="print"
-        android:layout_gravity="center_horizontal"
-        android:textSize="30sp" >
-    </Button>
+        android:textSize="30sp"></Button>
 
     <Button
         android:id="@+id/sql"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:layout_margin="20dp"
         android:text="MySQL"
-        android:textSize="30sp"
-        android:layout_gravity="center_horizontal" >
-    </Button>
+        android:textSize="30sp"></Button>
 
 </LinearLayout>

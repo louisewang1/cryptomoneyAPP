@@ -1,25 +1,34 @@
 package com.example.cryptomoney;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Handler;
+import android.os.Bundle;
+import android.os.Message;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import android.widget.TextView;
+import android.annotation.SuppressLint;
+//import android.support.v7.app.AppCompatActivity;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.Toast;
-
 import com.google.zxing.activity.CaptureActivity;
 import com.google.zxing.util.Constant;
 
-import java.sql.DriverManager;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -36,6 +45,33 @@ public class MainActivity extends AppCompatActivity {
 
     private Button connsql;
 
+    //_________________________
+    private Button button,button_delete,button_insert,button_update;
+    private TextView textView;
+    private static final int TEST_USER_SELECT = 1;
+    int i =0,d=0,z=0;
+    private EditText editText,editText_update;
+    @SuppressLint("HandlerLeak")
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            String user;
+            switch (msg.what){
+                case TEST_USER_SELECT:
+                    Test test = (Test) msg.obj;
+                    user = test.getUser();
+                    int id = test.getId();
+                    System.out.println("***********");
+                    System.out.println("***********");
+                    System.out.println("id:"+id);
+                    System.out.println("user:"+user);
+
+                    textView.setText(user);
+                    break;
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,29 +81,40 @@ public class MainActivity extends AppCompatActivity {
         print = (Button) findViewById(R.id.print);
         account = (Button)  findViewById(R.id.account_info);
         transfer = (Button) findViewById(R.id.transfer);
-        connsql = (Button) findViewById(R.id.sql);
+        //connsql = (Button) findViewById(R.id.sql);
 
-        connsql.setOnClickListener(new View.OnClickListener() {
+        button = (Button) findViewById(R.id.sql);
+        //textView = (TextView) findViewById(R.id.tv_response);
+        //button_delete = (Button) findViewById(R.id.bt_delete);
+        //button_insert = (Button) findViewById(R.id.bt_insert);
+        //button_update = (Button) findViewById(R.id.bt_update);
+        //editText_update = (EditText) findViewById(R.id.ed_update);
+
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        Connection conn = null;
+                        conn =(Connection) DBOpenHelper.getConn();
+                        i = 1;
+                        String sql = "select name from test_one where id='"+i+"'";
+                        Statement st;
                         try {
-                            Class.forName("com.mysql.jdbc.Driver");
-                            java.sql.Connection cn= DriverManager.getConnection("jdbc:mysql://10.5.52.254/books","root","ziton");
-                            String sql="select B_Name from book";
-                            Statement st=(Statement)cn.createStatement();
-                            ResultSet rs=st.executeQuery(sql);
-                            while(rs.next()){
-                                String mybook=rs.getString("B_Name");
-                                Log.i("MainActivity",mybook);
+                            st = (Statement) conn.createStatement();
+                            ResultSet rs = st.executeQuery(sql);
+                            while (rs.next()){
+                                //因为查出来的数据试剂盒的形式，所以我们新建一个javabean存储
+                                Test test = new Test();
+                                test.setUser(rs.getString(1));
+                                Message msg = new Message();
+                                msg.what =TEST_USER_SELECT;
+                                msg.obj = test;
+                                handler.sendMessage(msg);
                             }
-                            cn.close();
                             st.close();
-                            rs.close();
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
+                            conn.close();
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
