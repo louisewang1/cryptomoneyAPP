@@ -9,6 +9,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,6 +18,11 @@ import android.widget.Toast;
 
 import com.google.zxing.activity.CaptureActivity;
 import com.google.zxing.util.Constant;
+
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import cn.memobird.gtx.GTX;
 
@@ -28,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private Button account;
     private Button transfer;
 
+    private Button connsql;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +45,37 @@ public class MainActivity extends AppCompatActivity {
         print = (Button) findViewById(R.id.print);
         account = (Button)  findViewById(R.id.account_info);
         transfer = (Button) findViewById(R.id.transfer);
+        connsql = (Button) findViewById(R.id.sql);
+
+        connsql.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Class.forName("com.mysql.jdbc.Driver");
+                            java.sql.Connection cn= DriverManager.getConnection("jdbc:mysql://10.5.52.254/books","root","ziton");
+                            String sql="select B_Name from book";
+                            Statement st=(Statement)cn.createStatement();
+                            ResultSet rs=st.executeQuery(sql);
+                            while(rs.next()){
+                                String mybook=rs.getString("B_Name");
+                                Log.i("MainActivity",mybook);
+                            }
+                            cn.close();
+                            st.close();
+                            rs.close();
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+        });
+
 
         qrscan.setOnClickListener(new View.OnClickListener() {
             @Override
