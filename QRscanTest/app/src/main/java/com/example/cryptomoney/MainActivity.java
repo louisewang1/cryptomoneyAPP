@@ -47,30 +47,30 @@ public class MainActivity extends AppCompatActivity {
 
     //_________________________
     private Button button,button_delete,button_insert,button_update;
-    private TextView textView;
-    private static final int TEST_USER_SELECT = 1;
-    int i =0,d=0,z=0;
-    private EditText editText,editText_update;
-    @SuppressLint("HandlerLeak")
-    private Handler handler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            String user;
-            switch (msg.what){
-                case TEST_USER_SELECT:
-                    Test test = (Test) msg.obj;
-                    user = test.getUser();
-                    int id = test.getId();
-                    System.out.println("***********");
-                    System.out.println("***********");
-                    System.out.println("id:"+id);
-                    System.out.println("user:"+user);
-
-                    textView.setText(user);
-                    break;
-            }
-        }
-    };
+//    private TextView textView;
+//    private static final int TEST_USER_SELECT = 1;
+//    int i =0,d=0,z=0;
+//    private EditText editText,editText_update;
+//    @SuppressLint("HandlerLeak")
+//    private Handler handler = new Handler(){
+//        @Override
+//        public void handleMessage(Message msg) {
+//            String user;
+//            switch (msg.what){
+//                case TEST_USER_SELECT:
+//                    Test test = (Test) msg.obj;
+//                    user = test.getUser();
+//                    int id = test.getId();
+//                    System.out.println("***********");
+//                    System.out.println("***********");
+//                    System.out.println("id:"+id);
+//                    System.out.println("user:"+user);
+//
+//                    textView.setText(user);
+//                    break;
+//            }
+//        }
+//    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,49 +81,7 @@ public class MainActivity extends AppCompatActivity {
         print = (Button) findViewById(R.id.print);
         account = (Button)  findViewById(R.id.account_info);
         transfer = (Button) findViewById(R.id.transfer);
-        //connsql = (Button) findViewById(R.id.sql);
-
-        button = (Button) findViewById(R.id.sql);
-        //textView = (TextView) findViewById(R.id.tv_response);
-        //button_delete = (Button) findViewById(R.id.bt_delete);
-        //button_insert = (Button) findViewById(R.id.bt_insert);
-        //button_update = (Button) findViewById(R.id.bt_update);
-        //editText_update = (EditText) findViewById(R.id.ed_update);
-
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Connection conn = null;
-                        conn =(Connection) DBOpenHelper.getConn();
-                        i = 1;
-                        String sql = "select name from test_one where id='"+i+"'";
-                        Statement st;
-                        try {
-                            st = (Statement) conn.createStatement();
-                            ResultSet rs = st.executeQuery(sql);
-                            while (rs.next()){
-                                //因为查出来的数据试剂盒的形式，所以我们新建一个javabean存储
-                                Test test = new Test();
-                                test.setUser(rs.getString(1));
-                                Message msg = new Message();
-                                msg.what =TEST_USER_SELECT;
-                                msg.obj = test;
-                                handler.sendMessage(msg);
-                            }
-                            st.close();
-                            conn.close();
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }).start();
-            }
-        });
-
-
+        final Intent intent_from_login = getIntent();
         qrscan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -148,8 +106,12 @@ public class MainActivity extends AppCompatActivity {
         account.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,AccountActivity.class);
-                startActivity(intent);
+                String username = intent_from_login.getStringExtra("username");
+                Double balance = intent_from_login.getDoubleExtra("balance",0);
+                Intent intent_to_account = new Intent(MainActivity.this,AccountActivity.class);
+                intent_to_account.putExtra("username",username);
+                intent_to_account.putExtra("balance",balance);
+                startActivity(intent_to_account);
             }
         });
 

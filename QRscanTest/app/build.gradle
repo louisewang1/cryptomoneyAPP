@@ -30,6 +30,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation files('libs/gtxlibrary-external-1.0.9.jar')
     implementation files('libs/armeabi/libBmpJniUtil.so')
+    implementation files('libs/mysql-connector-java-5.1.30-bin.jar')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
