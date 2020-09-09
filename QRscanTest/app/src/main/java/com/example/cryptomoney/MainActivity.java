@@ -107,10 +107,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String username = intent_from_login.getStringExtra("username");
+                String email = intent_from_login.getStringExtra("email");
+                String cellphone = intent_from_login.getStringExtra("cellphone");
                 Double balance = intent_from_login.getDoubleExtra("balance",0);
                 Intent intent_to_account = new Intent(MainActivity.this,AccountActivity.class);
                 intent_to_account.putExtra("username",username);
                 intent_to_account.putExtra("balance",balance);
+                intent_to_account.putExtra("email",email);
+                intent_to_account.putExtra("cellphone",cellphone);
                 startActivity(intent_to_account);
             }
         });

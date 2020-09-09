@@ -55,6 +55,8 @@ public class LoginActivity extends AppCompatActivity {
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.putExtra("username",(String) result[0]);
                             intent.putExtra("balance",(Double) result[1]);
+                            intent.putExtra("email",(String) result[2]);
+                            intent.putExtra("cellphone",(String) result[3]);
                             startActivity(intent);
                             finish();
                         } else {
@@ -77,7 +79,7 @@ public class LoginActivity extends AppCompatActivity {
         ResultSet rs = null;
 //        StringBuilder builder = new StringBuilder();
 //        builder = null;
-        Object[] result = new Object[2];
+        Object[] result = new Object[4];
         try {
             ps = (PreparedStatement) conn.prepareStatement(sql);
             ps.setString(1,username);
@@ -87,6 +89,8 @@ public class LoginActivity extends AppCompatActivity {
                 while(rs.next()){
                     result[0] = rs.getString("username");
                     result[1] = rs.getDouble("balance");
+                    result[2] = rs.getString("email");
+                    result[3] = rs.getString("cellphone");
                     return result;
                 }
             }
