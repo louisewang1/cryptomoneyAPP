@@ -49,14 +49,15 @@ public class LoginActivity extends AppCompatActivity {
                     public void run() {
                         conn = (Connection) DBOpenHelper.getConn();
                         // check username and pwd
-                        Object[] result = checkuser(conn,username,pwd);
-                        Log.d("LoginActivity","username: " +result[0] +" balance: " + result[1]);
+                        String[] result = checkuser(conn,username,pwd);
+                        Log.d("LoginActivity","username: " +result[0] +" pwd: " + result[1]);
                         if (result[0] != null && result[1] != null) {
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.putExtra("username",(String) result[0]);
-                            intent.putExtra("balance",(Double) result[1]);
-                            intent.putExtra("email",(String) result[2]);
-                            intent.putExtra("cellphone",(String) result[3]);
+                            intent.putExtra("pwd",(String) result[1]);
+//                            intent.putExtra("balance",(Double) result[1]);
+//                            intent.putExtra("email",(String) result[2]);
+//                            intent.putExtra("cellphone",(String) result[3]);
                             startActivity(intent);
                             finish();
                         } else {
@@ -73,13 +74,13 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    public static Object[] checkuser(Connection conn, String username, String pwd) {
+    public static String[] checkuser(Connection conn, String username, String pwd) {
         String sql = "select * from accountdb where username = ? and pwd = ?";
         PreparedStatement ps = null;
         ResultSet rs = null;
 //        StringBuilder builder = new StringBuilder();
 //        builder = null;
-        Object[] result = new Object[4];
+        String[] result = new String[4];
         try {
             ps = (PreparedStatement) conn.prepareStatement(sql);
             ps.setString(1,username);
@@ -88,9 +89,9 @@ public class LoginActivity extends AppCompatActivity {
             if (rs != null) {
                 while(rs.next()){
                     result[0] = rs.getString("username");
-                    result[1] = rs.getDouble("balance");
-                    result[2] = rs.getString("email");
-                    result[3] = rs.getString("cellphone");
+                    result[1] = rs.getString("pwd");
+//                    result[2] = rs.getString("email");
+//                    result[3] = rs.getString("cellphone");
                     return result;
                 }
             }

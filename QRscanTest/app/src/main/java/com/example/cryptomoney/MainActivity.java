@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Bundle;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,7 +16,6 @@ import android.annotation.SuppressLint;
 //import android.support.v7.app.AppCompatActivity;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -27,6 +27,7 @@ import androidx.core.content.ContextCompat;
 
 import com.google.zxing.activity.CaptureActivity;
 import com.google.zxing.util.Constant;
+import com.mysql.jdbc.PreparedStatement;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -44,6 +45,10 @@ public class MainActivity extends AppCompatActivity {
     private Button transfer;
 
     private Button connsql;
+
+    private Connection conn = null;
+    private String username;
+    private String pwd;
 
     //_________________________
     private Button button,button_delete,button_insert,button_update;
@@ -104,18 +109,39 @@ public class MainActivity extends AppCompatActivity {
         });
 
         account.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
-                String username = intent_from_login.getStringExtra("username");
-                String email = intent_from_login.getStringExtra("email");
-                String cellphone = intent_from_login.getStringExtra("cellphone");
-                Double balance = intent_from_login.getDoubleExtra("balance",0);
-                Intent intent_to_account = new Intent(MainActivity.this,AccountActivity.class);
-                intent_to_account.putExtra("username",username);
-                intent_to_account.putExtra("balance",balance);
-                intent_to_account.putExtra("email",email);
-                intent_to_account.putExtra("cellphone",cellphone);
-                startActivity(intent_to_account);
+                conn = (Connection) DBOpenHelper.getConn();
+                username = intent_from_login.getStringExtra("username");
+                pwd = intent_from_login.getStringExtra("pwd");
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        conn = (Connection) DBOpenHelper.getConn();
+                        // check username and pwd
+                        Object[] account_info = getInfo(conn,username,pwd);
+                        Intent intent_to_account = new Intent(MainActivity.this, AccountActivity.class);
+                        intent_to_account.putExtra("username",(String) username);
+                        intent_to_account.putExtra("balance", (Double) account_info[0]);
+                        intent_to_account.putExtra("email",(String) account_info[1]);
+                        intent_to_account.putExtra("cellphone",(String) account_info[2]);
+                        startActivity(intent_to_account);
+                        DBOpenHelper.closeConnection(conn);
+                    }
+                }).start();
+
+//                String username = intent_from_login.getStringExtra("username");
+//                String email = intent_from_login.getStringExtra("email");
+//                String cellphone = intent_from_login.getStringExtra("cellphone");
+//                Double balance = intent_from_login.getDoubleExtra("balance",0);
+//                Intent intent_to_account = new Intent(MainActivity.this,AccountActivity.class);
+//                intent_to_account.putExtra("username",username);
+//                intent_to_account.putExtra("balance",balance);
+//                intent_to_account.putExtra("email",email);
+//                intent_to_account.putExtra("cellphone",cellphone);
+//                startActivity(intent_to_account);
             }
         });
 
@@ -160,5 +186,49 @@ public class MainActivity extends AppCompatActivity {
         } catch (SecurityException e) {
             e.printStackTrace();
         }
+    }
+
+    private Object[] getInfo(Connection conn, String username, String pwd) {
+        String sql = "select * from accountdb where username = ? and pwd = ?";
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Object[] result = new Object[3];
+//        StringBuilder builder = new StringBuilder();
+//        builder = null;
+        try {
+            ps = (PreparedStatement) conn.prepareStatement(sql);
+            ps.setString(1,username);
+            ps.setString(2,pwd);
+
+            rs = ps.executeQuery();
+            if (rs != null) {
+                while(rs.next()){
+//                    Log.d("MainActivity",username + pwd);
+                    result[0] = rs.getDouble("balance");
+                    result[1] = rs.getString("email");
+                    result[2] = rs.getString("cellphone");
+                }
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (ps != null) {
+                if (ps != null) {
+                    try {
+                        ps.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (rs != null) {
+                    try {
+                        rs.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return result;
     }
 }
