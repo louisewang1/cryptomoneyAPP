@@ -23,7 +23,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:id="@+id/account"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:singleLine="true" />
     </LinearLayout>
 
     <LinearLayout
@@ -44,15 +45,34 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:id="@+id/password"
-            android:maxLines="1"/>
+            android:maxLines="1"
+            android:singleLine="true"
+            android:password="true"/>
     </LinearLayout>
 
-    <Button
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/login"
-        android:layout_gravity="center_horizontal"
-        android:text="Login" />
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/login"
+            android:layout_gravity="center_horizontal"
+            android:text="Login" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/register"
+            android:layout_gravity="center_horizontal"
+            android:text="Register" />
+
+    </LinearLayout>
+
+
 </LinearLayout>
 
 

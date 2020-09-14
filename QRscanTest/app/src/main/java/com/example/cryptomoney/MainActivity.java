@@ -15,6 +15,8 @@ import android.widget.TextView;
 import android.annotation.SuppressLint;
 //import android.support.v7.app.AppCompatActivity;
 
+import java.io.Serializable;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.zxing.Result;
 import com.google.zxing.activity.CaptureActivity;
 import com.google.zxing.util.Constant;
 import com.mysql.jdbc.PreparedStatement;
@@ -33,76 +36,64 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.memobird.gtx.GTX;
 
+import static java.sql.Types.DOUBLE;
+import static java.sql.Types.INTEGER;
+import static java.sql.Types.VARCHAR;
+
 public class MainActivity extends AppCompatActivity {
 
+    // 定义控件和全局变量初始化
     private Button qrscan;
     private Button print;
     private EditText scanreturn;
     private Button account;
     private Button transfer;
-
-    private Button connsql;
+    private Button transaction;
 
     private Connection conn = null;
-    private String username;
-    private String pwd;
+    private int account_id;
 
-    //_________________________
-    private Button button,button_delete,button_insert,button_update;
-//    private TextView textView;
-//    private static final int TEST_USER_SELECT = 1;
-//    int i =0,d=0,z=0;
-//    private EditText editText,editText_update;
-//    @SuppressLint("HandlerLeak")
-//    private Handler handler = new Handler(){
-//        @Override
-//        public void handleMessage(Message msg) {
-//            String user;
-//            switch (msg.what){
-//                case TEST_USER_SELECT:
-//                    Test test = (Test) msg.obj;
-//                    user = test.getUser();
-//                    int id = test.getId();
-//                    System.out.println("***********");
-//                    System.out.println("***********");
-//                    System.out.println("id:"+id);
-//                    System.out.println("user:"+user);
-//
-//                    textView.setText(user);
-//                    break;
-//            }
-//        }
-//    };
+    private static String timePattern = "yyyy-MM-dd HH:mm:ss";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // 绑定控件
         qrscan = (Button) findViewById(R.id.qrscan);
         print = (Button) findViewById(R.id.print);
         account = (Button)  findViewById(R.id.account_info);
         transfer = (Button) findViewById(R.id.transfer);
-        final Intent intent_from_login = getIntent();
+        transaction = (Button) findViewById(R.id.tr_detail);
+
+        // 获取从LoginActivity传入的account_id
+        Intent intent_from_login = getIntent();
+        account_id = intent_from_login.getIntExtra("account_id",0);
+
         qrscan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // 二维码扫码
-                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA)
+                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA)  // 检查运行时权限
                         != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(MainActivity.this,
-                            new String[] {Manifest.permission.CAMERA},Constant.REQ_PERM_CAMERA);
+                            new String[] {Manifest.permission.CAMERA},Constant.REQ_PERM_CAMERA);  // 申请照相权限
                 }else {
-                    openCamera();
+                    openCamera();  // 已拥有权限，进行二维码扫描
                 }
             }
         });
 
         print.setOnClickListener(new View.OnClickListener() {
             @Override
+            //TODO: 需要获得AK后测试
             public void onClick(View view) {
                 GTX.init(MainActivity.this,"");
             }
@@ -112,50 +103,56 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                conn = (Connection) DBOpenHelper.getConn();
-                username = intent_from_login.getStringExtra("username");
-                pwd = intent_from_login.getStringExtra("pwd");
-
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         conn = (Connection) DBOpenHelper.getConn();
-                        // check username and pwd
-                        Object[] account_info = getInfo(conn,username,pwd);
-                        Intent intent_to_account = new Intent(MainActivity.this, AccountActivity.class);
-                        intent_to_account.putExtra("username",(String) username);
-                        intent_to_account.putExtra("balance", (Double) account_info[0]);
-                        intent_to_account.putExtra("email",(String) account_info[1]);
-                        intent_to_account.putExtra("cellphone",(String) account_info[2]);
+                        Object[] account_info = DisplayInfo(conn,account_id);
+                        Intent intent_to_account = new Intent(MainActivity.this, AccountActivity.class); // 启动AccountActivity传入用户信息
+                        intent_to_account.putExtra("id",(Integer) account_info[0]);
+                        intent_to_account.putExtra("username",(String) account_info[1]);
+                        intent_to_account.putExtra("balance", (Double) account_info[2]);
+                        intent_to_account.putExtra("email",(String) account_info[3]);
+                        intent_to_account.putExtra("cellphone",(String) account_info[4]);
                         startActivity(intent_to_account);
-                        DBOpenHelper.closeConnection(conn);
+                        DBOpenHelper.closeConnection(conn);  //TODO: 避免每次都关闭连接再重新连接
                     }
                 }).start();
-
-//                String username = intent_from_login.getStringExtra("username");
-//                String email = intent_from_login.getStringExtra("email");
-//                String cellphone = intent_from_login.getStringExtra("cellphone");
-//                Double balance = intent_from_login.getDoubleExtra("balance",0);
-//                Intent intent_to_account = new Intent(MainActivity.this,AccountActivity.class);
-//                intent_to_account.putExtra("username",username);
-//                intent_to_account.putExtra("balance",balance);
-//                intent_to_account.putExtra("email",email);
-//                intent_to_account.putExtra("cellphone",cellphone);
-//                startActivity(intent_to_account);
             }
         });
 
         transfer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,TransferActivity.class);
+                Intent intent = new Intent(MainActivity.this,TransferActivity.class); // 启动TransferActivity,传入account_id
+                intent.putExtra("account_id",account_id);
                 startActivity(intent);
+            }
+        });
+
+        transaction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        conn = (Connection) DBOpenHelper.getConn();
+                        List<Record> recordList = TranDetail(conn,account_id);
+                        Intent intent = new Intent(MainActivity.this,TransactionActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("recordList", (Serializable) recordList);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                        DBOpenHelper.closeConnection(conn);
+                    }
+                }).start();
+
             }
         });
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {  //权限请求结果回调
         if (requestCode == Constant.REQ_PERM_CAMERA && grantResults.length > 0 &&
                 grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             openCamera();
@@ -180,55 +177,76 @@ public class MainActivity extends AppCompatActivity {
 
     private void openCamera() {
         try {
-            Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
-            startActivityForResult(intent, Constant.REQ_QR_CODE);
-//            startActivzity(intent);
+            Intent intent = new Intent(MainActivity.this, CaptureActivity.class);  // 启动CaptureActivity(开源)
+            startActivityForResult(intent, Constant.REQ_QR_CODE);  // 等待CaptureActivity回调扫描结果
         } catch (SecurityException e) {
             e.printStackTrace();
         }
     }
 
-    private Object[] getInfo(Connection conn, String username, String pwd) {
-        String sql = "select * from accountdb where username = ? and pwd = ?";
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        Object[] result = new Object[3];
-//        StringBuilder builder = new StringBuilder();
-//        builder = null;
+    private Object[] DisplayInfo(Connection conn,Integer account_id) {
+//        Log.d("LoginActivity","conn: " + conn);
+        if (conn == null) return null;
+        Object[] account_info = new Object[5];
+        account_info[0] = account_id;
+        CallableStatement cs = null;
         try {
-            ps = (PreparedStatement) conn.prepareStatement(sql);
-            ps.setString(1,username);
-            ps.setString(2,pwd);
-
-            rs = ps.executeQuery();
-            if (rs != null) {
-                while(rs.next()){
-//                    Log.d("MainActivity",username + pwd);
-                    result[0] = rs.getDouble("balance");
-                    result[1] = rs.getString("email");
-                    result[2] = rs.getString("cellphone");
-                }
-            }
-        }catch (SQLException e) {
+            cs =conn.prepareCall("{call display_info(?,?,?,?,?)}"); // 调用display_info(in account_id,out username, out balance, out email, out cellphone)
+            cs.setInt(1,account_id);
+            cs.registerOutParameter(2, VARCHAR);
+            cs.registerOutParameter(3, DOUBLE);
+            cs.registerOutParameter(4, VARCHAR);
+            cs.registerOutParameter(5, VARCHAR);
+            cs.execute();
+            if (cs.getString(2) == null) return null;  // 无匹配条目
+            account_info[1] = cs.getString(2);
+            account_info[2] = cs.getDouble(3);
+            account_info[3] = cs.getString(4);
+            account_info[4] = cs.getString(5);
+        } catch (Exception e){
             e.printStackTrace();
-        } finally {
-            if (ps != null) {
-                if (ps != null) {
-                    try {
-                        ps.close();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
+        }if (cs != null) {
+            try {
+                cs.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
-        return result;
+        return account_info;
+    }
+
+    private List<Record> TranDetail(Connection conn, Integer account_id) {
+        if (conn == null) return null;
+        List<Record> recordList = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat(timePattern);
+        CallableStatement cs = null;
+        ResultSet rs;
+        try {
+            cs =conn.prepareCall("{call tran_detail(?)}"); // 调用display_info(in account_id,out username, out balance, out email, out cellphone)
+            cs.setInt(1,account_id);
+            cs.execute();
+            rs = cs.getResultSet();
+            int index = 1;
+            while (rs.next()) {
+                Record record = new Record();
+                record.setIndex(index);
+                record.setFrom(rs.getInt("tr_from_account"));
+                record.setTo(rs.getInt("tr_to_account"));
+                record.setTime(sdf.format(rs.getTimestamp("tr_time")));
+                record.setValue(rs.getDouble("tr_value"));
+                recordList.add(record);
+                index ++;
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }if (cs != null) {
+            try {
+                cs.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return recordList;
     }
 }
