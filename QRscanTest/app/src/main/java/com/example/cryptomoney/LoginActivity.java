@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.TextView;
+
 
 import com.google.zxing.util.Constant;
 import com.mysql.jdbc.PreparedStatement;
@@ -33,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button login;  // click login button
     private Connection conn = null; // connection to mysql
     private Button register;
+    private TextView showResponse;
 
     public final static int TYPE_CONN_FAILED = -1;  // identify different error
     public final static int TYPE_LOGIN_FAILED = 0;
@@ -48,6 +51,8 @@ public class LoginActivity extends AppCompatActivity {
         passwordEdit = (EditText) findViewById(R.id.password);
         login = (Button) findViewById(R.id.login);
         register = (Button) findViewById(R.id.register);
+
+        showResponse = (TextView) findViewById(R.id.tv_show_response);
 
         register.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,6 +73,13 @@ public class LoginActivity extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        final String  response = LoginService.loginByPost(username,pwd);
+                        if(response != null){
+                            showResponse(response);
+                        }else{
+                            showResponse("Request Failed");
+                        }
+                        /*
                         conn = (Connection) DBOpenHelper.getConn(); // 建立与Mysql连接
                         int account_id = LoginCheck(conn,username,pwd);  // 匹配用户名密码，返回用户id
                         if (account_id != TYPE_LOGIN_FAILED && account_id != TYPE_CONN_FAILED) { // 匹配成功，匹配MainActivity，传入account_id
@@ -89,14 +101,24 @@ public class LoginActivity extends AppCompatActivity {
                                     Toast.makeText(LoginActivity.this, "connection failure", Toast.LENGTH_SHORT).show();
                                 }
                             });
-                        }
+                        } */
                     }
                 }).start();
             }
         });
     }
 
-    public static int LoginCheck(Connection conn, String username, String pwd) {
+    private void showResponse(final  String response) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                showResponse.setText(response);
+            }
+        });
+    }
+
+/*
+        public static int LoginCheck(Connection conn, String username, String pwd) {
 //        Log.d("LoginActivity","conn: " + conn);
         if (conn == null) return TYPE_CONN_FAILED;
         CallableStatement cs = null;
@@ -135,5 +157,5 @@ public class LoginActivity extends AppCompatActivity {
         super.onDestroy();
         //TODO:不同活动共享同一连接，如何传递？
         DBOpenHelper.closeConnection(conn);  // 关闭连接
-    }
+    } */
 }
