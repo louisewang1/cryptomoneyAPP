@@ -1,7 +1,9 @@
 package com.example.cryptomoney;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Bundle;
@@ -16,6 +18,9 @@ import android.annotation.SuppressLint;
 //import android.support.v7.app.AppCompatActivity;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -42,6 +47,8 @@ import java.util.List;
 
 import cn.memobird.gtx.GTX;
 
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static java.sql.Types.DOUBLE;
 import static java.sql.Types.INTEGER;
 import static java.sql.Types.VARCHAR;
@@ -59,12 +66,16 @@ public class MainActivity extends AppCompatActivity {
     private Connection conn = null;
     private int account_id;
 
+    final String AK = "c68d494c429349baa165fb3725b804d8";  //c6a5a445dc25490183f42088f4b78ccf
     private static String timePattern = "yyyy-MM-dd HH:mm:ss";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        closeAndroidPDialog();
+        init();
 
         // 绑定控件
         qrscan = (Button) findViewById(R.id.qrscan);
@@ -95,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             //TODO: 需要获得AK后测试
             public void onClick(View view) {
-                GTX.init(MainActivity.this,"");
+                startActivity(new Intent(MainActivity.this, BluetoothActivity.class));
             }
         });
 
@@ -248,5 +259,48 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return recordList;
+    }
+
+    private void init() {
+        GTX.init(getApplicationContext(), AK);
+        try {
+            PackageManager pm = getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(getPackageName(), PackageManager.GET_CONFIGURATIONS);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        GTX.exitApp();
+    }
+
+
+    /**
+     * android9.0 谷歌限制开发者调用非官方公开API 方法或接口(使用@hide注解的系统源码或反射)
+     * 解决debug模式下在国内版Android P上的提醒弹窗 (Detected problems with API compatibility)
+     */
+    private void closeAndroidPDialog() {
+        try {
+            Class aClass = Class.forName("android.content.pm.PackageParser$Package");
+            Constructor declaredConstructor = aClass.getDeclaredConstructor(String.class);
+            declaredConstructor.setAccessible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            Class cls = Class.forName("android.app.ActivityThread");
+            Method declaredMethod = cls.getDeclaredMethod("currentActivityThread");
+            declaredMethod.setAccessible(true);
+            Object activityThread = declaredMethod.invoke(null);
+            Field mHiddenApiWarningShown = cls.getDeclaredField("mHiddenApiWarningShown");
+            mHiddenApiWarningShown.setAccessible(true);
+            mHiddenApiWarningShown.setBoolean(activityThread, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

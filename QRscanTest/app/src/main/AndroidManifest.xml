@@ -46,6 +46,11 @@
         </service>
 
         <activity android:name="com.google.zxing.activity.CaptureActivity" />
+        <activity android:name=".BluetoothActivity">
+        </activity>
+        <activity android:name=".SettingActivity">
+        </activity>
+
     </application>
 
 </manifest>
