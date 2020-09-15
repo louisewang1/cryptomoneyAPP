@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import java.net.URLEncoder;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -86,30 +87,37 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
 
+                final String registerRequest = "request="+ URLEncoder.encode("register")+ "&username="+ URLEncoder.encode(username)
+                        +"&password=" +URLEncoder.encode(pwd) + "&email=" +URLEncoder.encode(email) +"&cellphone=" +URLEncoder.encode(cellphone);
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        conn = (Connection) DBOpenHelper.getConn();
-                        int result = AccountRegister(conn,username,pwd,email,cellphone);
-                        if (result == 1) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(RegisterActivity.this,"Register succeeded",Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                            Intent resultIntent = new Intent();
-                            resultIntent.putExtra("username",username);
-                            resultIntent.putExtra("pwd",pwd);
-                            RegisterActivity.this.setResult(RESULT_OK,resultIntent);
-                            finish();
-                        } else if (result == 0) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(RegisterActivity.this,"Username already existed",Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                        String response = PostService.Post(registerRequest);
+                        if (response != null) {
+                            Log.d("RegiterActivity","response:"+response);
+                            int result = Integer.parseInt(response);
+                            if (result == 1) {
+                                Log.d("RegiterActivity","response= "+response);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(RegisterActivity.this, "Register succeeded", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                Intent resultIntent = new Intent();
+                                resultIntent.putExtra("username", username);
+                                resultIntent.putExtra("pwd", pwd);
+                                RegisterActivity.this.setResult(RESULT_OK, resultIntent);
+                                finish();
+                            } else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(RegisterActivity.this, "Username already existed", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
                         }
                     }
                 }).start();
@@ -117,35 +125,5 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    private int AccountRegister(Connection conn,String username, String pwd, String email,String cellphone) {
-        if (conn == null) return TYPE_CONN_FAILED;
-        CallableStatement cs = null;
-        try {
-            cs =conn.prepareCall("{call account_register(?,?,?,?,?)}");
-            cs.setString(1, username);
-            cs.setString(2, pwd);
-            cs.setString(3, email);
-            cs.setString(4,cellphone);
-            cs.registerOutParameter(5,INTEGER);
-            cs.execute();
-            if (cs.getInt(5) == 1) return TYPE_REG_SUCCESS;
-        } catch (Exception e){
-            e.printStackTrace();
-        }if (cs != null) {
-            try {
-                cs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return TYPE_REG_FAILED;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        DBOpenHelper.closeConnection(conn);
     }
 }

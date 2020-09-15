@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import java.net.URLEncoder;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -23,7 +24,7 @@ public class TransferActivity extends AppCompatActivity {
     // 定义控件和全局变量初始化
     private ImageButton back;
     private Button transfer;
-    private int account_id;
+    private Integer account_id;
     private Connection conn = null;
 
     public final static int TYPE_CONN_FAILED = -1;
@@ -63,83 +64,63 @@ public class TransferActivity extends AppCompatActivity {
                 EditText to_account = (EditText) findViewById(R.id.to_account);
                 EditText amount = (EditText) findViewById(R.id.amount);
 
-                final int to_account_id = Integer.parseInt(to_account.getText().toString());  // 定义ExeTransaction传参
-                final double value = Double.parseDouble(amount.getText().toString());
-                final int from_account_id = account_id;
+                final Integer to_account_id = Integer.parseInt(to_account.getText().toString());  // 定义ExeTransaction传参
+                final Double value = Double.parseDouble(amount.getText().toString());
+                final Integer from_account_id = account_id;
 //                Log.d("TransferActivity","to account:" + to_account_id + "amount: " + value);
+
+                final String transferRequest ="request=" + URLEncoder.encode("transfer") + "&to_account="+ URLEncoder.encode(to_account_id.toString())
+                        +"&value="+ URLEncoder.encode(value.toString()) + "&from_account="+ URLEncoder.encode(from_account_id.toString());
 
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        conn = (Connection) DBOpenHelper.getConn();
-                        int tr_result = ExeTransaction(conn,from_account_id,to_account_id,value);
-                        switch (tr_result) {
-                            case TYPE_TR_SUCCESS:
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(TransferActivity.this,"transfer succeeded",Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                break;
-                            case TYPE_ID_FAILED:
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(TransferActivity.this,"Account Id doesn't exist",Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                break;
-                            case TYPE_SELF_FAILED:
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(TransferActivity.this,"Can't transfer to yourself",Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                break;
-                            case TYPE_AMOUNT_FAILED:
+                        final String response = PostService.Post(transferRequest);
+                        if (response != null) {
+                            int tr_result = Integer.parseInt(response);
+//                            Log.d("TransferActivity",""+tr_result);
+                            switch (tr_result) {
+                                case TYPE_TR_SUCCESS:
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            Toast.makeText(TransferActivity.this,"Not enough balance",Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(TransferActivity.this,"transfer succeeded",Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                     break;
-                            default:
-                                break;
+                                case TYPE_ID_FAILED:
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(TransferActivity.this,"Account Id doesn't exist",Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                    break;
+                                case TYPE_SELF_FAILED:
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(TransferActivity.this,"Can't transfer to yourself",Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                    break;
+                                case TYPE_AMOUNT_FAILED:
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Toast.makeText(TransferActivity.this,"Not enough balance",Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                        break;
+                                default:
+                                    break;
+                            }
                         }
-                        DBOpenHelper.closeConnection(conn);
+
                     }
                 }).start();
             }
         });
     }
 
-    private int ExeTransaction(Connection conn, Integer from_account_id, Integer to_account_id, Double value) {
-        if (conn == null) return TYPE_CONN_FAILED;
-        CallableStatement cs = null;
-        try {
-            cs =conn.prepareCall("{call exe_transaction(?,?,?,?)}");
-            cs.setInt(1, from_account_id);
-            cs.setInt(2, to_account_id);
-            cs.setDouble(3, value);
-            cs.registerOutParameter(4, INTEGER);
-            cs.execute();
-//            Log.d("MainActivity","transaction result: " + cs.getInt(4));
-            if (cs.getInt(4) == 1) return TYPE_TR_SUCCESS;
-            else if (cs.getInt(4) == 0) return TYPE_AMOUNT_FAILED;
-            else if (cs.getInt(4) == -1 ) return TYPE_ID_FAILED;
-            else if (cs.getInt(4) == -2) return TYPE_SELF_FAILED;
-        } catch (Exception e){
-            e.printStackTrace();
-        }if (cs != null) {
-            try {
-                cs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return TYPE_CONN_FAILED;
-    }
 }

@@ -10,8 +10,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBUtil{
-    private static Connection conn;
-    private static final String URL = "jdbc:mysql://192.168.1.7:3306/test";
+//    private static Connection conn;
+	private static Connection conn = null;
+    private static final String URL = "jdbc:mysql://192.168.1.5:3306/test";
     private static final String USERNAME = "user";
     private static final String PASSWORD = "user";
     static{
@@ -25,16 +26,19 @@ public class DBUtil{
     public static Connection getConn(){
         try{
             conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+//            System.out.println("连接成功");
         }
         catch (Exception e) {
             e.printStackTrace();
+//            System.out.println("连接失败");
         }
         return conn;
     }
-    public static void closeConn(){
+    public static void closeConn(Connection conn){
         if(conn != null){
             try {
                 conn.close();
+//                System.out.println("连接关闭");
             } catch (SQLException e) {
                 e.printStackTrace();
             }

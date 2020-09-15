@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -37,10 +38,14 @@ import com.google.zxing.activity.CaptureActivity;
 import com.google.zxing.util.Constant;
 import com.mysql.jdbc.PreparedStatement;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private Button transaction;
 
     private Connection conn = null;
-    private int account_id;
+    private Integer account_id;
 
     final String AK = "c68d494c429349baa165fb3725b804d8";  //c6a5a445dc25490183f42088f4b78ccf
     private static String timePattern = "yyyy-MM-dd HH:mm:ss";
@@ -114,19 +119,35 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
+
+                final String accountInfoRequest ="request=" + URLEncoder.encode("accountinfo") + "&id="+ URLEncoder.encode(account_id.toString());
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        conn = (Connection) DBOpenHelper.getConn();
-                        Object[] account_info = DisplayInfo(conn,account_id);
-                        Intent intent_to_account = new Intent(MainActivity.this, AccountActivity.class); // 启动AccountActivity传入用户信息
-                        intent_to_account.putExtra("id",(Integer) account_info[0]);
-                        intent_to_account.putExtra("username",(String) account_info[1]);
-                        intent_to_account.putExtra("balance", (Double) account_info[2]);
-                        intent_to_account.putExtra("email",(String) account_info[3]);
-                        intent_to_account.putExtra("cellphone",(String) account_info[4]);
-                        startActivity(intent_to_account);
-                        DBOpenHelper.closeConnection(conn);  //TODO: 避免每次都关闭连接再重新连接
+
+                        final String response = PostService.Post(accountInfoRequest);
+                        if (response != null) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                int id = jsonObject.getInt("id");
+                                String username = jsonObject.getString("username");
+                                Log.d("MainActivity",username);
+                                Double balance = jsonObject.getDouble("balance");
+                                String email = jsonObject.getString("email");
+                                String cellphone = jsonObject.getString("cellphone");
+
+                                Intent intent_to_account = new Intent(MainActivity.this, AccountActivity.class); // 启动AccountActivity传入用户信息
+                                intent_to_account.putExtra("id",id);
+                                intent_to_account.putExtra("username",username);
+                                intent_to_account.putExtra("balance", balance);
+                                intent_to_account.putExtra("email",email);
+                                intent_to_account.putExtra("cellphone",cellphone);
+                                startActivity(intent_to_account);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }).start();
             }
@@ -144,17 +165,40 @@ public class MainActivity extends AppCompatActivity {
         transaction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                final String transactionRequest ="request=" + URLEncoder.encode("transaction") + "&id="+ URLEncoder.encode(account_id.toString());
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        conn = (Connection) DBOpenHelper.getConn();
-                        List<Record> recordList = TranDetail(conn,account_id);
-                        Intent intent = new Intent(MainActivity.this,TransactionActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("recordList", (Serializable) recordList);
-                        intent.putExtras(bundle);
-                        startActivity(intent);
-                        DBOpenHelper.closeConnection(conn);
+                        final String response = PostService.Post(transactionRequest);
+                        if (response != null) {
+
+                            try {
+                                List<Record> recordList = new ArrayList<>();
+                                SimpleDateFormat sdf = new SimpleDateFormat(timePattern);
+                                JSONArray jsonArray = new JSONArray(response);
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    Record record = new Record();
+                                    record.setIndex(jsonObject.getInt("index"));
+                                    record.setFrom(jsonObject.getInt("from_account"));
+                                    record.setTo(jsonObject.getInt("to_account"));
+                                    record.setTime(jsonObject.getString( "time"));
+                                    record.setValue(jsonObject.getDouble("value"));
+                                    recordList.add(record);
+                                }
+
+                                Intent intent = new Intent(MainActivity.this,TransactionActivity.class);
+                                Bundle bundle = new Bundle();
+                                bundle.putSerializable("recordList", (Serializable) recordList);
+                                intent.putExtras(bundle);
+                                startActivity(intent);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }).start();
 
@@ -195,71 +239,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private Object[] DisplayInfo(Connection conn,Integer account_id) {
-//        Log.d("LoginActivity","conn: " + conn);
-        if (conn == null) return null;
-        Object[] account_info = new Object[5];
-        account_info[0] = account_id;
-        CallableStatement cs = null;
-        try {
-            cs =conn.prepareCall("{call display_info(?,?,?,?,?)}"); // 调用display_info(in account_id,out username, out balance, out email, out cellphone)
-            cs.setInt(1,account_id);
-            cs.registerOutParameter(2, VARCHAR);
-            cs.registerOutParameter(3, DOUBLE);
-            cs.registerOutParameter(4, VARCHAR);
-            cs.registerOutParameter(5, VARCHAR);
-            cs.execute();
-            if (cs.getString(2) == null) return null;  // 无匹配条目
-            account_info[1] = cs.getString(2);
-            account_info[2] = cs.getDouble(3);
-            account_info[3] = cs.getString(4);
-            account_info[4] = cs.getString(5);
-        } catch (Exception e){
-            e.printStackTrace();
-        }if (cs != null) {
-            try {
-                cs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return account_info;
-    }
-
-    private List<Record> TranDetail(Connection conn, Integer account_id) {
-        if (conn == null) return null;
-        List<Record> recordList = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat(timePattern);
-        CallableStatement cs = null;
-        ResultSet rs;
-        try {
-            cs =conn.prepareCall("{call tran_detail(?)}"); // 调用display_info(in account_id,out username, out balance, out email, out cellphone)
-            cs.setInt(1,account_id);
-            cs.execute();
-            rs = cs.getResultSet();
-            int index = 1;
-            while (rs.next()) {
-                Record record = new Record();
-                record.setIndex(index);
-                record.setFrom(rs.getInt("tr_from_account"));
-                record.setTo(rs.getInt("tr_to_account"));
-                record.setTime(sdf.format(rs.getTimestamp("tr_time")));
-                record.setValue(rs.getDouble("tr_value"));
-                recordList.add(record);
-                index ++;
-            }
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }if (cs != null) {
-            try {
-                cs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return recordList;
-    }
 
     private void init() {
         GTX.init(getApplicationContext(), AK);
