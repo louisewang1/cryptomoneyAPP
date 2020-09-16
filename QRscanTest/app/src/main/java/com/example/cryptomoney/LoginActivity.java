@@ -3,16 +3,20 @@ package com.example.cryptomoney;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
 
 import java.net.URLEncoder;
 import java.sql.Connection;
+import java.util.prefs.PreferenceChangeEvent;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -24,10 +28,15 @@ public class LoginActivity extends AppCompatActivity {
     private Connection conn = null; // connection to mysql
     private Button register;
     private TextView showResponse;
+    private CheckBox rememberPass;
 
     public final static int TYPE_CONN_FAILED = -1;  // identify different error
     public final static int TYPE_LOGIN_FAILED = 0;
     public final static int REG_CODE = 2;
+
+    // 本地存储记住密码
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +51,19 @@ public class LoginActivity extends AppCompatActivity {
 
         showResponse = (TextView) findViewById(R.id.tv_show_response);
 
+        // 记住密码
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
+        rememberPass = (CheckBox) findViewById(R.id.remember_pass);
+        boolean isRemember = pref.getBoolean("remember_password",false);
+        if (isRemember) {
+            // 自动填充
+            String account = pref.getString("account","");
+            String password = pref.getString("pwd","");
+            accountEdit.setText(account);
+            passwordEdit.setText(password);
+            rememberPass.setChecked(true);
+        }
+
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -54,14 +76,14 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                // 获取输入字符串
-                final String username = accountEdit.getText().toString();
-                final String pwd = passwordEdit.getText().toString();
-                final String loginRequest = "request="+ URLEncoder.encode("login")+ "&username="+ URLEncoder.encode(username)+"&password=" +URLEncoder.encode(pwd);
-
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        // 获取输入字符串
+                        final String username = accountEdit.getText().toString();
+                        final String pwd = passwordEdit.getText().toString();
+                        final String loginRequest = "request="+ URLEncoder.encode("login")+ "&username="+ URLEncoder.encode(username)+"&password=" +URLEncoder.encode(pwd);
+
 //                        final String  response = PostService.loginByPost(username,pwd);
                         String response = PostService.Post(loginRequest);
 //                        if(response != null){
@@ -72,7 +94,17 @@ public class LoginActivity extends AppCompatActivity {
                         if (response != null) {
                             int id = Integer.parseInt(response);
                             Log.d("LoginActivity","id="+id);
-                            if (id > 0) {
+                            if (id > 0) {  // 登录成功
+                                // 记住密码
+                                editor = pref.edit();
+                                if (rememberPass.isChecked()) {
+                                    editor.putBoolean("remember_password",true);
+                                    editor.putString("account",username);
+                                    editor.putString("pwd",pwd);
+                                } else {
+                                    editor.clear();
+                                }
+                                editor.apply();  //清除密码
                                 showResponse("id = " +response);
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 intent.putExtra("account_id",id);  //传递account_id

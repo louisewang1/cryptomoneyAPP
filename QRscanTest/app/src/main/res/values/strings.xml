@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">QRscanTest</string>
+    <string name="app_name">cryptomoneyAPP</string>
     <string name="hour_half">30分钟</string>
     <string name="hour_one">1小时</string>
     <string name="hour_two">2小时</string>

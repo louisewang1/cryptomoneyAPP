@@ -2,6 +2,7 @@ package com.example.cryptomoney;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -9,6 +10,7 @@ import android.os.Handler;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,7 +31,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -71,8 +75,9 @@ public class MainActivity extends AppCompatActivity {
     private Connection conn = null;
     private Integer account_id;
 
-    final String AK = "c68d494c429349baa165fb3725b804d8";  //c6a5a445dc25490183f42088f4b78ccf
+    final String AK = "c6a5a445dc25490183f42088f4b78ccf";
     private static String timePattern = "yyyy-MM-dd HH:mm:ss";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -252,16 +257,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        GTX.exitApp();
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return super.onKeyDown(keyCode, event);
     }
+
+    @Override
+
+    public void onBackPressed() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+        dialog.setTitle("Exit confirmation");
+        dialog.setMessage("Are you sure to exit?");
+        dialog.setCancelable(true);
+        dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                GTX.exitApp();
+                finish();
+            }
+        });
+        dialog.setNegativeButton("No", null);
+        dialog.show();
+    }
+
 
 
     /**
      * android9.0 谷歌限制开发者调用非官方公开API 方法或接口(使用@hide注解的系统源码或反射)
      * 解决debug模式下在国内版Android P上的提醒弹窗 (Detected problems with API compatibility)
      */
+    //TODO: has error, need fix
     private void closeAndroidPDialog() {
         try {
             Class aClass = Class.forName("android.content.pm.PackageParser$Package");
@@ -282,4 +306,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+
+
 }
