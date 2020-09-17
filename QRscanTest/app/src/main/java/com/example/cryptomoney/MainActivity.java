@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     // 定义控件和全局变量初始化
     private Button qrscan;
     private Button print;
+    private Button NFC_read;
     private EditText scanreturn;
     private Button account;
     private Button transfer;
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 绑定控件
         qrscan = (Button) findViewById(R.id.qrscan);
+        NFC_read = (Button) findViewById(R.id.nfctag);
         print = (Button) findViewById(R.id.print);
         account = (Button)  findViewById(R.id.account_info);
         transfer = (Button) findViewById(R.id.transfer);
@@ -109,6 +111,14 @@ public class MainActivity extends AppCompatActivity {
                 }else {
                     openCamera();  // 已拥有权限，进行二维码扫描
                 }
+            }
+        });
+
+        NFC_read.setOnClickListener(new View.OnClickListener() {
+            @Override
+            //TODO: 需要获得AK后测试
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, NFCActivity.class));
             }
         });
 
