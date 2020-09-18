@@ -29,19 +29,42 @@
             android:layout_weight="1" ></Button>
     </LinearLayout>
 
+
     <ImageView
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:id="@+id/qrimg"
-        android:layout_gravity="center_horizontal">
+        android:outlineSpotShadowColor="@color/colorPrimary"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/bg_border">
         </ImageView>
 
-    <Button
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/search"
+            android:text="search device"> </Button>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/print"
+            android:layout_gravity='right'
+            android:text="print"> </Button>
+
+    </LinearLayout>
+
+
+    <ListView
+        android:id="@+id/lv_device"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/print"
-        android:layout_gravity="center_horizontal"
-        android:text="print QR" ></Button>
+        android:divider="@null">
+    </ListView>
 
 
 

@@ -11,6 +11,10 @@ android {
         versionCode 1
         versionName "1.0"
 
+        ndk {
+            abiFilters 'armeabi'
+        }
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -18,6 +22,12 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
         }
     }
 }
@@ -31,6 +41,7 @@ dependencies {
     implementation files('libs/gtxlibrary-external-1.0.9.jar')
     implementation files('libs/armeabi/libBmpJniUtil.so')
     implementation files('libs/mysql-connector-java-5.1.30-bin.jar')
+    implementation 'com.yanzhenjie:permission:1.0.9'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

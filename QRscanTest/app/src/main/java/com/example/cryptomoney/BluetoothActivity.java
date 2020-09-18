@@ -93,15 +93,15 @@ public class BluetoothActivity extends AppCompatActivity {
         btPrint = findViewById(R.id.bt_print);
         btBluetoothSearch = findViewById(R.id.bt_bluetooth);
         btGetImage = findViewById(R.id.bt_images);
-        btFilterNext = findViewById(R.id.bt_filter_next);
-        btSetting = findViewById(R.id.bt_setting);
-        sWordModel = findViewById(R.id.s_word_model);
-        sImageModel = findViewById(R.id.s_image_model);
-        sMixingModel = findViewById(R.id.s_mixing_model);
-        etText = findViewById(R.id.et_Text);
+//        btFilterNext = findViewById(R.id.bt_filter_next);
+//        btSetting = findViewById(R.id.bt_setting);
+//        sWordModel = findViewById(R.id.s_word_model);
+//        sImageModel = findViewById(R.id.s_image_model);
+//        sMixingModel = findViewById(R.id.s_mixing_model);
+//        etText = findViewById(R.id.et_Text);
         tvSelectDevice = findViewById(R.id.tv_select_device);
-        tvFilterName = findViewById(R.id.tv_filter_name);
-        ivImageProcess = findViewById(R.id.iv_image_process);
+//        tvFilterName = findViewById(R.id.tv_filter_name);
+//        ivImageProcess = findViewById(R.id.iv_image_process);
         lvDevices = findViewById(R.id.lv_device);
 
     }

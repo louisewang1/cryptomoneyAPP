@@ -91,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
         // 绑定控件
         qrscan = (Button) findViewById(R.id.qrscan);
         NFC_read = (Button) findViewById(R.id.nfctag);
-        print = (Button) findViewById(R.id.print);
         account = (Button)  findViewById(R.id.account_info);
         transfer = (Button) findViewById(R.id.transfer);
         transaction = (Button) findViewById(R.id.tr_detail);
@@ -129,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, NFCActivity.class));
             }
         });
-
 
 
         account.setOnClickListener(new View.OnClickListener() {
