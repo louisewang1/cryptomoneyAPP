@@ -72,11 +72,12 @@ public class MainActivity extends AppCompatActivity {
     private Button account;
     private Button transfer;
     private Button transaction;
+    private Button qrgenerate;
 
     private Connection conn = null;
     private Integer account_id;
 
-    final String AK = "c6a5a445dc25490183f42088f4b78ccf";
+
     private static String timePattern = "yyyy-MM-dd HH:mm:ss";
 
 
@@ -85,8 +86,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        closeAndroidPDialog();
-        init();
+
 
         // 绑定控件
         qrscan = (Button) findViewById(R.id.qrscan);
@@ -95,10 +95,18 @@ public class MainActivity extends AppCompatActivity {
         account = (Button)  findViewById(R.id.account_info);
         transfer = (Button) findViewById(R.id.transfer);
         transaction = (Button) findViewById(R.id.tr_detail);
+        qrgenerate = (Button) findViewById(R.id.qrgenerate);
 
         // 获取从LoginActivity传入的account_id
         Intent intent_from_login = getIntent();
         account_id = intent_from_login.getIntExtra("account_id",0);
+
+        qrgenerate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, QRgeneratorActivity.class));
+            }
+        });
 
         qrscan.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,13 +130,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        print.setOnClickListener(new View.OnClickListener() {
-            @Override
-            //TODO: 需要获得AK后测试
-            public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, BluetoothActivity.class));
-            }
-        });
+
 
         account.setOnClickListener(new View.OnClickListener() {
 
@@ -255,24 +257,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void init() {
-        GTX.init(getApplicationContext(), AK);
-        try {
-            PackageManager pm = getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(getPackageName(), PackageManager.GET_CONFIGURATIONS);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-    }
-
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        return super.onKeyDown(keyCode, event);
-    }
-
-    @Override
-
     public void onBackPressed() {
         AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
         dialog.setTitle("Exit confirmation");
@@ -289,33 +274,6 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-
-
-    /**
-     * android9.0 谷歌限制开发者调用非官方公开API 方法或接口(使用@hide注解的系统源码或反射)
-     * 解决debug模式下在国内版Android P上的提醒弹窗 (Detected problems with API compatibility)
-     */
-    //TODO: has error, need fix
-    private void closeAndroidPDialog() {
-        try {
-            Class aClass = Class.forName("android.content.pm.PackageParser$Package");
-            Constructor declaredConstructor = aClass.getDeclaredConstructor(String.class);
-            declaredConstructor.setAccessible(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            Class cls = Class.forName("android.app.ActivityThread");
-            Method declaredMethod = cls.getDeclaredMethod("currentActivityThread");
-            declaredMethod.setAccessible(true);
-            Object activityThread = declaredMethod.invoke(null);
-            Field mHiddenApiWarningShown = cls.getDeclaredField("mHiddenApiWarningShown");
-            mHiddenApiWarningShown.setAccessible(true);
-            mHiddenApiWarningShown.setBoolean(activityThread, true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
 
 
