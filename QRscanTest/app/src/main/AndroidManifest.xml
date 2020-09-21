@@ -27,7 +27,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".QRgeneratorActivity"></activity>
+        <activity android:name=".QRgeneratorActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".TransactionActivity" />
         <activity android:name=".TransferActivity" />
@@ -42,15 +42,8 @@
         <activity
             android:name=".MainActivity"
             android:label="cryptomoneyAPP" />
-        <activity android:name=".NFCActivity">
-            <intent-filter>
-                <action android:name="android.nfc.action.TAG_DISCOVERED" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="*/*" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".NFCRWActivity"> </activity>
 
         <service
             android:name="cn.memobird.gtx.task.GtxService"
@@ -64,8 +57,6 @@
         </service>
 
         <activity android:name="com.google.zxing.activity.CaptureActivity" />
-        <activity android:name=".BluetoothActivity"></activity>
-        <activity android:name=".SettingActivity"></activity>
     </application>
 
 </manifest>

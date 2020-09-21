@@ -105,13 +105,13 @@ public class QRgeneratorActivity extends AppCompatActivity {
                 if (ContextCompat.checkSelfPermission(QRgeneratorActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)  // 检查运行时权限
                         != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(QRgeneratorActivity.this,
-                            new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, REQ_LOC);  // 申请精确定位权限
+                            new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, REQ_LOC);  // 申请定位权限
                 }else {
                     devices.clear();
                     deviceListAdapter.notifyDataSetChanged();
                     if (mDialog != null)
                         mDialog.show();
-                    // 设备搜素
+                    //设备搜索
                     GTX.searchBluetoothDevices(onBluetoothFindListener, mDialog);
                 }
 
@@ -136,7 +136,7 @@ public class QRgeneratorActivity extends AppCompatActivity {
                     print();
                 }
                 else {
-                    Common.showShortToast(QRgeneratorActivity.this, "请连接设备！");
+                    Common.showShortToast(QRgeneratorActivity.this, "please connect to the printer first");
                 }
             }
         });
@@ -180,6 +180,11 @@ public class QRgeneratorActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {  //权限请求结果回调
         if (requestCode == REQ_LOC && grantResults.length > 0 &&
                 grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            devices.clear();
+            deviceListAdapter.notifyDataSetChanged();
+            if (mDialog != null)
+                mDialog.show();
+            GTX.searchBluetoothDevices(onBluetoothFindListener, mDialog);
         }
         else {
             Toast.makeText(this,"Permission denied",Toast.LENGTH_SHORT).show();
@@ -190,7 +195,7 @@ public class QRgeneratorActivity extends AppCompatActivity {
     private OnBluetoothFindListener onBluetoothFindListener = new OnBluetoothFindListener() {
         @Override
         public void returnResult(int taskCode, BluetoothDevice bluetoothDevice, short signal) {
-            Log.d("QRgeneratorActivity","taskcode:" +taskCode);
+//            Log.d("QRgeneratorActivity","taskcode:" +taskCode);
             if (mDialog != null)
                 mDialog.cancel();
             if (taskCode == GTXKey.RESULT.FIND_DEVICE_GET_ONE && bluetoothDevice != null) {     //搜索到一台设备
@@ -200,9 +205,9 @@ public class QRgeneratorActivity extends AppCompatActivity {
                 lvDevices.setVisibility(View.VISIBLE);
             } else if (taskCode == GTXKey.RESULT.FIND_DEVICE_FINISH_TASK) {     //搜索任务正常结束
                 if (devices.size() == 0) {
-                    Common.showShortToast(QRgeneratorActivity.this, "请确定设备是否开启或是否被其它手机连接！");
+                    Common.showShortToast(QRgeneratorActivity.this, "No available device");
                 } else {
-                    Common.showShortToast(QRgeneratorActivity.this, "设备搜索结束！");
+                    Common.showShortToast(QRgeneratorActivity.this, "device searching finished");
                 }
             } else {                                                            //其它异常
                 Common.showShortToast(QRgeneratorActivity.this, "Error " + taskCode);
@@ -226,7 +231,7 @@ public class QRgeneratorActivity extends AppCompatActivity {
                     Common.DEFAULT_IMAGE_WIDTH = Common.SIZE_384;
                 }
             } else if (taskCode == GTXKey.RESULT.COMMON_FAIL) {
-                Common.showShortToast(QRgeneratorActivity.this, "连接失败！");
+                Common.showShortToast(QRgeneratorActivity.this, "connection failed");
             } else {
                 Common.showShortToast(QRgeneratorActivity.this, "Error " + taskCode);
             }
@@ -238,7 +243,7 @@ public class QRgeneratorActivity extends AppCompatActivity {
         @Override
         public void returnResult(int taskCode) {
             if (taskCode == GTXKey.RESULT.COMMON_SUCCESS) {
-                Common.showShortToast(QRgeneratorActivity.this, "打印成功！");
+                Common.showShortToast(QRgeneratorActivity.this, "successfully printed");
             } else {
                 Log.d("QRgeneratorActivity","taskCode="+taskCode);
                 Common.showShortToast(QRgeneratorActivity.this, "Error " + taskCode);

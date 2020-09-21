@@ -134,7 +134,7 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
         final Uri uri = data.getData();
 
         mProgress = new ProgressDialog(CaptureActivity.this);
-        mProgress.setMessage("正在扫描...");
+        mProgress.setMessage("Scanning");
         mProgress.setCancelable(false);
         mProgress.show();
         runOnUiThread(new Runnable() {

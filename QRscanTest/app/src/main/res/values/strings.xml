@@ -1,37 +1,6 @@
 <resources>
     <string name="app_name">cryptomoneyAPP</string>
-    <string name="hour_half">30分钟</string>
-    <string name="hour_one">1小时</string>
-    <string name="hour_two">2小时</string>
-    <string name="hour_three">3小时</string>
-    <string name="hour_four">4小时</string>
-    <string name="hour_never">不关机</string>
-    <string name="unknown">未知</string>
-    <string name="unknown_error">未知错误</string>
-    <string name="electricity">电量</string>
-    <string name="print_low">淡色</string>
-    <string name="print_medium">适中</string>
-    <string name="print_high">加深</string>
 
-    <string-array name="led">
-        <item>开启</item>
-        <item>关闭</item>
-    </string-array>
-    <string-array name="print_deep">
-        <item>淡色</item>
-        <item>适中</item>
-        <item>加深</item>
-    </string-array>
-    <string-array name="auto_shutdown">
-        <item>10分钟</item>
-        <item>30分钟</item>
-        <item>60分钟</item>
-        <item>120分钟</item>
-        <item>160分钟</item>
-        <item>240分钟</item>
-    </string-array>
-    <string-array name="print_size">
-        <item>384px</item>
-        <item>576px</item>
-    </string-array>
+
+
 </resources>

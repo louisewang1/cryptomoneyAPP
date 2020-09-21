@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             //TODO: 需要获得AK后测试
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, NFCActivity.class));
+                startActivity(new Intent(MainActivity.this, NFCRWActivity.class));
             }
         });
 
