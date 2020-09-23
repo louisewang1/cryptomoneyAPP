@@ -6,6 +6,7 @@ import android.nfc.FormatException;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -42,6 +43,8 @@ public class NFCRWActivity extends AppCompatActivity {
     private String msgWrite = null;
     private EditText nfc_txt;
     private ImageButton back;
+
+    private Toast toast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,12 +100,18 @@ public class NFCRWActivity extends AppCompatActivity {
                 try {
                     nfcUtils.writeNFCToTag(msgWrite, intent);
 //                    Log.d("NFCRWActivity","finish writing");
-                    Toast.makeText(this,"write to NFC successfully.",Toast.LENGTH_SHORT).show();
+                    toast = Toast.makeText(this,"write to NFC successfully.",Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER,0,0);
+                    toast.show();
                 } catch (IOException e) {
-                    Toast.makeText(this,"write to NFC failed.",Toast.LENGTH_SHORT).show();
+                    toast = Toast.makeText(this,"write to NFC failed.",Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER,0,0);
+                    toast.show();
 //                    Log.d("NFCRWActivity","write to NFC failed：" + e.getMessage());
                 } catch (FormatException e) {
-                    Toast.makeText(this,"write to NFC failed.",Toast.LENGTH_SHORT).show();
+                    toast = Toast.makeText(this,"write to NFC failed.",Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER,0,0);
+                    toast.show();
 //                    Log.d("NFCRWActivity","write to NFC failed：" + e.getMessage());
                 } finally {
                     msgWrite = null;
@@ -111,6 +120,9 @@ public class NFCRWActivity extends AppCompatActivity {
 
             case Constant.NFC_READ:
                 String message = nfcUtils.readMessage(intent);
+                toast = Toast.makeText(this,"Read NFC successfully.",Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER,0,0);
+                toast.show();
 //                mDialog = new ReadDialog();
                 nfc_txt.setText(message);
 
