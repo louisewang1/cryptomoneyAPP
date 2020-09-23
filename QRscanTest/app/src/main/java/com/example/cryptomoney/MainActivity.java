@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,6 +32,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -64,9 +66,7 @@ import static java.sql.Types.VARCHAR;
 
 public class MainActivity extends AppCompatActivity {
 
-    // 定义控件和全局变量初始化
     private Button qrscan;
-    private Button print;
     private Button NFC_read;
     private EditText scanreturn;
     private Button account;
@@ -74,21 +74,22 @@ public class MainActivity extends AppCompatActivity {
     private Button transaction;
     private Button qrgenerate;
 
-    private Connection conn = null;
     private Integer account_id;
-
-
     private static String timePattern = "yyyy-MM-dd HH:mm:ss";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null)  {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false);
+        }
 
-
-        // 绑定控件
         qrscan = (Button) findViewById(R.id.qrscan);
         NFC_read = (Button) findViewById(R.id.nfctag);
         account = (Button)  findViewById(R.id.account_info);
@@ -96,11 +97,11 @@ public class MainActivity extends AppCompatActivity {
         transaction = (Button) findViewById(R.id.tr_detail);
         qrgenerate = (Button) findViewById(R.id.qrgenerate);
 
-        // 获取从LoginActivity传入的account_id
         Intent intent_from_login = getIntent();
         account_id = intent_from_login.getIntExtra("account_id",0);
 
         qrgenerate.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(MainActivity.this, QRgeneratorActivity.class));
@@ -108,34 +109,35 @@ public class MainActivity extends AppCompatActivity {
         });
 
         qrscan.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
-                // 二维码扫码
-                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA)  // 检查运行时权限
+
+                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA)
                         != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(MainActivity.this,
-                            new String[] {Manifest.permission.CAMERA},Constant.REQ_PERM_CAMERA);  // 申请照相权限
+                            new String[] {Manifest.permission.CAMERA},Constant.REQ_PERM_CAMERA);
                 }else {
-                    openCamera();  // 已拥有权限，进行二维码扫描
+                    openCamera();
                 }
             }
         });
 
         NFC_read.setOnClickListener(new View.OnClickListener() {
+
             @Override
-            //TODO: 需要获得AK后测试
             public void onClick(View view) {
+
                 startActivity(new Intent(MainActivity.this, NFCRWActivity.class));
             }
         });
 
-
         account.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View view) {
 
-                final String accountInfoRequest ="request=" + URLEncoder.encode("accountinfo") + "&id="+ URLEncoder.encode(account_id.toString());
+                final String accountInfoRequest ="request=" + URLEncoder.encode("accountinfo") +
+                        "&id="+ URLEncoder.encode(account_id.toString());
 
                 new Thread(new Runnable() {
                     @Override
@@ -207,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
                                 Intent intent = new Intent(MainActivity.this,TransactionActivity.class);
                                 Bundle bundle = new Bundle();
                                 bundle.putSerializable("recordList", (Serializable) recordList);
+                                bundle.putInt("account_id",account_id);
                                 intent.putExtras(bundle);
                                 startActivity(intent);
 
@@ -235,11 +238,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        //扫描结果回调
         if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_OK) {
             Bundle bundle = data.getExtras();
             String scanResult = bundle.getString(Constant.INTENT_EXTRA_KEY_QR_SCAN);
-            //将扫描出的信息显示出来
             scanreturn = (EditText) findViewById(R.id.scan_result);
             scanreturn.setText(scanResult);
         }
@@ -247,13 +248,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void openCamera() {
         try {
-            Intent intent = new Intent(MainActivity.this, CaptureActivity.class);  // 启动CaptureActivity(开源)
-            startActivityForResult(intent, Constant.REQ_QR_CODE);  // 等待CaptureActivity回调扫描结果
+            Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
+            startActivityForResult(intent, Constant.REQ_QR_CODE);
         } catch (SecurityException e) {
             e.printStackTrace();
         }
     }
-
 
     @Override
     public void onBackPressed() {
@@ -272,7 +272,13 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-
-
-
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+            default:
+        }
+        return true;
+    }
 }

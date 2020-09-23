@@ -1,11 +1,14 @@
 package com.example.cryptomoney;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -41,20 +44,13 @@ public class TransferActivity extends AppCompatActivity {
         Intent intent_from_main = getIntent(); // 获取account_id
         account_id = intent_from_main.getIntExtra("account_id",0);
 
-        // hide default toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
+        if (actionBar != null)  {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false);
         }
-
-        // 添加返回上一层按钮
-        back = (ImageButton) findViewById(com.google.zxing.R.id.btn_back);
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
 
         transfer = (Button) findViewById(R.id.transfer);
         transfer.setOnClickListener(new View.OnClickListener() {
@@ -121,6 +117,16 @@ public class TransferActivity extends AppCompatActivity {
                 }).start();
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+            default:
+        }
+        return true;
     }
 
 }

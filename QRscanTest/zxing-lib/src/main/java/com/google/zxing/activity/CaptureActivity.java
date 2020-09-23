@@ -1,5 +1,6 @@
 package com.google.zxing.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -13,7 +14,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
@@ -77,20 +81,29 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
         setContentView(R.layout.activity_scanner);
 
         // hide default toolbar
+//        ActionBar actionBar = getSupportActionBar();
+//        if (actionBar != null) {
+//            actionBar.hide();
+//        }
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
+        if (actionBar != null)  {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false);
         }
 
         CameraManager.init(getApplication());
         viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_content);
-        back = (ImageButton) findViewById(R.id.btn_back);
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+//        back = (ImageButton) findViewById(R.id.btn_back);
+//        back.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                finish();
+//            }
+//        });
+
+
 
         btnFlash = (ImageButton) findViewById(R.id.btn_flash);
         btnFlash.setOnClickListener(flashListener);
@@ -373,4 +386,14 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
             }
         }
     };
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+            default:
+        }
+        return true;
+    }
 }
