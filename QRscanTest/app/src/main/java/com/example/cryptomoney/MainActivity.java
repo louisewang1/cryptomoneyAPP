@@ -25,6 +25,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -73,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private Button transfer;
     private Button transaction;
     private Button qrgenerate;
+    private Button crypto;
 
     private Integer account_id;
     private static String timePattern = "yyyy-MM-dd HH:mm:ss";
@@ -96,9 +100,17 @@ public class MainActivity extends AppCompatActivity {
         transfer = (Button) findViewById(R.id.transfer);
         transaction = (Button) findViewById(R.id.tr_detail);
         qrgenerate = (Button) findViewById(R.id.qrgenerate);
+        crypto = (Button) findViewById(R.id.crypto);
 
         Intent intent_from_login = getIntent();
         account_id = intent_from_login.getIntExtra("account_id",0);
+
+        crypto.setOnClickListener(new View.OnClickListener() {  //send money and
+            @Override
+            public void onClick(View view) {
+                
+            }
+        });
 
         qrgenerate.setOnClickListener(new View.OnClickListener() {
 
@@ -281,4 +293,5 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
+
 }

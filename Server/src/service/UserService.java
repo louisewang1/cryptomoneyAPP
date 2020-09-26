@@ -26,8 +26,8 @@ public class UserService {
 	   return userDAO.displayinfo(conn,account_id);
    }
    
-   public int register(Connection conn,String username,String password, String email, String cellphone) {
-	   return userDAO.accountregister(conn,username,password,email,cellphone);
+   public int register(Connection conn,String username,String password, String email, String cellphone, String pk) {
+	   return userDAO.accountregister(conn,username,password,email,cellphone,pk);
    }
    
    public int transfer(Connection conn,int from_account, int to_account, double value) {

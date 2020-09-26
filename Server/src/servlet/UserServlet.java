@@ -84,7 +84,9 @@ public class UserServlet extends HttpServlet {
 				String password1 = request.getParameter("password");
 				String email = request.getParameter("email");
 				String cellphone = request.getParameter("cellphone");
-				response.getOutputStream().write(Integer.toString(userService.register(conn,username1, password1,email,cellphone)).getBytes("utf-8"));
+				String pk = request.getParameter("pk");
+				System.out.println("pk from client=" + pk);
+				response.getOutputStream().write(Integer.toString(userService.register(conn,username1, password1,email,cellphone,pk)).getBytes("utf-8"));
 				break;
 				
 			case "transfer":

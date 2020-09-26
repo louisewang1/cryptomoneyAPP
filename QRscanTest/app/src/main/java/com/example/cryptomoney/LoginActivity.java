@@ -108,7 +108,7 @@ public class LoginActivity extends AppCompatActivity {
                                 } else {
                                     editor.clear();
                                 }
-                                editor.apply();  //清除密码
+                                editor.apply();
                                 showResponse("id = " +response);
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 intent.putExtra("account_id",id);  //传递account_id

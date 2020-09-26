@@ -106,18 +106,19 @@ public class UserDAO {
       return account_info;
   }
 	
-	public int accountregister(Connection conn,String username, String pwd, String email,String cellphone) {
+	public int accountregister(Connection conn,String username, String pwd, String email,String cellphone, String pk) {
         CallableStatement cs = null;
         try {
 //        	Connection conn = DBUtil.getConn();
-            cs =conn.prepareCall("{call account_register(?,?,?,?,?)}");
+            cs =conn.prepareCall("{call account_register(?,?,?,?,?,?)}");
             cs.setString(1, username);
             cs.setString(2, pwd);
             cs.setString(3, email);
             cs.setString(4,cellphone);
-            cs.registerOutParameter(5,Types.INTEGER);
+            cs.setNString(5, pk);
+            cs.registerOutParameter(6,Types.INTEGER);
             cs.execute();
-            if (cs.getInt(5) == 1) return 1;  // success
+            if (cs.getInt(6) == 1) return 1;  // success
         } catch (Exception e){
             e.printStackTrace();
         }if (cs != null) {

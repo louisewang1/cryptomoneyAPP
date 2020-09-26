@@ -26,7 +26,7 @@ public class DBUtil{
     public static Connection getConn(){
         try{
             conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-//            System.out.println("连接成功");
+            System.out.println("连接成功");
         }
         catch (Exception e) {
             e.printStackTrace();
