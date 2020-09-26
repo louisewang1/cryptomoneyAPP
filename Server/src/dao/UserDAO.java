@@ -12,6 +12,7 @@ import java.util.List;
 import entity.UserInfo;
 import util.DBUtil;
 import entity.Record;
+import java.util.Random;
 
 public class UserDAO {
 	
@@ -21,6 +22,8 @@ public class UserDAO {
     public final static int TYPE_AMOUNT_FAILED = 0;
     public final static int TYPE_ID_FAILED = -2;
     public final static int TYPE_SELF_FAILED = -3;
+    public final static int TYPE_BALANCE_FAILED = -4;
+    public final static int TYPE_PK_FAILED = -5;
     
     private static String timePattern = "yyyy-MM-dd HH:mm:ss";
 	
@@ -192,6 +195,68 @@ public class UserDAO {
 	        }
 	        return recordList;
 	    }
+	 
+	 public String cryptotransfer(Connection conn, Integer account_id, Double value,String pk) {
+		 if (conn == null) return null;
+		 CallableStatement cs = null;
+		 String result = null;
+		 try {
+			 cs = conn.prepareCall("{call check_pk(?,?,?)}");
+			 cs.setInt(1, account_id);
+			 cs.setString(2, pk);
+			 cs.registerOutParameter(3,Types.INTEGER);
+			 cs.execute();
+			 if (cs.getInt(3) == 1) {  // pk matches
+				 cs = conn.prepareCall("{call check_balance(?,?,?)}");
+				 cs.setInt(1, account_id);
+				 cs.setDouble(2, value);
+				 cs.registerOutParameter(3, Types.INTEGER);
+				 cs.execute();
+				 if (cs.getInt(3) == 1) {  // balance enough
+					 String addr;
+					 do {
+//						 System.out.println("add a record");
+						 addr = getRandomString(100);  
+						 System.out.println("token address= " + addr);
+						 cs = conn.prepareCall("{call crypto_transfer(?,?,?,?)}");
+						 cs.setInt(1, account_id);
+						 cs.setDouble(2, value);
+						 cs.setString(3, addr);
+						 cs.registerOutParameter(4, Types.INTEGER);
+						 cs.execute();
+					 }while (cs.getInt(4) != 1);
+					 return result = addr;
+				 }
+				 else {
+					 result = "not enough balance";
+				 }
+			 } else {
+				 result = "pk doesn't match";
+			 } 
+		 } catch (Exception e){
+	            e.printStackTrace();
+	     }if (cs != null) {
+	    	 try {
+	    		 cs.close();
+	    	 } catch (SQLException e) {
+	                e.printStackTrace();
+	         }
+	     }
+	        return result;
+	 
+	 }
+	 
+	//generate random address
+	 public static String getRandomString(int length){
+	     String str="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	     Random random=new Random();
+	     StringBuffer sb=new StringBuffer();
+	     for(int i=0;i<length;i++){
+	       int number=random.nextInt(62);
+	       sb.append(str.charAt(number));
+	     }
+	     return sb.toString();
+	 }
 	
 }
 

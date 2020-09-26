@@ -37,4 +37,8 @@ public class UserService {
    public List<Record> transaction(Connection conn,int account_id) {
 	   return userDAO.trandetail(conn,account_id);
    }
+   
+   public String cryptomoney(Connection conn,int account_id,double value,String pk) {
+	   return userDAO.cryptotransfer(conn,account_id,value,pk);
+   }
 }

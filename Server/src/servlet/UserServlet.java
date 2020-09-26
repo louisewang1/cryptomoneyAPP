@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 
 import service.UserService;
+import util.Base64Utils;
 import util.DBUtil;
 import entity.Record;
 
@@ -85,7 +86,8 @@ public class UserServlet extends HttpServlet {
 				String email = request.getParameter("email");
 				String cellphone = request.getParameter("cellphone");
 				String pk = request.getParameter("pk");
-				System.out.println("pk from client=" + pk);
+				System.out.println("pk= " + pk);
+//				System.out.println("byte pk= " + Base64Utils.decode(pk));
 				response.getOutputStream().write(Integer.toString(userService.register(conn,username1, password1,email,cellphone,pk)).getBytes("utf-8"));
 				break;
 				
@@ -111,6 +113,13 @@ public class UserServlet extends HttpServlet {
 					array.put(object1);
 				}
 				response.getWriter().write(array.toString());
+				break;
+				
+			case "crypto":
+				int id2 = Integer.parseInt(request.getParameter("id"));
+				double value2 = Double.parseDouble(request.getParameter("value"));
+				String pk1 = request.getParameter("pk");
+				response.getOutputStream().write(userService.cryptomoney(conn, id2, value2, pk1).getBytes("utf-8"));
 				break;
 				
 			default:

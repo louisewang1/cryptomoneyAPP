@@ -12,7 +12,7 @@ import java.sql.SQLException;
 public class DBUtil{
 //    private static Connection conn;
 	private static Connection conn = null;
-    private static final String URL = "jdbc:mysql://192.168.1.5:3306/test";
+    private static final String URL = "jdbc:mysql://192.168.1.13:3306/test";
     private static final String USERNAME = "user";
     private static final String PASSWORD = "user";
     static{

@@ -99,26 +99,28 @@ public class MainActivity extends AppCompatActivity {
         account = (Button)  findViewById(R.id.account_info);
         transfer = (Button) findViewById(R.id.transfer);
         transaction = (Button) findViewById(R.id.tr_detail);
-        qrgenerate = (Button) findViewById(R.id.qrgenerate);
+//        qrgenerate = (Button) findViewById(R.id.qrgenerate);
         crypto = (Button) findViewById(R.id.crypto);
 
         Intent intent_from_login = getIntent();
         account_id = intent_from_login.getIntExtra("account_id",0);
 
-        crypto.setOnClickListener(new View.OnClickListener() {  //send money and
+        crypto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                
+                Intent intent = new Intent(MainActivity.this,CryptoActivity.class); // 启动TransferActivity,传入account_id
+                intent.putExtra("account_id",account_id);
+                startActivity(intent);
             }
         });
 
-        qrgenerate.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, QRgeneratorActivity.class));
-            }
-        });
+//        qrgenerate.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View view) {
+//                startActivity(new Intent(MainActivity.this, QRgeneratorActivity.class));
+//            }
+//        });
 
         qrscan.setOnClickListener(new View.OnClickListener() {
 

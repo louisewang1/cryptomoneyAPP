@@ -101,17 +101,22 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
 
-                keypair = RSAUtils.generateRSAKeyPair(1024);
+                keypair = RSAUtils.generateRSAKeyPair(256);
                 RSAPublicKey publicKey = (RSAPublicKey) keypair.getPublic();
                 RSAPrivateKey privateKey = (RSAPrivateKey) keypair.getPrivate();
 //                byte[] pk = pulicKey.getEncoded();
-                Log.d("RegisterActivity","pk exponent = "+publicKey.getEncoded());
+//                Log.d("RegisterActivity","byte pk = "+publicKey.getEncoded());
+//                Log.d("RegisterActivity","byte pk to string = "+publicKey.getEncoded().toString());
+//                Log.d("RegisterActivity","byte pk to string to byte = "+publicKey.getEncoded().toString().getBytes());
 //                String sk = Base64Utils.encode(publicKey.getEncoded());
-                Log.d("RegisterActivity","encoded = "+privateKey.getEncoded());
-                Log.d("RegisterActivity","sk exponent = "+privateKey.getPrivateExponent());
+//                Log.d("RegisterActivity","sk = "+Base64Utils.encode(privateKey.getEncoded()));
+//                Log.d("RegisterActivity","sk exponent= "+privateKey.getPrivateExponent());
+//                Log.d("RegisterActivity","pk= "+Base64Utils.encode(publicKey.getEncoded()));
+//                Log.d("RegisterActivity","Base64dec pk= "+Base64Utils.decode(Base64Utils.encode(publicKey.getEncoded())));
+//                Log.d("RegisterActivity","sk exponent = "+privateKey.getPrivateExponent());
 //                try {
 //                    RSAPrivateKey recovered = (RSAPrivateKey) RSAUtils.getPrivateKey(privateKey.getEncoded());
-//                    Log.d("RegisterActivity","recovered sk exponent = "+recovered.getPrivateExponent());
+//                    Log.d("RegisterActivity","sk exponent = "+recovered.getPrivateExponent());
 //                } catch (NoSuchAlgorithmException e) {
 //                    e.printStackTrace();
 //                } catch (InvalidKeySpecException e) {
@@ -121,22 +126,24 @@ public class RegisterActivity extends AppCompatActivity {
                 pref = PreferenceManager.getDefaultSharedPreferences(RegisterActivity.this);
                 editor = pref.edit();
                 editor.putString("pk",Base64Utils.encode(publicKey.getEncoded()));
-                editor.putString("sk",Base64Utils.encode(privateKey.getEncoded()));
+                editor.putString("sk",privateKey.getPrivateExponent().toString());
                 editor.apply();
 
                 final String registerRequest = "request="+ URLEncoder.encode("register")+ "&username="+ URLEncoder.encode(username)
                         +"&password=" +URLEncoder.encode(pwd) + "&email=" +URLEncoder.encode(email) +"&cellphone=" +URLEncoder.encode(cellphone)
-                        +"&pk=" +URLEncoder.encode(publicKey.getEncoded().toString());
+                        +"&pk=" +URLEncoder.encode(Base64Utils.encode(publicKey.getEncoded()));
+
+
 
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         String response = PostService.Post(registerRequest);
                         if (response != null) {
-                            Log.d("RegiterActivity","response:"+response);
+//                            Log.d("RegiterActivity","response:"+response);
                             int result = Integer.parseInt(response);
                             if (result == 1) {
-                                Log.d("RegiterActivity","response= "+response);
+//                                Log.d("RegiterActivity","response= "+response);
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {

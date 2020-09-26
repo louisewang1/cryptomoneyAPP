@@ -51,15 +51,15 @@
 
     </EditText>
 
-    <Button
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/qrgenerate"
-        android:text="QR generator"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="10dp"
-        android:textSize="25sp" >
-    </Button>
+<!--    <Button-->
+<!--        android:layout_width="200dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:id="@+id/qrgenerate"-->
+<!--        android:text="QR generator"-->
+<!--        android:layout_gravity="center_horizontal"-->
+<!--        android:layout_margin="10dp"-->
+<!--        android:textSize="25sp" >-->
+<!--    </Button>-->
 
     <Button
         android:id="@+id/nfctag"

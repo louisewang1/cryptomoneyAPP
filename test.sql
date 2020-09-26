@@ -29,17 +29,41 @@ CREATE TABLE `accountinfodb` (
 
 /*Data for the table `accountinfodb` */
 
+insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
+(1,'Alice',90,'00000@000.com','00000000');
+
+/*Table structure for table `cryptotransferdb` */
+
+CREATE TABLE `cryptotransferdb` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `account_id` int(11) NOT NULL,
+  `amount` double NOT NULL DEFAULT '0',
+  `crypto_time` datetime NOT NULL,
+  `address` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_cryptotransferdb_id` (`account_id`),
+  CONSTRAINT `fk_cryptotransferdb_id` FOREIGN KEY (`account_id`) REFERENCES `logindb` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+
+/*Data for the table `cryptotransferdb` */
+
+insert  into `cryptotransferdb`(`id`,`account_id`,`amount`,`crypto_time`,`address`) values 
+(1,1,10,'2020-09-26 21:39:58','y5Vp1xljftSp7moR0Bsuhpui03SyTj2kZjPsBthr81k6VhLbKXR8DZSTwzssiAO7h8GftYSwHcPdyJQdfjnqVUP7QNTvNs0sPaY5');
+
 /*Table structure for table `logindb` */
 
 CREATE TABLE `logindb` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL,
   `pwd` varchar(100) NOT NULL,
-  `pk` varchar(50) DEFAULT NULL,
+  `pk` varchar(500) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 /*Data for the table `logindb` */
+
+insert  into `logindb`(`id`,`username`,`pwd`,`pk`) values 
+(1,'Alice','00000','MDwwDQYJKoZIhvcNAQEBBQADKwAwKAIhAMIhtI9xJrUOn8eY5BE5vgbT9ezxmribLlooEiaydKXzAgMBAAE=');
 
 /*Table structure for table `transactiondb` */
 
@@ -61,7 +85,7 @@ CREATE TABLE `transactiondb` (
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `account_register`(IN username_ VARCHAR(50), IN pwd_ VARCHAR(100), IN email_ VARCHAR(100), IN cellphone_ VARCHAR(100), in pk_ varchar(50), OUT result_reg INT)
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `account_register`(IN username_ VARCHAR(50), IN pwd_ VARCHAR(100), IN email_ VARCHAR(100), IN cellphone_ VARCHAR(100), in pk_ varchar(500), OUT result_reg INT)
 label:BEGIN
 DECLARE account_id_ INT DEFAULT 0;
 SELECT id INTO account_id_ FROM logindb WHERE username = username_;
@@ -76,6 +100,59 @@ ELSE
     LEAVE label;
 END IF;
 END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `check_balance` */
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `check_balance`(in account_id_ int, in value_ double, out result int)
+label:begin
+DECLARE balance_ DOUBLE DEFAULT 0.0;
+SELECT balance INTO balance_ FROM accountinfodb WHERE account_id = account_id_;
+IF balance_ < value_ THEN 
+    SET result = 0; # 余额不足
+else 
+    set result = 1;
+END IF;   
+end */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `check_pk` */
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `check_pk`(in account_id_ int, in pk_ varchar(500), out result int)
+label:begin
+declare real_pk varchar(500);
+select pk into real_pk from logindb where id = account_id_;
+if real_pk <=> pk_ then
+    set result = 1;
+else 
+    set result = 0;
+end if;
+end */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `crypto_transfer` */
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `crypto_transfer`(IN account_id_ int, in value_ double, in addr_ varchar(100), out result int)
+label:begin
+DECLARE time_ DATETIME;
+declare addr_exist int default 1;
+SELECT COUNT(*) INTO addr_exist FROM cryptotransferdb WHERE address = addr_;
+if addr_exist = 0 then
+    SELECT NOW() INTO time_;
+    UPDATE accountinfodb SET balance = balance - value_ WHERE account_id = account_id_;
+    INSERT INTO cryptotransferdb(account_id,amount,crypto_time,address) VALUES(account_id_,value_,time_,addr_);
+    set result = 1;
+else 
+    set result = 0;
+    leave label;
+end if;
+end */$$
 DELIMITER ;
 
 /* Procedure structure for procedure `display_info` */
