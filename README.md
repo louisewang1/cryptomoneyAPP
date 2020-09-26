@@ -12,7 +12,7 @@
 9. 蓝牙连接打印机打印二维码  **蓝牙测试必须连接真机，否则无法搜索到设备**
 10. NFC读写  **NFC测试必须连接真机，否则模拟器闪退**
 11. 下拉刷新
-12. logindb新增pk字段，用户注册时自动生成RSA的pk,sk pk,sk加密保存在本地（不够安全？），pk同时添加到logindb中pk字段
+12. logindb新增pk字段，用户注册时自动生成RSA的pk,sk pk,sk加密保存在本地（不够安全？），pk同时加密添加到logindb中
  
 **未完成**
 1. Accessibility
