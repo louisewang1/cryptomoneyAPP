@@ -30,7 +30,7 @@ CREATE TABLE `accountinfodb` (
 /*Data for the table `accountinfodb` */
 
 insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
-(1,'Alice',90,'00000@000.com','00000000');
+(1,'Alice',85,'00000@000.com','00000000');
 
 /*Table structure for table `cryptotransferdb` */
 
@@ -43,12 +43,13 @@ CREATE TABLE `cryptotransferdb` (
   PRIMARY KEY (`id`),
   KEY `fk_cryptotransferdb_id` (`account_id`),
   CONSTRAINT `fk_cryptotransferdb_id` FOREIGN KEY (`account_id`) REFERENCES `logindb` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 
 /*Data for the table `cryptotransferdb` */
 
 insert  into `cryptotransferdb`(`id`,`account_id`,`amount`,`crypto_time`,`address`) values 
-(1,1,10,'2020-09-26 21:39:58','y5Vp1xljftSp7moR0Bsuhpui03SyTj2kZjPsBthr81k6VhLbKXR8DZSTwzssiAO7h8GftYSwHcPdyJQdfjnqVUP7QNTvNs0sPaY5');
+(1,1,10,'2020-09-26 21:39:58','y5Vp1xljftSp7moR0Bsuhpui03SyTj2kZjPsBthr81k6VhLbKXR8DZSTwzssiAO7h8GftYSwHcPdyJQdfjnqVUP7QNTvNs0sPaY5'),
+(2,1,5,'2020-09-27 10:23:11','IxQJI2AgYRiNbftJtD5sVK5U6cI7jucVB6KdEaLx4EMgO21NP19aAlqwpuQ9iKn3cQVhXZkE7lIRnmOyq0HNIa4WnXgr1EszH38n');
 
 /*Table structure for table `logindb` */
 
@@ -132,6 +133,16 @@ else
     set result = 0;
 end if;
 end */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `cryptotran_detail` */
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `cryptotran_detail`(IN account_id_ int)
+label:BEGIN
+SELECT amount,crypto_time,address FROM cryptotransferdb WHERE account_id = account_id_;
+END */$$
 DELIMITER ;
 
 /* Procedure structure for procedure `crypto_transfer` */
