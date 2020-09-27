@@ -60,6 +60,8 @@ public class QRgeneratorActivity extends AppCompatActivity {
     private Bitmap qrimage;
     private String base64ImageString;
     private List<BluetoothDevice> devices = new ArrayList<>();
+    private Double amount;
+    private String address;
 
     private final static int REQ_LOC = 10;
 
@@ -70,6 +72,12 @@ public class QRgeneratorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qr_generator);
 
+        amount = getIntent().getDoubleExtra("amount",0);
+        address = getIntent().getStringExtra("address");
+//        Log.d("QRgeneratorActivity","amount= "+amount);
+//        Log.d("QRgeneratorActivity","address= "+address);
+
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -78,12 +86,16 @@ public class QRgeneratorActivity extends AppCompatActivity {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
+
+
         qrstring = (EditText) findViewById(R.id.qrstring);
         generate = (Button) findViewById(R.id.generate);
         search = (Button) findViewById(R.id.search);
         qrimg = (ImageView) findViewById(R.id.qrimg);
         lvDevices = findViewById(R.id.lv_device);
         print = findViewById(R.id.print);
+
+        qrstring.setText("amount="+amount+"&address="+address);
 
         GTX.init(getApplicationContext(), AK);  //初始化
 
@@ -97,16 +109,17 @@ public class QRgeneratorActivity extends AppCompatActivity {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(QRgeneratorActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)  // 检查运行时权限
+                if (ContextCompat.checkSelfPermission(QRgeneratorActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)  // 检查运行时权限
                         != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(QRgeneratorActivity.this,
-                            new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, REQ_LOC);  // 申请定位权限
+                            new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQ_LOC);  // 申请定位权限,MUST BE FINE!
                 }else {
                     devices.clear();
                     deviceListAdapter.notifyDataSetChanged();
                     if (mDialog != null)
                         mDialog.show();
                     //设备搜索
+                    Log.d("QRgeneratorActivity","start searching");
                     GTX.searchBluetoothDevices(onBluetoothFindListener, mDialog);
                 }
 
@@ -128,7 +141,7 @@ public class QRgeneratorActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (GTX.getConnectDevice() != null) {
-                    print();
+                    printQR();
                 }
                 else {
                     Common.showShortToast(QRgeneratorActivity.this, "please connect to the printer first");
@@ -141,20 +154,31 @@ public class QRgeneratorActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String text = qrstring.getText().toString();
-                qrimage = QrCodeGenerator.getQrCodeImage(text,100,100);
+                qrimage = QrCodeGenerator.getQrCodeImage(text,200,200);
                 qrimg.setImageBitmap(qrimage);
             }
         });
 
     }
 
-    private void print() {
+    private void printQR() {
         GTX.doImageToDither(onDitherListener,qrimage,mDialog, Common.DEFAULT_IMAGE_WIDTH,true);
 //        GTX.doImageToDither(qrimage,mDialog,Common.DEFAULT_IMAGE_WIDTH,true);
-        Log.d("QRgeneratorActivity","string: "+base64ImageString);
-        if (base64ImageString != null) {
-            GTX.printImage(onPrintListener, base64ImageString, mDialog);
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Log.d("QRgeneratorActivity","string: "+base64ImageString);
+                if (base64ImageString != null) {
+                    GTX.printImage(onPrintListener, base64ImageString, mDialog);
+                }
+            }
+        }).start();
+
     }
 
      //图像处理结果OnImageToDitherListener
@@ -175,6 +199,7 @@ public class QRgeneratorActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {  //权限请求结果回调
         if (requestCode == REQ_LOC && grantResults.length > 0 &&
                 grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Log.d("QRgeneratorActivity","permission granted");
             devices.clear();
             deviceListAdapter.notifyDataSetChanged();
             if (mDialog != null)
@@ -182,6 +207,9 @@ public class QRgeneratorActivity extends AppCompatActivity {
             GTX.searchBluetoothDevices(onBluetoothFindListener, mDialog);
         }
         else {
+            if (mDialog != null)
+                mDialog.cancel();
+            Log.d("QRgeneratorActivity","permission granted");
             Toast.makeText(this,"Permission denied",Toast.LENGTH_SHORT).show();
         }
     }
@@ -190,7 +218,7 @@ public class QRgeneratorActivity extends AppCompatActivity {
     private OnBluetoothFindListener onBluetoothFindListener = new OnBluetoothFindListener() {
         @Override
         public void returnResult(int taskCode, BluetoothDevice bluetoothDevice, short signal) {
-//            Log.d("QRgeneratorActivity","taskcode:" +taskCode);
+            Log.d("QRgeneratorActivity","taskcode:" +taskCode);
             if (mDialog != null)
                 mDialog.cancel();
             if (taskCode == GTXKey.RESULT.FIND_DEVICE_GET_ONE && bluetoothDevice != null) {     //搜索到一台设备

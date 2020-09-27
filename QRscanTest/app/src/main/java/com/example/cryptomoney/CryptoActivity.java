@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.cryptomoney.utils.Base64Utils;
 
@@ -74,9 +75,7 @@ public class CryptoActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     response.setText("token address: " +addr);
-                                    Intent intent = new Intent(CryptoActivity.this,QRgeneratorActivity.class);
-                                    intent.putExtra("address",addr);
-                                    startActivity(intent);
+                                    Toast.makeText(CryptoActivity.this,"Crypto transfer succeeded",Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }

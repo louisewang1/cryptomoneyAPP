@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private Button transfer;
     private Button transaction;
     private Button qrgenerate;
+    private Button crypto_tr;
     private Button crypto;
 
     private Integer account_id;
@@ -101,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
         transaction = (Button) findViewById(R.id.tr_detail);
 //        qrgenerate = (Button) findViewById(R.id.qrgenerate);
         crypto = (Button) findViewById(R.id.crypto);
+        crypto_tr = (Button) findViewById(R.id.cryptotr_detail);
 
         Intent intent_from_login = getIntent();
         account_id = intent_from_login.getIntExtra("account_id",0);
@@ -111,6 +113,47 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this,CryptoActivity.class); // 启动TransferActivity,传入account_id
                 intent.putExtra("account_id",account_id);
                 startActivity(intent);
+            }
+        });
+
+        crypto_tr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final String cryptotransactionRequest ="request=" + URLEncoder.encode("cryptotransaction") + "&id="+ URLEncoder.encode(account_id.toString());
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final String response = PostService.Post(cryptotransactionRequest);
+                        if (response != null) {
+
+                            try {
+                                List<CryptoRecord> recordList = new ArrayList<>();
+//                                SimpleDateFormat sdf = new SimpleDateFormat(timePattern);
+                                JSONArray jsonArray = new JSONArray(response);
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    CryptoRecord record = new CryptoRecord();
+                                    record.setIndex(jsonObject.getInt("index"));
+                                    record.setAddr(jsonObject.getString("address"));
+                                    record.setTime(jsonObject.getString( "time"));
+                                    record.setValue(jsonObject.getDouble("value"));
+                                    recordList.add(record);
+                                }
+
+                                Intent intent = new Intent(MainActivity.this,CryptoTransactionActivity.class);
+                                Bundle bundle = new Bundle();
+                                bundle.putSerializable("recordList", (Serializable) recordList);
+                                bundle.putInt("account_id",account_id);
+                                intent.putExtras(bundle);
+                                startActivity(intent);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }).start();
             }
         });
 

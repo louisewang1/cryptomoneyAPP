@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--create a sub-layout for each item in listview-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.6"
+            android:id="@+id/index"
+            android:textSize="15sp"
+            android:layout_gravity="center_horizontal"
+            android:textAlignment="center" >
+        </TextView>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"
+            android:id="@+id/value"
+            android:textSize="15sp"
+            android:layout_gravity="center_horizontal"
+            android:textAlignment="center" >
+        </TextView>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:id="@+id/address"
+            android:textSize="15sp"
+            android:layout_gravity="center_horizontal"
+            android:textAlignment="center"  />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:id="@+id/time"
+            android:textSize="15sp"
+            android:layout_gravity="center_horizontal"
+            android:textAlignment="center"  >
+        </TextView>
+
+    </LinearLayout>
+
+</LinearLayout>

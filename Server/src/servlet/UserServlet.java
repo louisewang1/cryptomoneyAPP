@@ -18,6 +18,7 @@ import org.json.JSONArray;
 import service.UserService;
 import util.Base64Utils;
 import util.DBUtil;
+import entity.CryptoRecord;
 import entity.Record;
 
 
@@ -120,6 +121,22 @@ public class UserServlet extends HttpServlet {
 				double value2 = Double.parseDouble(request.getParameter("value"));
 				String pk1 = request.getParameter("pk");
 				response.getOutputStream().write(userService.cryptomoney(conn, id2, value2, pk1).getBytes("utf-8"));
+				break;
+				
+			case "cryptotransaction":
+				int id3 = Integer.parseInt(request.getParameter("id"));
+				List<CryptoRecord> result1 = userService.cryptotransaction(conn, id3);
+				JSONArray array1 = new JSONArray();
+				for (int i = 0; i<result1.size(); i++) {
+					JSONObject object1 = new JSONObject();
+					object1.put("index",result1.get(i).getIndex());
+					object1.put("address",result1.get(i).getAddr());
+					object1.put("time",result1.get(i).getTime());
+//					System.out.print(result.get(i).getTime());
+					object1.put("value",result1.get(i).getValue());
+					array1.put(object1);
+				}
+				response.getWriter().write(array1.toString());
 				break;
 				
 			default:

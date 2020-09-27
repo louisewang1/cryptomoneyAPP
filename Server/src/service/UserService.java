@@ -6,6 +6,7 @@ import java.util.List;
 import dao.UserDAO;
 import entity.UserInfo;
 import util.DBUtil;
+import entity.CryptoRecord;
 import entity.Record;
 
 public class UserService {
@@ -40,5 +41,9 @@ public class UserService {
    
    public String cryptomoney(Connection conn,int account_id,double value,String pk) {
 	   return userDAO.cryptotransfer(conn,account_id,value,pk);
+   }
+   
+   public List<CryptoRecord> cryptotransaction(Connection conn,int account_id) {
+	   return userDAO.cryptotrandetail(conn,account_id);
    }
 }

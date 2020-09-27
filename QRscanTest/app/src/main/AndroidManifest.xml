@@ -27,8 +27,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".CryptoActivity"></activity>
-        <activity android:name=".RSATestActivity"></activity>
+        <activity android:name=".CryptoTransactionActivity"></activity>
+        <activity android:name=".CryptoActivity" />
+        <activity android:name=".RSATestActivity" />
         <activity android:name=".QRgeneratorActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".TransactionActivity" />
@@ -41,7 +42,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
         <activity android:name=".NFCRWActivity" />
 
         <service

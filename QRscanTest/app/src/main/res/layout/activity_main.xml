@@ -19,7 +19,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="Account Info"
-        android:layout_margin="10dp"
         android:textSize="25sp" />
 
     <Button
@@ -28,7 +27,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="Transfer"
-        android:layout_margin="10dp"
         android:textSize="25sp" />
 
     <Button
@@ -37,7 +35,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="QRscan"
-        android:layout_margin="10dp"
         android:textSize="25sp"></Button>
 
     <EditText
@@ -45,7 +42,6 @@
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="10dp"
         android:hint="Scan result will be displayed here"
         android:singleLine="true">
 
@@ -67,7 +63,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="NFC"
-        android:layout_margin="10dp"
         android:textSize="25sp" />
 
 
@@ -85,7 +80,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="Transaction detail"
-        android:layout_margin="10dp"
         android:textSize="25sp"></Button>
 
     <Button
@@ -93,8 +87,15 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="crypto"
-        android:layout_margin="10dp"
+        android:text="crypto transfer"
+        android:textSize="25sp"></Button>
+
+    <Button
+        android:id="@+id/cryptotr_detail"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="crypto transaction detail"
         android:textSize="25sp"></Button>
 
 

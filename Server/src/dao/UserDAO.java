@@ -11,6 +11,7 @@ import java.util.List;
 
 import entity.UserInfo;
 import util.DBUtil;
+import entity.CryptoRecord;
 import entity.Record;
 import java.util.Random;
 
@@ -243,8 +244,41 @@ public class UserDAO {
 	         }
 	     }
 	        return result;
-	 
 	 }
+	 
+	 public List<CryptoRecord> cryptotrandetail(Connection conn, Integer account_id) {
+	        if (conn == null) return null;
+	        List<CryptoRecord> recordList = new ArrayList<>();
+	        SimpleDateFormat sdf = new SimpleDateFormat(timePattern);
+	        CallableStatement cs = null;
+	        ResultSet rs;
+	        try {
+	            cs =conn.prepareCall("{call cryptotran_detail(?)}"); // µ÷ÓÃdisplay_info(in account_id,out username, out balance, out email, out cellphone)
+	            cs.setInt(1,account_id);
+	            cs.execute();
+	            rs = cs.getResultSet();
+	            int index = 1;
+	            while (rs.next()) {
+	            	CryptoRecord record = new CryptoRecord();
+	                record.setIndex(index);
+	                record.setAddr(rs.getString("address"));
+	                record.setTime(sdf.format(rs.getTimestamp("crypto_time")));
+	                record.setValue(rs.getDouble("amount"));
+	                recordList.add(record);
+	                index ++;
+	            }
+
+	        } catch (Exception e){
+	            e.printStackTrace();
+	        }if (cs != null) {
+	            try {
+	                cs.close();
+	            } catch (SQLException e) {
+	                e.printStackTrace();
+	            }
+	        }
+	        return recordList;
+	    }
 	 
 	//generate random address
 	 public static String getRandomString(int length){
