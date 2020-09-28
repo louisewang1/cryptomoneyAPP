@@ -1,5 +1,9 @@
 package dao;
 
+import java.math.BigInteger;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.RSAPublicKeySpec;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -10,10 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import entity.UserInfo;
+import util.Base64Utils;
 import util.DBUtil;
+import util.RSAUtils;
 import entity.CryptoRecord;
 import entity.Record;
 import java.util.Random;
+
+import javax.crypto.Cipher;
 
 public class UserDAO {
 	
@@ -110,19 +118,20 @@ public class UserDAO {
       return account_info;
   }
 	
-	public int accountregister(Connection conn,String username, String pwd, String email,String cellphone, String pk) {
+	public int accountregister(Connection conn,String username, String pwd, String email,String cellphone, String pk,String modulus) {
         CallableStatement cs = null;
         try {
 //        	Connection conn = DBUtil.getConn();
-            cs =conn.prepareCall("{call account_register(?,?,?,?,?,?)}");
+            cs =conn.prepareCall("{call account_register(?,?,?,?,?,?,?)}");
             cs.setString(1, username);
             cs.setString(2, pwd);
             cs.setString(3, email);
             cs.setString(4,cellphone);
             cs.setNString(5, pk);
-            cs.registerOutParameter(6,Types.INTEGER);
+            cs.setNString(6, modulus);
+            cs.registerOutParameter(7,Types.INTEGER);
             cs.execute();
-            if (cs.getInt(6) == 1) return 1;  // success
+            if (cs.getInt(7) == 1) return 1;  // success
         } catch (Exception e){
             e.printStackTrace();
         }if (cs != null) {
@@ -197,17 +206,18 @@ public class UserDAO {
 	        return recordList;
 	    }
 	 
-	 public String cryptotransfer(Connection conn, Integer account_id, Double value,String pk) {
+	 public String cryptotransfer(Connection conn, Integer account_id, Double value,String modulus) {
 		 if (conn == null) return null;
 		 CallableStatement cs = null;
 		 String result = null;
 		 try {
-			 cs = conn.prepareCall("{call check_pk(?,?,?)}");
+			 cs = conn.prepareCall("{call check_modulus(?,?,?)}");
 			 cs.setInt(1, account_id);
-			 cs.setString(2, pk);
+			 System.out.println("modulus= "+modulus);
+			 cs.setString(2, modulus);
 			 cs.registerOutParameter(3,Types.INTEGER);
 			 cs.execute();
-			 if (cs.getInt(3) == 1) {  // pk matches
+			 if (cs.getInt(3) == 1) {  // modulus matches
 				 cs = conn.prepareCall("{call check_balance(?,?,?)}");
 				 cs.setInt(1, account_id);
 				 cs.setDouble(2, value);
@@ -217,7 +227,7 @@ public class UserDAO {
 					 String addr;
 					 do {
 //						 System.out.println("add a record");
-						 addr = getRandomString(100);  
+						 addr = getRandomString(20);  
 						 System.out.println("token address= " + addr);
 						 cs = conn.prepareCall("{call crypto_transfer(?,?,?,?)}");
 						 cs.setInt(1, account_id);
@@ -232,7 +242,7 @@ public class UserDAO {
 					 result = "not enough balance";
 				 }
 			 } else {
-				 result = "pk doesn't match";
+				 result = "modulus doesn't match";
 			 } 
 		 } catch (Exception e){
 	            e.printStackTrace();
@@ -279,6 +289,56 @@ public class UserDAO {
 	        }
 	        return recordList;
 	    }
+	 
+	 public String getcryptomoney(Connection conn,String id_enc, String addr) {
+		 if (conn == null) return null;
+		 CallableStatement cs = null;
+		 String result = null;
+		 try {
+			 cs = conn.prepareCall("{call addr_to_id(?,?)}");
+			 cs.setString(1, addr);
+			 cs.registerOutParameter(2,Types.INTEGER);
+			 cs.execute();
+			 Integer from_id = cs.getInt(2);
+			 if (from_id > 0) {  // from_id exists
+				 System.out.println("from_id= "+from_id);
+				 cs = conn.prepareCall("{call get_pk_N(?,?,?)}");
+				 cs.setInt(1, from_id);
+				 cs.registerOutParameter(2,Types.VARCHAR);
+				 cs.registerOutParameter(3,Types.VARCHAR);
+				 cs.execute();
+				 BigInteger pk_exp = new BigInteger(Base64Utils.decode(cs.getString(2)));
+				 BigInteger modulus = new BigInteger(Base64Utils.decode(cs.getString(3)));
+				 System.out.println("pk_exp= "+pk_exp);
+				 System.out.println("modulus= "+modulus);
+				 System.out.println("id_enc= "+id_enc);
+				 
+				 Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+			     KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+                 RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(modulus,pk_exp);
+                 PublicKey pk = keyFactory.generatePublic(rsaPublicKeySpec);
+                 
+				 cipher.init(Cipher.DECRYPT_MODE,pk);
+				 String id_dec = new String(cipher.doFinal(Base64Utils.decode(id_enc)));
+				 System.out.println("id_dec= "+id_dec);
+				 
+				 if (id_dec.startsWith("ACCOUNT=")) {
+					 result = "successfully decrypted";
+					 Integer to_id = Integer.parseInt(id_dec.split("=")[1]);
+					 System.out.println("to_id= "+to_id);
+				 }
+			 }
+		 } catch (Exception e){
+	            e.printStackTrace();
+	        }if (cs != null) {
+	            try {
+	                cs.close();
+	            } catch (SQLException e) {
+	                e.printStackTrace();
+	            }
+	        }
+	        return result;
+	 }
 	 
 	//generate random address
 	 public static String getRandomString(int length){

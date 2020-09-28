@@ -29,9 +29,6 @@ CREATE TABLE `accountinfodb` (
 
 /*Data for the table `accountinfodb` */
 
-insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
-(1,'Alice',85,'00000@000.com','00000000');
-
 /*Table structure for table `cryptotransferdb` */
 
 CREATE TABLE `cryptotransferdb` (
@@ -43,13 +40,9 @@ CREATE TABLE `cryptotransferdb` (
   PRIMARY KEY (`id`),
   KEY `fk_cryptotransferdb_id` (`account_id`),
   CONSTRAINT `fk_cryptotransferdb_id` FOREIGN KEY (`account_id`) REFERENCES `logindb` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Data for the table `cryptotransferdb` */
-
-insert  into `cryptotransferdb`(`id`,`account_id`,`amount`,`crypto_time`,`address`) values 
-(1,1,10,'2020-09-26 21:39:58','y5Vp1xljftSp7moR0Bsuhpui03SyTj2kZjPsBthr81k6VhLbKXR8DZSTwzssiAO7h8GftYSwHcPdyJQdfjnqVUP7QNTvNs0sPaY5'),
-(2,1,5,'2020-09-27 10:23:11','IxQJI2AgYRiNbftJtD5sVK5U6cI7jucVB6KdEaLx4EMgO21NP19aAlqwpuQ9iKn3cQVhXZkE7lIRnmOyq0HNIa4WnXgr1EszH38n');
 
 /*Table structure for table `logindb` */
 
@@ -58,13 +51,11 @@ CREATE TABLE `logindb` (
   `username` varchar(50) NOT NULL,
   `pwd` varchar(100) NOT NULL,
   `pk` varchar(500) NOT NULL,
+  `N` varchar(1000) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Data for the table `logindb` */
-
-insert  into `logindb`(`id`,`username`,`pwd`,`pk`) values 
-(1,'Alice','00000','MDwwDQYJKoZIhvcNAQEBBQADKwAwKAIhAMIhtI9xJrUOn8eY5BE5vgbT9ezxmribLlooEiaydKXzAgMBAAE=');
 
 /*Table structure for table `transactiondb` */
 
@@ -86,21 +77,34 @@ CREATE TABLE `transactiondb` (
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `account_register`(IN username_ VARCHAR(50), IN pwd_ VARCHAR(100), IN email_ VARCHAR(100), IN cellphone_ VARCHAR(100), in pk_ varchar(500), OUT result_reg INT)
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `account_register`(IN username_ VARCHAR(50), IN pwd_ VARCHAR(100), IN email_ VARCHAR(100), IN cellphone_ VARCHAR(100), IN pk_ VARCHAR(500), in n_ varchar(1000), OUT result INT)
 label:BEGIN
 DECLARE account_id_ INT DEFAULT 0;
 SELECT id INTO account_id_ FROM logindb WHERE username = username_;
 IF account_id_ = 0 THEN 
-    INSERT INTO logindb(username,pwd,pk) VALUES(username_,pwd_,pk_);
+    INSERT INTO logindb(username,pwd,pk,N) VALUES(username_,pwd_,pk_,n_);
     SELECT LAST_INSERT_ID() INTO account_id_;
     INSERT INTO accountinfodb(account_id,username) SELECT id,username FROM logindb WHERE id = account_id_;
     UPDATE accountinfodb SET email = email_, cellphone = cellphone_ WHERE account_id = account_id_ ;
-    SET result_reg = 1; # 注册成功
+    set result = 1; # 注册成功
+    leave label;
 ELSE 
-    SET result_reg = 0; # 用户名已存在 
+    SET result = 0; # 用户名已存在 
     LEAVE label;
 END IF;
 END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `addr_to_id` */
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `addr_to_id`(IN addr_ varchar(50), OUT result int)
+label:BEGIN
+Declare account_id_ int default 0;
+select account_id into account_id_ from cryptotransferdb where address = addr_;
+set result = account_id_;
+end */$$
 DELIMITER ;
 
 /* Procedure structure for procedure `check_balance` */
@@ -119,20 +123,20 @@ END IF;
 end */$$
 DELIMITER ;
 
-/* Procedure structure for procedure `check_pk` */
+/* Procedure structure for procedure `check_modulus` */
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `check_pk`(in account_id_ int, in pk_ varchar(500), out result int)
-label:begin
-declare real_pk varchar(500);
-select pk into real_pk from logindb where id = account_id_;
-if real_pk <=> pk_ then
-    set result = 1;
-else 
-    set result = 0;
-end if;
-end */$$
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `check_modulus`(IN account_id_ INT, IN N_ VARCHAR(500), OUT result INT)
+label:BEGIN
+DECLARE real_N VARCHAR(1000);
+SELECT N INTO real_N FROM logindb WHERE id = account_id_;
+IF real_N <=> N_ THEN
+    SET result = 1;
+ELSE 
+    SET result = 0;
+END IF;
+END */$$
 DELIMITER ;
 
 /* Procedure structure for procedure `cryptotran_detail` */
@@ -206,6 +210,17 @@ insert into transactiondb(account_id,tr_from_account,tr_to_account,tr_time,tr_va
 INSERT INTO transactiondb(account_id,tr_from_account,tr_to_account,tr_time,tr_value) vALUES(to_account_id,from_account_id,to_account_id,tr_time_,tr_value);
 set result = 1; # 转账成功
 end */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `get_pk_N` */
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `get_pk_N`(IN account_id_ INT, OUT pk_ VARCHAR(500), out N_ varchar(1000))
+label:BEGIN
+SELECT pk INTO pk_ FROM logindb WHERE id = account_id_;
+SELECT N INTO N_ FROM logindb WHERE id = account_id_;
+END */$$
 DELIMITER ;
 
 /* Procedure structure for procedure `login_check` */

@@ -31,7 +31,7 @@ public class CryptoActivity extends AppCompatActivity {
 
     private Integer account_id;
     private SharedPreferences pref;
-    private String pk;
+    private String modulus;
     private String value;
     public final static int ADDR_LENGTH = 100;
 
@@ -54,8 +54,8 @@ public class CryptoActivity extends AppCompatActivity {
         request = (Button) findViewById(R.id.request);
         response = (TextView) findViewById(R.id.response);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-        pk = pref.getString("pk","");
-        Log.d("CryptoActivity","string pk= "+pk);
+        modulus = pref.getString("modulus","");
+        Log.d("CryptoActivity","modulus= "+modulus);
 
         request.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,7 +63,7 @@ public class CryptoActivity extends AppCompatActivity {
                 value = amount.getText().toString();
 //                Log.d("CryptoActivity","value= "+value);
                 final String cryptoRequest ="request=" + URLEncoder.encode("crypto") + "&id="+ URLEncoder.encode(account_id.toString())
-                        +"&value="+ URLEncoder.encode(value) + "&pk="+ URLEncoder.encode(pk);
+                        +"&value="+ URLEncoder.encode(value) + "&N="+ URLEncoder.encode(modulus);
 
                 new Thread(new Runnable() {
                     @Override

@@ -87,9 +87,10 @@ public class UserServlet extends HttpServlet {
 				String email = request.getParameter("email");
 				String cellphone = request.getParameter("cellphone");
 				String pk = request.getParameter("pk");
-				System.out.println("pk= " + pk);
+				String modulus = request.getParameter("N");
+//				System.out.println("pk= " + pk);
 //				System.out.println("byte pk= " + Base64Utils.decode(pk));
-				response.getOutputStream().write(Integer.toString(userService.register(conn,username1, password1,email,cellphone,pk)).getBytes("utf-8"));
+				response.getOutputStream().write(Integer.toString(userService.register(conn,username1, password1,email,cellphone,pk,modulus)).getBytes("utf-8"));
 				break;
 				
 			case "transfer":
@@ -119,8 +120,8 @@ public class UserServlet extends HttpServlet {
 			case "crypto":
 				int id2 = Integer.parseInt(request.getParameter("id"));
 				double value2 = Double.parseDouble(request.getParameter("value"));
-				String pk1 = request.getParameter("pk");
-				response.getOutputStream().write(userService.cryptomoney(conn, id2, value2, pk1).getBytes("utf-8"));
+				String modulus1 = request.getParameter("N");
+				response.getOutputStream().write(userService.cryptomoney(conn, id2, value2, modulus1).getBytes("utf-8"));
 				break;
 				
 			case "cryptotransaction":
@@ -139,6 +140,10 @@ public class UserServlet extends HttpServlet {
 				response.getWriter().write(array1.toString());
 				break;
 				
+			case "getencrypto":
+				String id_enc = request.getParameter("id_enc");
+				String addr = request.getParameter("addr");
+				response.getOutputStream().write(userService.getcryptomoney(conn, id_enc, addr).getBytes("utf-8"));
 			default:
 				break;
 				

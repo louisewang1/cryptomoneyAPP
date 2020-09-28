@@ -21,34 +21,34 @@ public class PostService {
      * @param password
      * @return
      */
-    public static String loginByGet(String username,String password){
-        try {
-            //提交数据到服务器
-            //拼装路径
-            String path = "http://10.5.52.254:8080/WebServer/UserServlet?username="
-                    + URLEncoder.encode(username,"UTF-8") + "&password=" + URLEncoder.encode(password,"UTF-8");
-            URL url = new URL(path);
-
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();//打开连接
-
-            conn.setRequestMethod("GET");//设置请求方式为get
-
-            conn.setConnectTimeout(5000);//设置连接超时时间为5秒
-
-            int code = conn.getResponseCode();//获得请求码
-            if(code == 200){
-                InputStream is = conn.getInputStream();
-                String text = StreamTools.readInputStream(is);
-                return text;
-            }else{
-                return null;
-            }
-//            return null;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+//    public static String loginByGet(String username,String password){
+//        try {
+//            //提交数据到服务器
+//            //拼装路径
+//            String path = "http://10.5.52.254:8080/WebServer/UserServlet?username="
+//                    + URLEncoder.encode(username,"UTF-8") + "&password=" + URLEncoder.encode(password,"UTF-8");
+//            URL url = new URL(path);
+//
+//            HttpURLConnection conn = (HttpURLConnection) url.openConnection();//打开连接
+//
+//            conn.setRequestMethod("GET");//设置请求方式为get
+//
+//            conn.setConnectTimeout(5000);//设置连接超时时间为5秒
+//
+//            int code = conn.getResponseCode();//获得请求码
+//            if(code == 200){
+//                InputStream is = conn.getInputStream();
+//                String text = StreamTools.readInputStream(is);
+//                return text;
+//            }else{
+//                return null;
+//            }
+////            return null;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
 
     //这里提交的路径一定要写准确，填写你当前所在局域网的ip + 项目名 + Servlet Url

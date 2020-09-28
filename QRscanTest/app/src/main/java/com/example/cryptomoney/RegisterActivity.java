@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.example.cryptomoney.utils.Base64Utils;
 import com.example.cryptomoney.utils.RSAUtils;
 
+import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -30,9 +31,11 @@ import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.Array;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import static java.sql.Types.INTEGER;
 
@@ -101,39 +104,40 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
 
-                keypair = RSAUtils.generateRSAKeyPair(256);
+                keypair = RSAUtils.generateRSAKeyPair(512);
                 RSAPublicKey publicKey = (RSAPublicKey) keypair.getPublic();
                 RSAPrivateKey privateKey = (RSAPrivateKey) keypair.getPrivate();
-//                byte[] pk = pulicKey.getEncoded();
-//                Log.d("RegisterActivity","byte pk = "+publicKey.getEncoded());
-//                Log.d("RegisterActivity","byte pk to string = "+publicKey.getEncoded().toString());
-//                Log.d("RegisterActivity","byte pk to string to byte = "+publicKey.getEncoded().toString().getBytes());
-//                String sk = Base64Utils.encode(publicKey.getEncoded());
-//                Log.d("RegisterActivity","sk = "+Base64Utils.encode(privateKey.getEncoded()));
-//                Log.d("RegisterActivity","sk exponent= "+privateKey.getPrivateExponent());
-//                Log.d("RegisterActivity","pk= "+Base64Utils.encode(publicKey.getEncoded()));
-//                Log.d("RegisterActivity","Base64dec pk= "+Base64Utils.decode(Base64Utils.encode(publicKey.getEncoded())));
-//                Log.d("RegisterActivity","sk exponent = "+privateKey.getPrivateExponent());
+
+                // 注册成功后生成密钥对保存在sharedpreference中 //todo:不安全
+                String pk_enc = Base64Utils.encode(publicKey.getEncoded());
 //                try {
-//                    RSAPrivateKey recovered = (RSAPrivateKey) RSAUtils.getPrivateKey(privateKey.getEncoded());
-//                    Log.d("RegisterActivity","sk exponent = "+recovered.getPrivateExponent());
-//                } catch (NoSuchAlgorithmException e) {
-//                    e.printStackTrace();
-//                } catch (InvalidKeySpecException e) {
+//                    PublicKey pk2 = RSAUtils.loadPublicKey("MDwwDQYJKoZIhvcNAQEBBQADKwAwKAIhAL5J0bDBTANeWs/ITbAUisxsU1TNhx6Aw10w/NK44mulAgMBAAE=");
+//                    Log.d("RegisterActivity","pk2= "+pk2);
+//                } catch (Exception e) {
 //                    e.printStackTrace();
 //                }
-                // 注册成功后生成密钥对保存在sharedpreference中 //todo:不安全
+
+                String pk_exp = Base64Utils.encode(publicKey.getPublicExponent().toByteArray());
+                String sk_exp = Base64Utils.encode(privateKey.getPrivateExponent().toByteArray());
+                String modulus = Base64Utils.encode(publicKey.getModulus().toByteArray());
+
                 pref = PreferenceManager.getDefaultSharedPreferences(RegisterActivity.this);
                 editor = pref.edit();
-                editor.putString("pk",Base64Utils.encode(publicKey.getEncoded()));
-                editor.putString("sk",privateKey.getPrivateExponent().toString());
+                editor.putString("pk",pk_enc);
+                editor.putString("pk_exp",pk_exp);
+                editor.putString("sk_exp",sk_exp);
+                editor.putString("modulus",modulus);
                 editor.apply();
+
+                Log.d("MainActivity","pk= "+Base64Utils.encode(publicKey.getEncoded()));
+                Log.d("MainActivity","sk_exp= "+privateKey.getPrivateExponent().toString());
+                Log.d("MainActivity","pk_exp= "+pk_exp);
+                Log.d("MainActivity","N= "+privateKey.getModulus().toString());
+                Log.d("MainActivity","sk= "+Base64Utils.encode(privateKey.getEncoded()));
 
                 final String registerRequest = "request="+ URLEncoder.encode("register")+ "&username="+ URLEncoder.encode(username)
                         +"&password=" +URLEncoder.encode(pwd) + "&email=" +URLEncoder.encode(email) +"&cellphone=" +URLEncoder.encode(cellphone)
-                        +"&pk=" +URLEncoder.encode(Base64Utils.encode(publicKey.getEncoded()));
-
-
+                        +"&pk=" +URLEncoder.encode(pk_exp)+"&N=" +URLEncoder.encode(modulus);
 
                 new Thread(new Runnable() {
                     @Override
@@ -148,7 +152,6 @@ public class RegisterActivity extends AppCompatActivity {
                                     @Override
                                     public void run() {
                                         Toast.makeText(RegisterActivity.this, "Register succeeded", Toast.LENGTH_SHORT).show();
-
                                     }
                                 });
                                 Intent resultIntent = new Intent();

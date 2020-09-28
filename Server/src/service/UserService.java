@@ -27,8 +27,8 @@ public class UserService {
 	   return userDAO.displayinfo(conn,account_id);
    }
    
-   public int register(Connection conn,String username,String password, String email, String cellphone, String pk) {
-	   return userDAO.accountregister(conn,username,password,email,cellphone,pk);
+   public int register(Connection conn,String username,String password, String email, String cellphone, String pk,String modulus) {
+	   return userDAO.accountregister(conn,username,password,email,cellphone,pk,modulus);
    }
    
    public int transfer(Connection conn,int from_account, int to_account, double value) {
@@ -39,11 +39,15 @@ public class UserService {
 	   return userDAO.trandetail(conn,account_id);
    }
    
-   public String cryptomoney(Connection conn,int account_id,double value,String pk) {
-	   return userDAO.cryptotransfer(conn,account_id,value,pk);
+   public String cryptomoney(Connection conn,int account_id,double value,String modulus) {
+	   return userDAO.cryptotransfer(conn,account_id,value,modulus);
    }
    
    public List<CryptoRecord> cryptotransaction(Connection conn,int account_id) {
 	   return userDAO.cryptotrandetail(conn,account_id);
+   }
+   
+   public String getcryptomoney(Connection conn, String id_enc,String addr) {
+	   return userDAO.getcryptomoney(conn,id_enc,addr);
    }
 }

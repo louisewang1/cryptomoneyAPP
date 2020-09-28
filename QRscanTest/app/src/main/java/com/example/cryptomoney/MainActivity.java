@@ -4,11 +4,14 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Bundle;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -24,10 +27,19 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.net.URLEncoder;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -35,6 +47,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,6 +55,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.cryptomoney.utils.Base64Utils;
+import com.example.cryptomoney.utils.RSAUtils;
 import com.google.zxing.Result;
 import com.google.zxing.activity.CaptureActivity;
 import com.google.zxing.util.Constant;
@@ -58,6 +73,8 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.crypto.Cipher;
 
 import cn.memobird.gtx.GTX;
 
@@ -78,6 +95,11 @@ public class MainActivity extends AppCompatActivity {
     private Button qrgenerate;
     private Button crypto_tr;
     private Button crypto;
+    private Button execute;
+    private PrivateKey sk;
+    private PublicKey pk;
+    private String sk_enc;
+    private SharedPreferences pref;
 
     private Integer account_id;
     private static String timePattern = "yyyy-MM-dd HH:mm:ss";
@@ -103,9 +125,83 @@ public class MainActivity extends AppCompatActivity {
 //        qrgenerate = (Button) findViewById(R.id.qrgenerate);
         crypto = (Button) findViewById(R.id.crypto);
         crypto_tr = (Button) findViewById(R.id.cryptotr_detail);
+        execute = (Button) findViewById(R.id.execute);
+        scanreturn = (EditText) findViewById(R.id.scan_result);
 
         Intent intent_from_login = getIntent();
         account_id = intent_from_login.getIntExtra("account_id",0);
+
+        execute.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onClick(View view) {
+                String qrstring = scanreturn.getText().toString();
+                Log.d("MainActivity","qrstring= "+qrstring);
+//                String from_id = qrstring.split("id=")[1].split("&N=")[0];
+//                Log.d("MainActivity","id= "+from_id);
+                String N_base64 = qrstring.split("N=")[1].split("&d=")[0];
+                BigInteger N = new BigInteger(Base64Utils.decode(N_base64));
+                Log.d("MainActivity","N= "+N);
+                String d_base64 = qrstring.split("&d=")[1].split("&addr=")[0];
+                BigInteger d = new BigInteger(Base64Utils.decode(d_base64));
+                Log.d("MainActivity","d= "+d);
+                String addr = qrstring.split("&addr=")[1];
+                Log.d("MainActivity","addr= "+addr);
+
+                try {
+//                    sk = RSAUtils.getPrivateKey(N.toString(),d.toString());
+                    KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+                    RSAPrivateKeySpec rsaPrivateKeySpec = new RSAPrivateKeySpec(N,d);
+                    PrivateKey sk = keyFactory.generatePrivate(rsaPrivateKeySpec);
+                    Log.d("MainActivity","recovered sk= "+sk);
+
+//                    pref = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+//                    BigInteger e = new BigInteger(Base64Utils.decode(pref.getString("pk_exp","")));
+//                    Log.d("MainActivity","e= "+e);
+//                    RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(N,e);
+//                    PublicKey pk = keyFactory.generatePublic(rsaPublicKeySpec);
+//                    Log.d("MainActivity","recovered pk= "+pk);
+
+//                    sk_enc = Base64Utils.encode(sk.getEncoded());
+//                    Cipher cipher = Cipher.getInstance("RSA");
+                    Cipher cipher=Cipher.getInstance("RSA/ECB/PKCS1Padding");
+                    cipher.init(Cipher.ENCRYPT_MODE,sk);
+//                    Log.d("MainActivity","recovered sk= "+sk_enc);
+                    String id = "ACCOUNT="+account_id.toString();
+                    byte[]  id_enc = cipher.doFinal(id.getBytes());
+
+//                    cipher.init(Cipher.DECRYPT_MODE,pk);
+//                    byte[] id_dec = cipher.doFinal(id_enc);
+//                    System.out.println("id_dec= "+new String(id_dec));
+
+                    String id_enc_str = Base64Utils.encode(id_enc);
+                    Log.d("MainActivity","id_enc= "+id_enc_str);
+//                    Log.d("MainActivity","encrypted id= "+id_enc);
+
+                    final String cryptomoneyinRequest ="request=" + URLEncoder.encode("getencrypto") +
+                            "&id_enc="+ URLEncoder.encode(id_enc_str)+"&addr="+ URLEncoder.encode(addr);
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            final String response = PostService.Post(cryptomoneyinRequest);
+                            if (response != null) {
+                               runOnUiThread(new Runnable() {
+                                   @Override
+                                   public void run() {
+                                       Toast.makeText(MainActivity.this,response,Toast.LENGTH_SHORT).show();
+                                   }
+                               });
+                            }
+                        }
+                    }).start();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
 
         crypto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -298,8 +394,8 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_OK) {
             Bundle bundle = data.getExtras();
             String scanResult = bundle.getString(Constant.INTENT_EXTRA_KEY_QR_SCAN);
-            scanreturn = (EditText) findViewById(R.id.scan_result);
             scanreturn.setText(scanResult);
+
         }
     }
 

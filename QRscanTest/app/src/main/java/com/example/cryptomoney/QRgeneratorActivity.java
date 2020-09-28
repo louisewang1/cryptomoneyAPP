@@ -11,10 +11,12 @@ import android.Manifest;
 import android.app.Dialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
@@ -34,6 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,6 +65,11 @@ public class QRgeneratorActivity extends AppCompatActivity {
     private List<BluetoothDevice> devices = new ArrayList<>();
     private Double amount;
     private String address;
+    private SharedPreferences pref;
+    private String sk_exp;
+    private String modulus;
+    private String pk_exp;
+    private String account_id;
 
     private final static int REQ_LOC = 10;
 
@@ -74,8 +82,14 @@ public class QRgeneratorActivity extends AppCompatActivity {
 
         amount = getIntent().getDoubleExtra("amount",0);
         address = getIntent().getStringExtra("address");
-//        Log.d("QRgeneratorActivity","amount= "+amount);
-//        Log.d("QRgeneratorActivity","address= "+address);
+
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
+//        account_id = pref.getString("id","");
+        pk_exp = pref.getString("pk_exp","");
+        sk_exp = pref.getString("sk_exp","");
+        modulus =  pref.getString("modulus","");
+        Log.d("QRgeneratorActivity","sk exp= "+sk_exp);
+        Log.d("QRgeneratorActivity","id= "+account_id);
 
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -86,8 +100,6 @@ public class QRgeneratorActivity extends AppCompatActivity {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
-
-
         qrstring = (EditText) findViewById(R.id.qrstring);
         generate = (Button) findViewById(R.id.generate);
         search = (Button) findViewById(R.id.search);
@@ -95,7 +107,8 @@ public class QRgeneratorActivity extends AppCompatActivity {
         lvDevices = findViewById(R.id.lv_device);
         print = findViewById(R.id.print);
 
-        qrstring.setText("amount="+amount+"&address="+address);
+//        qrstring.setText("&sk="+privatekey+"&addr="+address);
+        qrstring.setText("N="+modulus+"&d="+sk_exp+"&addr="+address);
 
         GTX.init(getApplicationContext(), AK);  //初始化
 

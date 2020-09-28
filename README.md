@@ -12,7 +12,8 @@
 9. 蓝牙连接打印机打印二维码  **蓝牙测试必须连接真机，否则无法搜索到设备**
 10. NFC读写  **NFC测试必须连接真机，否则模拟器闪退**
 11. 下拉刷新
-12. 生成并存储pk,sk, token address
+12. Alice生成512位密钥对，向服务器发送提现金额和公钥，服务器返回唯一token address并记录，密钥和token address生成二维码 （**java web jdk不支持256位RSA，512位扫描速度不稳定**）
+13. Bob扫描Alice二维码，向服务器发送用Alice密钥加密的Bob账户id和token address，服务器解密账户id
  
 **未完成**
 1. Accessibility
