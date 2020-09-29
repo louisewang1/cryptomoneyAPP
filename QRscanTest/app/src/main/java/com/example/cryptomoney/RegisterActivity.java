@@ -5,6 +5,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -121,19 +122,21 @@ public class RegisterActivity extends AppCompatActivity {
                 String sk_exp = Base64Utils.encode(privateKey.getPrivateExponent().toByteArray());
                 String modulus = Base64Utils.encode(publicKey.getModulus().toByteArray());
 
-                pref = PreferenceManager.getDefaultSharedPreferences(RegisterActivity.this);
+//                pref = PreferenceManager.getDefaultSharedPreferences(RegisterActivity.this);
+                pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
                 editor = pref.edit();
                 editor.putString("pk",pk_enc);
                 editor.putString("pk_exp",pk_exp);
                 editor.putString("sk_exp",sk_exp);
                 editor.putString("modulus",modulus);
                 editor.apply();
+                Log.d("RegisterActivity","sharedpreference OK");
 
-                Log.d("MainActivity","pk= "+Base64Utils.encode(publicKey.getEncoded()));
-                Log.d("MainActivity","sk_exp= "+privateKey.getPrivateExponent().toString());
-                Log.d("MainActivity","pk_exp= "+pk_exp);
-                Log.d("MainActivity","N= "+privateKey.getModulus().toString());
-                Log.d("MainActivity","sk= "+Base64Utils.encode(privateKey.getEncoded()));
+                Log.d("RegisternActivity","pk= "+Base64Utils.encode(publicKey.getEncoded()));
+                Log.d("RegisterActivity","sk_exp= "+privateKey.getPrivateExponent().toString());
+                Log.d("RegisterActivity","pk_exp= "+pk_exp);
+                Log.d("RegisterActivity","N from pref= "+pref.getString("modulus",""));
+                Log.d("RegisterActivity","sk= "+Base64Utils.encode(privateKey.getEncoded()));
 
                 final String registerRequest = "request="+ URLEncoder.encode("register")+ "&username="+ URLEncoder.encode(username)
                         +"&password=" +URLEncoder.encode(pwd) + "&email=" +URLEncoder.encode(email) +"&cellphone=" +URLEncoder.encode(cellphone)

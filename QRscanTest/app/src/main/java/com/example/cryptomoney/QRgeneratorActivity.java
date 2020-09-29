@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.app.Dialog;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -83,7 +84,8 @@ public class QRgeneratorActivity extends AppCompatActivity {
         amount = getIntent().getDoubleExtra("amount",0);
         address = getIntent().getStringExtra("address");
 
-        pref = PreferenceManager.getDefaultSharedPreferences(this);
+//        pref = PreferenceManager.getDefaultSharedPreferences(this);
+        pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
 //        account_id = pref.getString("id","");
         pk_exp = pref.getString("pk_exp","");
         sk_exp = pref.getString("sk_exp","");

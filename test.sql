@@ -29,6 +29,10 @@ CREATE TABLE `accountinfodb` (
 
 /*Data for the table `accountinfodb` */
 
+insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
+(1,'1',140,'',''),
+(2,'2',60,'','');
+
 /*Table structure for table `cryptotransferdb` */
 
 CREATE TABLE `cryptotransferdb` (
@@ -40,7 +44,7 @@ CREATE TABLE `cryptotransferdb` (
   PRIMARY KEY (`id`),
   KEY `fk_cryptotransferdb_id` (`account_id`),
   CONSTRAINT `fk_cryptotransferdb_id` FOREIGN KEY (`account_id`) REFERENCES `logindb` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 
 /*Data for the table `cryptotransferdb` */
 
@@ -53,9 +57,13 @@ CREATE TABLE `logindb` (
   `pk` varchar(500) NOT NULL,
   `N` varchar(1000) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 
 /*Data for the table `logindb` */
+
+insert  into `logindb`(`id`,`username`,`pwd`,`pk`,`N`) values 
+(1,'1','1','AQAB','AO/Qm9XLCAfCjDpNxVaiB0XLEbdj5g4MNgb/1mS6n0mOWmk1iuQfJXs/AVEPdOepKRmKUUs+ikVSWIRbeOExadk='),
+(2,'2','2','AQAB','ANviCVQrr88u4GKoPUWuranG66Het30Y/P9WpghMskHM/IEanrESUQyx5K64PCoDm++1ucgDESpgfH/fTfC+ClU=');
 
 /*Table structure for table `transactiondb` */
 
@@ -177,6 +185,18 @@ DELIMITER $$
 /*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `display_info`(in account_id_ int, out username_ varchar(50),out balance_ double, out email_ varchar(100), out cellphone_ varchar(100))
 label:begin
 select username,balance,email,cellphone into username_,balance_,email_,cellphone_ from accountinfodb where account_id = account_id_;
+end */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `exe_crypto` */
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `exe_crypto`(In to_id_ int, In addr_ VARCHAR(50), OUT amount_ double)
+label:begin
+select amount into amount_ from cryptotransferdb where address = addr_;
+update accountinfodb set balance = balance + amount_ where account_id = to_id_;
+delete from cryptotransferdb where address = addr_;
 end */$$
 DELIMITER ;
 

@@ -323,9 +323,19 @@ public class UserDAO {
 				 System.out.println("id_dec= "+id_dec);
 				 
 				 if (id_dec.startsWith("ACCOUNT=")) {
-					 result = "successfully decrypted";
+//					 result = "successfully decrypted";
 					 Integer to_id = Integer.parseInt(id_dec.split("=")[1]);
 					 System.out.println("to_id= "+to_id);
+					 cs = conn.prepareCall("{call exe_crypto(?,?,?)}");
+					 cs.setInt(1, to_id);
+					 cs.setString(2,addr);
+					 cs.registerOutParameter(3, Types.DOUBLE);
+					 cs.execute();
+					 Double amount = cs.getDouble(3);
+					 result = amount.toString() + "received";
+				 }
+				 else {
+					 result = "decryption failed";
 				 }
 			 }
 		 } catch (Exception e){
