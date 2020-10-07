@@ -7,7 +7,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-<jsp:useBean id="db" class="util.DBUtil" scope="page"/>
+<jsp:useBean id="db" class="Bean.DBBean" scope="page"/>
 <%
     request.setCharacterEncoding("UTF-8");
     String username=(String)request.getParameter("username");//获取login页面输入的用户名和密码
