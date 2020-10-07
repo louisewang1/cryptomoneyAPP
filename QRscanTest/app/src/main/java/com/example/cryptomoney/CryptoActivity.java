@@ -23,6 +23,8 @@ import com.example.cryptomoney.utils.Base64Utils;
 import java.net.URLEncoder;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CryptoActivity extends AppCompatActivity {
 
@@ -34,7 +36,7 @@ public class CryptoActivity extends AppCompatActivity {
     private SharedPreferences pref;
     private String modulus;
     private String value;
-    public final static int ADDR_LENGTH = 100;
+    public final static int ADDR_LENGTH = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,33 +66,42 @@ public class CryptoActivity extends AppCompatActivity {
             public void onClick(View view) {
                 value = amount.getText().toString();
 //                Log.d("CryptoActivity","value= "+value);
-                final String cryptoRequest ="request=" + URLEncoder.encode("crypto") + "&id="+ URLEncoder.encode(account_id.toString())
-                        +"&value="+ URLEncoder.encode(value) + "&N="+ URLEncoder.encode(modulus);
+                boolean isdouble = isNumeric(value);
+                if (isdouble != true) Common.showShortToast(CryptoActivity.this,"Invalid input");
+                else {
+                    final String cryptoRequest ="request=" + URLEncoder.encode("crypto") + "&id="+ URLEncoder.encode(account_id.toString())
+                            +"&value="+ URLEncoder.encode(value) + "&N="+ URLEncoder.encode(modulus);
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final String addr = PostService.Post(cryptoRequest);
-                        Log.d("CryptoActivity","response= "+addr);
-                        if (addr != null && addr.length() == ADDR_LENGTH) {  // response return token address
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    response.setText("token address: " +addr);
-                                    Toast.makeText(CryptoActivity.this,"Crypto transfer succeeded",Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            final String addr = PostService.Post(cryptoRequest);
+                            Log.d("CryptoActivity","response= "+addr);
+                            if (addr != null && addr.length() == ADDR_LENGTH) {  // response return token address
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        response.setText("token address: " +addr);
+                                        Toast.makeText(CryptoActivity.this,"Crypto transfer succeeded",Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(CryptoActivity.this,CryptoModeActivity.class);
+                                        intent.putExtra("amount",value);
+                                        intent.putExtra("address",addr);
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                });
+                            }
+                            else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        response.setText(addr);
+                                    }
+                                });
+                            }
                         }
-                        else {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    response.setText(addr);
-                                }
-                            });
-                        }
-                    }
-                }).start();
+                    }).start();
+                }
             }
         });
     }
@@ -104,4 +115,14 @@ public class CryptoActivity extends AppCompatActivity {
         }
         return true;
     }
+
+    public static boolean isNumeric(String str){
+        Pattern pattern = Pattern.compile("[0-9]+[.]{0,1}[0-9]*[dD]{0,1}");
+        Matcher isNum = pattern.matcher(str);
+        if( !isNum.matches() ){
+            return false;
+        }
+        return true;
+    }
+
 }

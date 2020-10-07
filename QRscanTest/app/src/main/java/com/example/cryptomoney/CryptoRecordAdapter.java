@@ -51,7 +51,7 @@ public class CryptoRecordAdapter extends RecyclerView.Adapter<CryptoRecordAdapte
             public void onClick(View view) {
                 int position = holder.getAdapterPosition();
                 CryptoRecord record = mRecordList.get(position);
-                Intent intent = new Intent(view.getContext(),QRgeneratorActivity.class);
+                Intent intent = new Intent(view.getContext(),CryptoModeActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
                 intent.putExtra("amount",record.getValue());
                 intent.putExtra("address",record.getAddr());

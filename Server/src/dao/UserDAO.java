@@ -338,6 +338,9 @@ public class UserDAO {
 					 result = "decryption failed";
 				 }
 			 }
+			 else {
+				 result = "expired transaction";
+			 }
 		 } catch (Exception e){
 	            e.printStackTrace();
 	        }if (cs != null) {

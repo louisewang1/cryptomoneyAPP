@@ -17,10 +17,10 @@ import java.net.URLEncoder;
 public class PostService {
     /**
      *
-     * @param username
-     * @param password
-     * @return
-     */
+//     * @param username
+//     * @param password
+//     * @return
+//     */
 //    public static String loginByGet(String username,String password){
 //        try {
 //            //提交数据到服务器
@@ -91,7 +91,8 @@ public class PostService {
 
     public static String Post(String data){
         try {
-            String path = "http://192.168.1.13:8080/WebServer/UserServlet"; //ur server ip
+//            String path = "http://82.130.102.60:8080/WebServer/UserServlet"; //ur server ip
+            String path = "http://82.130.102.60:8080/WebServer/UserServlet";
             URL url = new URL(path);
             HttpURLConnection conn =  (HttpURLConnection) url.openConnection();
             conn.setConnectTimeout(8000);

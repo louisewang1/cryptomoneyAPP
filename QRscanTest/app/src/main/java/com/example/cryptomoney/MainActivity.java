@@ -87,15 +87,15 @@ import static java.sql.Types.VARCHAR;
 public class MainActivity extends AppCompatActivity {
 
     private Button qrscan;
-    private Button NFC_read;
-    private EditText scanreturn;
+//    private Button NFC_read;
+//    private EditText scanreturn;
     private Button account;
     private Button transfer;
     private Button transaction;
     private Button qrgenerate;
     private Button crypto_tr;
     private Button crypto;
-    private Button execute;
+//    private Button execute;
     private PrivateKey sk;
     private PublicKey pk;
     private String sk_enc;
@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Integer account_id;
     private static String timePattern = "yyyy-MM-dd HH:mm:ss";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,90 +119,18 @@ public class MainActivity extends AppCompatActivity {
         }
 
         qrscan = (Button) findViewById(R.id.qrscan);
-        NFC_read = (Button) findViewById(R.id.nfctag);
+//        NFC_read = (Button) findViewById(R.id.nfctag);
         account = (Button)  findViewById(R.id.account_info);
         transfer = (Button) findViewById(R.id.transfer);
         transaction = (Button) findViewById(R.id.tr_detail);
 //        qrgenerate = (Button) findViewById(R.id.qrgenerate);
         crypto = (Button) findViewById(R.id.crypto);
         crypto_tr = (Button) findViewById(R.id.cryptotr_detail);
-        execute = (Button) findViewById(R.id.execute);
-        scanreturn = (EditText) findViewById(R.id.scan_result);
+//        execute = (Button) findViewById(R.id.execute);
+//        scanreturn = (EditText) findViewById(R.id.scan_result);
 
         Intent intent_from_login = getIntent();
         account_id = intent_from_login.getIntExtra("account_id",0);
-
-        execute.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void onClick(View view) {
-                String qrstring = scanreturn.getText().toString();
-                Log.d("MainActivity","qrstring= "+qrstring);
-//                String from_id = qrstring.split("id=")[1].split("&N=")[0];
-//                Log.d("MainActivity","id= "+from_id);
-                String N_base64 = qrstring.split("N=")[1].split("&d=")[0];
-                BigInteger N = new BigInteger(Base64Utils.decode(N_base64));
-                Log.d("MainActivity","N= "+N);
-                String d_base64 = qrstring.split("&d=")[1].split("&addr=")[0];
-                BigInteger d = new BigInteger(Base64Utils.decode(d_base64));
-                Log.d("MainActivity","d= "+d);
-                String addr = qrstring.split("&addr=")[1];
-                Log.d("MainActivity","addr= "+addr);
-
-                try {
-//                    sk = RSAUtils.getPrivateKey(N.toString(),d.toString());
-                    KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-                    RSAPrivateKeySpec rsaPrivateKeySpec = new RSAPrivateKeySpec(N,d);
-                    PrivateKey sk = keyFactory.generatePrivate(rsaPrivateKeySpec);
-                    Log.d("MainActivity","recovered sk= "+sk);
-
-//                    pref = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-//                    BigInteger e = new BigInteger(Base64Utils.decode(pref.getString("pk_exp","")));
-//                    Log.d("MainActivity","e= "+e);
-//                    RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(N,e);
-//                    PublicKey pk = keyFactory.generatePublic(rsaPublicKeySpec);
-//                    Log.d("MainActivity","recovered pk= "+pk);
-
-//                    sk_enc = Base64Utils.encode(sk.getEncoded());
-//                    Cipher cipher = Cipher.getInstance("RSA");
-                    Cipher cipher=Cipher.getInstance("RSA/ECB/PKCS1Padding");
-                    cipher.init(Cipher.ENCRYPT_MODE,sk);
-//                    Log.d("MainActivity","recovered sk= "+sk_enc);
-                    String id = "ACCOUNT="+account_id.toString();
-                    byte[]  id_enc = cipher.doFinal(id.getBytes());
-
-//                    cipher.init(Cipher.DECRYPT_MODE,pk);
-//                    byte[] id_dec = cipher.doFinal(id_enc);
-//                    System.out.println("id_dec= "+new String(id_dec));
-
-                    String id_enc_str = Base64Utils.encode(id_enc);
-                    Log.d("MainActivity","id_enc= "+id_enc_str);
-//                    Log.d("MainActivity","encrypted id= "+id_enc);
-
-                    final String cryptomoneyinRequest ="request=" + URLEncoder.encode("getencrypto") +
-                            "&id_enc="+ URLEncoder.encode(id_enc_str)+"&addr="+ URLEncoder.encode(addr);
-
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final String response = PostService.Post(cryptomoneyinRequest);
-                            if (response != null) {
-                               runOnUiThread(new Runnable() {
-                                   @Override
-                                   public void run() {
-                                       Toast.makeText(MainActivity.this,response,Toast.LENGTH_SHORT).show();
-                                   }
-                               });
-                            }
-                        }
-                    }).start();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            }
-        });
 
         crypto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -266,24 +195,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(MainActivity.this,
-                            new String[] {Manifest.permission.CAMERA},Constant.REQ_PERM_CAMERA);
-                }else {
-                    openCamera();
-                }
+                Intent intent_to_mode = new Intent(MainActivity.this,RcvModeActivity.class);
+                intent_to_mode.putExtra("account_id",account_id);
+                startActivity(intent_to_mode);
+
             }
         });
 
-        NFC_read.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-
-                startActivity(new Intent(MainActivity.this, NFCRWActivity.class));
-            }
-        });
+//        NFC_read.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View view) {
+//
+//                startActivity(new Intent(MainActivity.this, NFCRWActivity.class));
+//            }
+//        });
 
         account.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -393,9 +319,60 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_OK) {
             Bundle bundle = data.getExtras();
-            String scanResult = bundle.getString(Constant.INTENT_EXTRA_KEY_QR_SCAN);
-            scanreturn.setText(scanResult);
+            String qrstring = bundle.getString(Constant.INTENT_EXTRA_KEY_QR_SCAN);
 
+            if (qrstring.indexOf("N") == 0) {
+                String N_base64 = qrstring.split("N=")[1].split("&d=")[0];
+                BigInteger N = new BigInteger(Base64Utils.decode(N_base64));
+                Log.d("MainActivity","N= "+N);
+                String d_base64 = qrstring.split("&d=")[1].split("&addr=")[0];
+                BigInteger d = new BigInteger(Base64Utils.decode(d_base64));
+                Log.d("MainActivity","d= "+d);
+                String addr = qrstring.split("&addr=")[1];
+                Log.d("MainActivity","addr= "+addr);
+
+                try {
+//                    sk = RSAUtils.getPrivateKey(N.toString(),d.toString());
+                    KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+                    RSAPrivateKeySpec rsaPrivateKeySpec = new RSAPrivateKeySpec(N,d);
+                    PrivateKey sk = keyFactory.generatePrivate(rsaPrivateKeySpec);
+                    Log.d("MainActivity","recovered sk= "+sk);
+                    Cipher cipher=Cipher.getInstance("RSA/ECB/PKCS1Padding");
+                    cipher.init(Cipher.ENCRYPT_MODE,sk);
+//                    Log.d("MainActivity","recovered sk= "+sk_enc);
+                    String id = "ACCOUNT="+account_id.toString();
+                    byte[]  id_enc = cipher.doFinal(id.getBytes());
+
+                    String id_enc_str = Base64Utils.encode(id_enc);
+                    Log.d("MainActivity","id_enc= "+id_enc_str);
+//                    Log.d("MainActivity","encrypted id= "+id_enc);
+
+                    final String cryptomoneyinRequest ="request=" + URLEncoder.encode("getencrypto") +
+                            "&id_enc="+ URLEncoder.encode(id_enc_str)+"&addr="+ URLEncoder.encode(addr);
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            final String response = PostService.Post(cryptomoneyinRequest);
+                            if (response != null) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Common.showLongToast(MainActivity.this,response);
+                                    }
+                                });
+                            }
+                        }
+                    }).start();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            else {
+                Common.showLongToast(MainActivity.this,"QR reading failed, please scan again ");
+            }
         }
     }
 

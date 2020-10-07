@@ -3,6 +3,8 @@ package com.example.cryptomoney;
 import android.app.Dialog;
 import android.content.Context;
 //import android.support.v4.content.ContextCompat;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -20,7 +22,16 @@ public class Common {
     public static int DEFAULT_IMAGE_WIDTH = SIZE_384;//384;
 
     public static void showShortToast(Context context, String string) {
-        Toast.makeText(context, string, Toast.LENGTH_SHORT).show();
+        Toast toast = Toast.makeText(context, string, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
+
+
+    public static void showLongToast(Context context, String string) {
+        Toast toast = Toast.makeText(context, string, Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
     public static int getNextFilter() {

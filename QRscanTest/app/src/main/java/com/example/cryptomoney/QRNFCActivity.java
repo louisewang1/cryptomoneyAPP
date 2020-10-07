@@ -16,10 +16,13 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.nfc.FormatException;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,12 +31,15 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.cryptomoney.utils.NfcUtils;
 import com.google.zxing.util.Constant;
 import com.google.zxing.util.QrCodeGenerator;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -50,9 +56,9 @@ import cn.memobird.gtx.listener.OnImageToDitherListener;
 import cn.memobird.gtx.listener.OnImageToFilterListener;
 
 
-public class QRgeneratorActivity extends AppCompatActivity {
+public class QRNFCActivity extends AppCompatActivity {
 
-//    private EditText qrstring;
+    //    private EditText qrstring;
 //    private Button generate;
     private Button search;
     private ImageView qrimg;
@@ -71,7 +77,11 @@ public class QRgeneratorActivity extends AppCompatActivity {
     private String modulus;
     private String pk_exp;
     private String account_id;
+    private String qrtext;
     private String text;
+    private String nfctext;
+    private NfcUtils nfcUtils;
+    private TextView nfcstatus;
     private String mode;
 
     private final static int REQ_LOC = 10;
@@ -81,11 +91,12 @@ public class QRgeneratorActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_qr_generator);
+        setContentView(R.layout.activity_qr_nfc);
 
         amount = getIntent().getDoubleExtra("amount",0);
         address = getIntent().getStringExtra("address");
         mode = getIntent().getStringExtra("mode");
+        nfcUtils = new NfcUtils(this);
 
 //        pref = PreferenceManager.getDefaultSharedPreferences(this);
         pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
@@ -93,8 +104,6 @@ public class QRgeneratorActivity extends AppCompatActivity {
         pk_exp = pref.getString("pk_exp","");
         sk_exp = pref.getString("sk_exp","");
         modulus =  pref.getString("modulus","");
-        Log.d("QRgeneratorActivity","sk exp= "+sk_exp);
-        Log.d("QRgeneratorActivity","id= "+account_id);
 
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -111,15 +120,19 @@ public class QRgeneratorActivity extends AppCompatActivity {
         qrimg = (ImageView) findViewById(R.id.qrimg);
         lvDevices = findViewById(R.id.lv_device);
         print = findViewById(R.id.print);
+        nfcstatus = findViewById(R.id.nfcstatus);
 
 //        qrstring.setText("&sk="+privatekey+"&addr="+address);
         text = "N="+modulus+"&d="+sk_exp+"&addr="+address;
-        qrimage = QrCodeGenerator.getQrCodeImage(text,200,200);
+        System.out.println(text);
+        qrtext = extractodd(text);
+        nfctext = extracteven(text);
+        qrimage = QrCodeGenerator.getQrCodeImage(qrtext,200,200);
         qrimg.setImageBitmap(qrimage);
 
 //        GTX.init(getApplicationContext(), AK);  //初始化
 
-        mDialog = Common.showLoadingDialog(QRgeneratorActivity.this);
+        mDialog = Common.showLoadingDialog(QRNFCActivity.this);
 
         // 定义蓝牙连接列表
         deviceListAdapter = new DeviceListAdapter(this, devices);
@@ -129,9 +142,9 @@ public class QRgeneratorActivity extends AppCompatActivity {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(QRgeneratorActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)  // 检查运行时权限
+                if (ContextCompat.checkSelfPermission(QRNFCActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)  // 检查运行时权限
                         != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(QRgeneratorActivity.this,
+                    ActivityCompat.requestPermissions(QRNFCActivity.this,
                             new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQ_LOC);  // 申请定位权限,MUST BE FINE!
                 }else {
                     devices.clear();
@@ -164,21 +177,29 @@ public class QRgeneratorActivity extends AppCompatActivity {
                     printQR();
                 }
                 else {
-                    Common.showShortToast(QRgeneratorActivity.this, "please connect to the printer first");
+                    Common.showShortToast(QRNFCActivity.this, "please connect to the printer first");
                 }
             }
         });
 
-        // 生成二维码
-//        generate.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                String text = qrstring.getText().toString();
-//                qrimage = QrCodeGenerator.getQrCodeImage(text,200,200);
-//                qrimg.setImageBitmap(qrimage);
-//            }
-//        });
+    }
 
+    //        write in NFC
+    @Override
+    protected void onNewIntent(Intent intent){
+        super.onNewIntent(intent);
+        try {
+            nfcUtils.writeNFCToTag(nfctext, intent);
+            //                    Log.d("NFCRWActivity","finish writing");
+            Common.showShortToast(this, "write to NFC successfully.");
+            nfcstatus.setText("Status: writing successfully");
+        } catch (IOException e) {
+            Common.showShortToast(this, "write to NFC failed.");
+            //                    Log.d("NFCRWActivity","write to NFC failed：" + e.getMessage());
+        } catch (FormatException e) {
+            Common.showShortToast(this, "write to failed.");
+            //                    Log.d("NFCRWActivity","write to NFC failed：" + e.getMessage());
+        }
     }
 
     private void printQR() {
@@ -195,8 +216,8 @@ public class QRgeneratorActivity extends AppCompatActivity {
                 Log.d("QRgeneratorActivity","string: "+base64ImageString);
                 if (base64ImageString != null && amount > 0) {
                     List<GTXScripElement> scripElements = new ArrayList<>();
-                    scripElements.add(new GTXScripElement(1, "amount= "+amount.toString()));
                     scripElements.add(new GTXScripElement(1, "mode= "+mode));
+                    scripElements.add(new GTXScripElement(1, "amount= "+amount.toString()));
                     scripElements.add(new GTXScripElement(5, base64ImageString));
                     GTX.printMixing(onPrintListener, scripElements, mDialog);
 //                    GTX.printImage(onPrintListener, base64ImageString, mDialog);
@@ -206,16 +227,16 @@ public class QRgeneratorActivity extends AppCompatActivity {
 
     }
 
-     //图像处理结果OnImageToDitherListener
+    //图像处理结果OnImageToDitherListener
     private OnImageToDitherListener onDitherListener = new OnImageToDitherListener() {
         @Override
         public void returnResult(String base64ImageString, Bitmap bitmap, int taskCode) {
             if (taskCode == GTXKey.RESULT.COMMON_SUCCESS && base64ImageString != null) {
 //                Log.d("QRgeneratorActivity","String in Ditherlistener: "+base64ImageString);
-                QRgeneratorActivity.this.base64ImageString = base64ImageString;
+                QRNFCActivity.this.base64ImageString = base64ImageString;
             } else {
 //                Log.d("QRgeneratorActivity","Dither failed");
-                Common.showShortToast(QRgeneratorActivity.this, "Error " + taskCode);
+                Common.showShortToast(QRNFCActivity.this, "Error " + taskCode);
             }
         }
     };
@@ -255,12 +276,12 @@ public class QRgeneratorActivity extends AppCompatActivity {
                 lvDevices.setVisibility(View.VISIBLE);
             } else if (taskCode == GTXKey.RESULT.FIND_DEVICE_FINISH_TASK) {     //搜索任务正常结束
                 if (devices.size() == 0) {
-                    Common.showShortToast(QRgeneratorActivity.this, "No MEMOBIRD device available");
+                    Common.showShortToast(QRNFCActivity.this, "No MEMOBIRD device available");
                 } else {
-                    Common.showShortToast(QRgeneratorActivity.this, "device searching finished");
+                    Common.showShortToast(QRNFCActivity.this, "device searching finished");
                 }
             } else {                                                            //其它异常
-                Common.showShortToast(QRgeneratorActivity.this, "Error " + taskCode);
+                Common.showShortToast(QRNFCActivity.this, "Error " + taskCode);
             }
         }
 
@@ -274,16 +295,16 @@ public class QRgeneratorActivity extends AppCompatActivity {
                 mDialog.cancel();
             if (taskCode == GTXKey.RESULT.COMMON_SUCCESS) {              //成功连接设备
                 lvDevices.setVisibility(View.GONE);
-                Common.showShortToast(QRgeneratorActivity.this,"connected successfully");
+                Common.showShortToast(QRNFCActivity.this,"connected successfully");
                 if (GTX.getConnectDevice().getName().contains("G4")) {
                     Common.DEFAULT_IMAGE_WIDTH = Common.SIZE_576;
                 } else {
                     Common.DEFAULT_IMAGE_WIDTH = Common.SIZE_384;
                 }
             } else if (taskCode == GTXKey.RESULT.COMMON_FAIL) {
-                Common.showShortToast(QRgeneratorActivity.this, "connection failed");
+                Common.showShortToast(QRNFCActivity.this, "connection failed");
             } else {
-                Common.showShortToast(QRgeneratorActivity.this, "Error " + taskCode);
+                Common.showShortToast(QRNFCActivity.this, "Error " + taskCode);
             }
         }
     };
@@ -293,10 +314,10 @@ public class QRgeneratorActivity extends AppCompatActivity {
         @Override
         public void returnResult(int taskCode) {
             if (taskCode == GTXKey.RESULT.COMMON_SUCCESS) {
-                Common.showShortToast(QRgeneratorActivity.this, "successfully printed");
+                Common.showShortToast(QRNFCActivity.this, "successfully printed");
             } else {
                 Log.d("QRgeneratorActivity","taskCode="+taskCode);
-                Common.showShortToast(QRgeneratorActivity.this, "Error " + taskCode);
+                Common.showShortToast(QRNFCActivity.this, "Error " + taskCode);
             }
         }
     };
@@ -312,6 +333,37 @@ public class QRgeneratorActivity extends AppCompatActivity {
         return true;
     }
 
+    public String extractodd(String text) {
+        String oddtext = "";
+        for (int i=0; i<text.length();i=i+2) {
+            oddtext +=text.charAt(i);
+        }
+        System.out.println(oddtext);
+        return oddtext;
+    }
+
+    public String extracteven(String text) {
+        String eventext = "";
+        for (int i=1; i<text.length();i=i+2) {
+            eventext +=text.charAt(i);
+        }
+        System.out.println(eventext);
+        return eventext;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        Logger.e(TAG, "onResume");
+        nfcUtils.enableForegroundDispatch();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+//        Logger.e(TAG, "onPause");
+        nfcUtils.disableForegroundDispatch();
+    }
 
     protected void onDestroy() {
         super.onDestroy();

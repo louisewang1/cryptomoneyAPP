@@ -27,7 +27,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".CryptoTransactionActivity"></activity>
+        <activity android:name=".QRNFCRcvActivity"></activity>
+        <activity android:name=".RcvModeActivity" />
+        <activity android:name=".QRNFCActivity" />
+        <activity android:name=".CryptoModeActivity" />
+        <activity android:name=".CryptoTransactionActivity" />
         <activity android:name=".CryptoActivity" />
         <activity android:name=".RSATestActivity" />
         <activity android:name=".QRgeneratorActivity" />

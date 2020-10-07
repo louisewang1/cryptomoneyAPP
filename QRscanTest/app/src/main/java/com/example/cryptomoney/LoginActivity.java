@@ -19,6 +19,8 @@ import java.net.URLEncoder;
 import java.sql.Connection;
 import java.util.prefs.PreferenceChangeEvent;
 
+import cn.memobird.gtx.GTX;
+
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -34,6 +36,7 @@ public class LoginActivity extends AppCompatActivity {
     public final static int TYPE_CONN_FAILED = -1;  // identify different error
     public final static int TYPE_LOGIN_FAILED = 0;
     public final static int REG_CODE = 2;
+    final String AK = "c6a5a445dc25490183f42088f4b78ccf";
 
     // 本地存储记住密码
     private SharedPreferences pref;
@@ -43,6 +46,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        GTX.init(getApplicationContext(), AK);  //初始化
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
