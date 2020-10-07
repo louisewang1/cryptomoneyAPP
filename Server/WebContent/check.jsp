@@ -14,13 +14,14 @@
     String password=(String)request.getParameter("password");
 
 
-    String sql="select * from users where username="+"'"+username+"'";//定义一个查询语句
+    String sql="select * from logindb where username="+"'"+username+"'";//定义一个查询语句
     ResultSet rs=db.executeQuery(sql);//执行查询语句
     if(rs.next())
     {
         //将输入的密码与数据库密码相比对，执行相应操作
-        if(password.equals(rs.getObject("password"))){
-            response.sendRedirect("success.jsp");
+        if(password.equals(rs.getObject("pwd"))){
+        	String temp = "success.jsp?paramID=" + username;
+            response.sendRedirect(temp);
         }
         else{
             out.print("<script language='javaScript'> alert('密码错误');</script>");

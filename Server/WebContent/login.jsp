@@ -8,20 +8,20 @@
 </head>
 <body>
     <center>
-        <h1 style="color:blue">登录</h1>
+        <h1 style="color:blue">Login To Your Account</h1>
             <form id="indexform" name="indexForm" action="check.jsp" method="post">
                 <table border="0">
                     <tr>
-                        <td>账号：</td>
+                        <td>Username：</td>
                         <td><input type="text" name="username"></td>
                     </tr>
                     <tr>
-                        <td>密码：</td>
+                        <td>Password：</td>
                         <td><input type="password" name="password"></td>
                     </tr>
                 </table>
             <br>
-                <input type="submit" value="登录">
+                <input type="submit" value="Login">
             </form>
     </center>
 </body>

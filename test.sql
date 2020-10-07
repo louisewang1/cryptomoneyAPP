@@ -2,7 +2,8 @@
 SQLyog Ultimate v12.14 (64 bit)
 MySQL - 5.1.30-community : Database - test
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -29,8 +30,10 @@ CREATE TABLE `accountinfodb` (
 
 /*Data for the table `accountinfodb` */
 
-insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
-(1,'1',140,'',''),
+insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
+
+(1,'1',140,'',''),
+
 (2,'2',60,'','');
 
 /*Table structure for table `cryptotransferdb` */
@@ -61,8 +64,10 @@ CREATE TABLE `logindb` (
 
 /*Data for the table `logindb` */
 
-insert  into `logindb`(`id`,`username`,`pwd`,`pk`,`N`) values 
-(1,'1','1','AQAB','AO/Qm9XLCAfCjDpNxVaiB0XLEbdj5g4MNgb/1mS6n0mOWmk1iuQfJXs/AVEPdOepKRmKUUs+ikVSWIRbeOExadk='),
+insert  into `logindb`(`id`,`username`,`pwd`,`pk`,`N`) values 
+
+(1,'1','1','AQAB','AO/Qm9XLCAfCjDpNxVaiB0XLEbdj5g4MNgb/1mS6n0mOWmk1iuQfJXs/AVEPdOepKRmKUUs+ikVSWIRbeOExadk='),
+
 (2,'2','2','AQAB','ANviCVQrr88u4GKoPUWuranG66Het30Y/P9WpghMskHM/IEanrESUQyx5K64PCoDm++1ucgDESpgfH/fTfC+ClU=');
 
 /*Table structure for table `transactiondb` */
