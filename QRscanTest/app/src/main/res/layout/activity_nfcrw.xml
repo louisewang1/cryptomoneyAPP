@@ -62,7 +62,7 @@
                     android:gravity="center"
                     android:text="READ"
                     android:textAllCaps="false"
-                    android:textSize="19sp"
+                    android:textSize="17sp"
                     android:checked="true"/>
 
             </RadioGroup>

@@ -20,7 +20,10 @@ public class UserService {
 		userInfo.setPassword(password);
 //		return userDAO.queryUser(userInfo);
 		return userDAO.logincheck(conn,userInfo);
-		
+	}
+	
+	public int merchantlogin(Connection conn,String username, String password) {
+		return userDAO.merchant_logincheck(conn,username,password);
 	}
 	
    public Object[] accountinfo(Connection conn,int account_id) {
@@ -49,5 +52,9 @@ public class UserService {
    
    public String getcryptomoney(Connection conn, String id_enc,String addr) {
 	   return userDAO.getcryptomoney(conn,id_enc,addr);
+   }
+   
+   public int merchantregister(Connection conn,String username, String password, String email,String cellphone, String sk_exp,String modulus) {
+	   return userDAO.merchantregister(conn,username,password,email,cellphone,sk_exp,modulus);
    }
 }

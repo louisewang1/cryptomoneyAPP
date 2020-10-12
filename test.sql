@@ -30,7 +30,7 @@ CREATE TABLE `accountinfodb` (
 /*Data for the table `accountinfodb` */
 
 insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
-(1,'1',100,'','');
+(1,'Alice',100,'','');
 
 /*Table structure for table `cryptotransferdb` */
 
@@ -45,7 +45,7 @@ CREATE TABLE `cryptotransferdb` (
   PRIMARY KEY (`id`),
   KEY `fk_cryptotransferdb_id` (`account_id`),
   CONSTRAINT `fk_cryptotransferdb_id` FOREIGN KEY (`account_id`) REFERENCES `logindb` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Data for the table `cryptotransferdb` */
 
@@ -61,7 +61,41 @@ CREATE TABLE `logindb` (
 /*Data for the table `logindb` */
 
 insert  into `logindb`(`id`,`username`,`pwd`) values 
-(1,'1','1');
+(1,'Alice','1');
+
+/*Table structure for table `merchant_infodb` */
+
+CREATE TABLE `merchant_infodb` (
+  `account_id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `balance` double NOT NULL DEFAULT '0',
+  `email` varchar(50) DEFAULT NULL,
+  `cellphone` varchar(20) DEFAULT NULL,
+  KEY `fk_merchant_info_id` (`account_id`),
+  CONSTRAINT `fk_merchant_info_id` FOREIGN KEY (`account_id`) REFERENCES `merchant_logindb` (`account_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Data for the table `merchant_infodb` */
+
+insert  into `merchant_infodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
+(1,'KFC',0,'','');
+
+/*Table structure for table `merchant_logindb` */
+
+CREATE TABLE `merchant_logindb` (
+  `account_id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(20) NOT NULL,
+  `pwd` varchar(50) NOT NULL,
+  `sk` varchar(100) NOT NULL,
+  `N` varchar(100) NOT NULL,
+  PRIMARY KEY (`account_id`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+
+/*Data for the table `merchant_logindb` */
+
+insert  into `merchant_logindb`(`account_id`,`username`,`pwd`,`sk`,`N`) values 
+(1,'KFC','1','X/zEyXVgqhCGxyJ2nASeDfO+hwNgNj3PrZN/CCvCgP8Z/E2crPkjhecs/hbweHyfSnFf4Qq9yX7+ZrWEyM//MQ==','AJT927s7d/BKm0nSH9Wsm3nLz5uzvp/Wg+H+jGvkqLsmZoBkOYYDu4VswmSFqePdqPOn87h9KjY0MLa2eiQA4wc=');
 
 /*Table structure for table `transactiondb` */
 
@@ -250,6 +284,40 @@ label:begin
 SELECT id into account_id_ from logindb where username = username_ and pwd = pwd_;
 if isnull(account_id_) then set account_id_ = 0;
 end if;
+end */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `merchant_login_check` */
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `merchant_login_check`(IN username_ VARCHAR(50), IN pwd_ VARCHAR(50), OUT account_id_ INT)
+label:BEGIN
+SELECT account_id INTO account_id_ FROM merchant_logindb WHERE username = username_ AND pwd = pwd_;
+IF ISNULL(account_id_) THEN SET account_id_ = 0;
+END IF;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `merchant_register` */
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `merchant_register`(IN username_ varchar(20), in pwd_ varchar(50), in email_ varchar(50), in cellphone_ varchar(20), In sk_ varchar(100), in N_ varchar(100), out result int)
+label:begin
+DECLARE account_id_ INT DEFAULT 0;
+SELECT account_id INTO account_id_ FROM merchant_logindb WHERE username = username_;
+IF account_id_ = 0 THEN 
+    INSERT INTO merchant_logindb(username,pwd,sk,N) VALUES(username_,pwd_,sk_,N_);
+    SELECT LAST_INSERT_ID() INTO account_id_;
+    INSERT INTO merchant_infodb(account_id,username) SELECT account_id,username FROM merchant_logindb WHERE account_id = account_id_;
+    UPDATE merchant_infodb SET email = email_, cellphone = cellphone_ WHERE account_id = account_id_ ;
+    SET result = 1; # 注册成功
+    LEAVE label;
+ELSE 
+    SET result = 0; # 用户名已存在 
+    LEAVE label;
+END IF;
 end */$$
 DELIMITER ;
 

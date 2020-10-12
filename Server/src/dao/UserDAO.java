@@ -86,6 +86,33 @@ public class UserDAO {
         return TYPE_CONN_FAILED;
 	}
 	
+	public int merchant_logincheck(Connection conn, String username,String password) {
+		if (conn == null) return TYPE_CONN_FAILED;
+        CallableStatement cs = null;
+        try {
+            cs =conn.prepareCall("{call merchant_login_check(?,?,?)}"); // µ÷ÓÃlogin_check(in username, in pwd, out account_id)
+            cs.setString(1,username);
+            cs.setString(2,password);
+            cs.registerOutParameter(3, Types.INTEGER);
+            cs.execute();
+//            Log.d("LoginActivity","id: " + cs.getInt(3));
+            if (cs.getInt(3) == 0) return TYPE_LOGIN_FAILED;
+            else {
+//            	userinfo.setId(cs.getInt(3));
+            	return cs.getInt(3);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }if (cs != null) {
+            try {
+                cs.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return TYPE_CONN_FAILED;
+	}
+	
 	public Object[] displayinfo(Connection conn,int account_id) {
 //		Connection conn1 = DBUtil.getConn();
 //      Log.d("LoginActivity","conn: " + conn);
@@ -119,7 +146,8 @@ public class UserDAO {
   }
 	
 	public int accountregister(Connection conn,String username, String pwd, String email,String cellphone) {
-        CallableStatement cs = null;
+		if (conn == null) return TYPE_CONN_FAILED;
+		CallableStatement cs = null;
         try {
 //        	Connection conn = DBUtil.getConn();
             cs =conn.prepareCall("{call account_register(?,?,?,?,?)}");
@@ -143,6 +171,32 @@ public class UserDAO {
         }
         return 0;  //error
     }
+	
+	 public int merchantregister(Connection conn,String username, String pwd, String email,String cellphone, String sk_exp,String modulus) {
+		 if (conn == null) return TYPE_CONN_FAILED;
+		 CallableStatement cs = null;
+		 try {
+			 cs =conn.prepareCall("{call merchant_register(?,?,?,?,?,?,?)}");
+	         cs.setString(1, username);
+	         cs.setString(2, pwd);
+	         cs.setString(3, email);
+	         cs.setString(4,cellphone);
+	         cs.setNString(5, sk_exp);
+	         cs.setNString(6, modulus);
+	         cs.registerOutParameter(7,Types.INTEGER);
+	         cs.execute();
+	         if (cs.getInt(7) == 1) return 1;  // success
+	        } catch (Exception e){
+	            e.printStackTrace();
+	        }if (cs != null) {
+	            try {
+	                cs.close();
+	            } catch (SQLException e) {
+	                e.printStackTrace();
+	            }
+	        }
+	        return 0;  //error
+	 }
 	
 	public int exetransaction(Connection conn, Integer from_account_id, Integer to_account_id, Double value) {
         if (conn == null) return TYPE_CONN_FAILED;

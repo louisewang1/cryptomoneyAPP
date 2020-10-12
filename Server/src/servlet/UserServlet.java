@@ -2,6 +2,9 @@ package servlet;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.security.KeyPair;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 //import java.io.PrintWriter;
 import java.sql.Connection;
 import java.util.List;
@@ -18,6 +21,7 @@ import org.json.JSONArray;
 import service.UserService;
 import util.Base64Utils;
 import util.DBUtil;
+import util.RSAUtils;
 import entity.CryptoRecord;
 import entity.Record;
 
@@ -59,10 +63,16 @@ public class UserServlet extends HttpServlet {
 		
 		switch (userRequest) {
 		
-			case "login":
+			case "customerlogin":
 				String username = request.getParameter("username");
 				String password = request.getParameter("password");
 				response.getOutputStream().write(Integer.toString(userService.login(conn,username, password)).getBytes("utf-8"));
+				break;
+			
+			case "merchantlogin":
+				String username3 = request.getParameter("username");
+				String password3 = request.getParameter("password");
+				response.getOutputStream().write(Integer.toString(userService.merchantlogin(conn,username3, password3)).getBytes("utf-8"));
 				break;
 				
 			case "accountinfo":
@@ -81,16 +91,35 @@ public class UserServlet extends HttpServlet {
 				response.getWriter().write(object.toString());
 				break;
 				
-			case "register":
+			case "customerregister":
 				String username1 = request.getParameter("username");
 				String password1 = request.getParameter("password");
 				String email = request.getParameter("email");
 				String cellphone = request.getParameter("cellphone");
-//				String pk = request.getParameter("pk");
-//				String modulus = request.getParameter("N");
-//				System.out.println("pk= " + pk);
-//				System.out.println("byte pk= " + Base64Utils.decode(pk));
 				response.getOutputStream().write(Integer.toString(userService.register(conn,username1, password1,email,cellphone)).getBytes("utf-8"));
+				break;
+			
+			case "merchantregister":
+				String username2 = request.getParameter("username");
+				String password2 = request.getParameter("password");
+				String email2 = request.getParameter("email");
+				String cellphone2 = request.getParameter("cellphone");
+				
+				KeyPair keypair = RSAUtils.generateRSAKeyPair(512);
+                RSAPublicKey publicKey = (RSAPublicKey) keypair.getPublic();
+                RSAPrivateKey privateKey = (RSAPrivateKey) keypair.getPrivate();
+               
+                String pk_exp = Base64Utils.encode(publicKey.getPublicExponent().toByteArray());
+                String sk_exp = Base64Utils.encode(privateKey.getPrivateExponent().toByteArray());
+                String modulus = Base64Utils.encode(publicKey.getModulus().toByteArray());
+                 
+				Integer result2 = userService.merchantregister(conn,username2, password2,email2,cellphone2,sk_exp,modulus);
+				if (result2 == 1) {
+                    response.getWriter().write("pk="+pk_exp+"&N="+modulus);
+				}
+				else {
+					response.getWriter().write("merchant account already existed");
+				}
 				break;
 				
 			case "transfer":
@@ -121,8 +150,8 @@ public class UserServlet extends HttpServlet {
 				int id2 = Integer.parseInt(request.getParameter("id"));
 				double value2 = Double.parseDouble(request.getParameter("value"));
 				String modulus1 = request.getParameter("N");
-				String pk_exp = request.getParameter("pk");
-				response.getOutputStream().write(userService.cryptomoney(conn, id2, value2, modulus1,pk_exp).getBytes("utf-8"));
+				String pk_exp2 = request.getParameter("pk");
+				response.getOutputStream().write(userService.cryptomoney(conn, id2, value2, modulus1,pk_exp2).getBytes("utf-8"));
 				break;
 				
 			case "cryptotransaction":

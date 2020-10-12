@@ -17,9 +17,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.example.cryptomoney.utils.Base64Utils;
+import com.example.cryptomoney.utils.Constant;
 import com.example.cryptomoney.utils.RSAUtils;
 
 import java.math.BigInteger;
@@ -51,15 +54,20 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText emailEdit;
     private EditText cellphoneEdit;
     private Button register;
-    private KeyPair keypair;
+    private RadioButton customer, merchant;
+    private RadioGroup group;
+    private int registerMode;
+    private String response;
 
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
 
     private Connection conn = null;
-    public final static int TYPE_CONN_FAILED = -1;
-    public final static int TYPE_REG_SUCCESS = 1;
-    public final static int TYPE_REG_FAILED = 0;
+//    public final static int TYPE_CONN_FAILED = -1;
+//    public final static int TYPE_REG_SUCCESS = 1;
+//    public final static int TYPE_REG_FAILED = 0;
+    public final static int CUSTOMER_MODE = 1;
+    public final static int MERCHANT_MODE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +89,28 @@ public class RegisterActivity extends AppCompatActivity {
         emailEdit = (EditText) findViewById(R.id.email);
         cellphoneEdit = (EditText) findViewById(R.id.cellphone);
         register = (Button) findViewById(R.id.register);
+        customer = (RadioButton) findViewById(R.id.customer);
+        merchant = (RadioButton) findViewById(R.id.merchant);
+        group = (RadioGroup) findViewById(R.id.group);
+
+        if (customer.isChecked())  registerMode = CUSTOMER_MODE;
+        else if (merchant.isChecked()) registerMode = MERCHANT_MODE;
+
+        group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()  {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                switch (i) {
+                    case R.id.customer:
+                        registerMode = CUSTOMER_MODE;
+                        break;
+                    case R.id.merchant:
+                        registerMode = MERCHANT_MODE;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
 
 
         register.setOnClickListener(new View.OnClickListener() {
@@ -94,7 +124,7 @@ public class RegisterActivity extends AppCompatActivity {
                 final String pwd_again = pwd_againEdit.getText().toString();
                 final String email = emailEdit.getText().toString();
                 final String cellphone = cellphoneEdit.getText().toString();
-
+                System.out.println(registerMode);
                 if (TextUtils.isEmpty(username) || TextUtils.isEmpty(username)) {
                     Toast.makeText(RegisterActivity.this, "Username or password can't be empty",Toast.LENGTH_SHORT).show();
                     return;
@@ -105,71 +135,89 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
 
-//                keypair = RSAUtils.generateRSAKeyPair(512);
-//                RSAPublicKey publicKey = (RSAPublicKey) keypair.getPublic();
-//                RSAPrivateKey privateKey = (RSAPrivateKey) keypair.getPrivate();
-//
-//                // 注册成功后生成密钥对保存在sharedpreference中 //todo:不安全
-//                String pk_enc = Base64Utils.encode(publicKey.getEncoded());
-//
-//                String pk_exp = Base64Utils.encode(publicKey.getPublicExponent().toByteArray());
-//                String sk_exp = Base64Utils.encode(privateKey.getPrivateExponent().toByteArray());
-//                String modulus = Base64Utils.encode(publicKey.getModulus().toByteArray());
-//
-////                pref = PreferenceManager.getDefaultSharedPreferences(RegisterActivity.this);
-//                pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
-//                editor = pref.edit();
-//                editor.putString("pk",pk_enc);
-//                editor.putString("pk_exp",pk_exp);
-//                editor.putString("sk_exp",sk_exp);
-//                editor.putString("modulus",modulus);
-//                editor.apply();
-//                Log.d("RegisterActivity","sharedpreference OK");
-//
-//                Log.d("RegisternActivity","pk= "+Base64Utils.encode(publicKey.getEncoded()));
-//                Log.d("RegisterActivity","sk_exp= "+privateKey.getPrivateExponent().toString());
-//                Log.d("RegisterActivity","pk_exp= "+pk_exp);
-//                Log.d("RegisterActivity","N from pref= "+pref.getString("modulus",""));
-//                Log.d("RegisterActivity","sk= "+Base64Utils.encode(privateKey.getEncoded()));
+                if (registerMode == CUSTOMER_MODE) {
+//                    System.out.println("into customer mode");
+                    final String registerRequest = "request="+ URLEncoder.encode("customerregister")+ "&username="+ URLEncoder.encode(username)
+                            +"&password=" +URLEncoder.encode(pwd) + "&email=" +URLEncoder.encode(email) +"&cellphone=" +URLEncoder.encode(cellphone);
 
-//                final String registerRequest = "request="+ URLEncoder.encode("register")+ "&username="+ URLEncoder.encode(username)
-//                        +"&password=" +URLEncoder.encode(pwd) + "&email=" +URLEncoder.encode(email) +"&cellphone=" +URLEncoder.encode(cellphone)
-//                        +"&pk=" +URLEncoder.encode(pk_exp)+"&N=" +URLEncoder.encode(modulus);
-
-                final String registerRequest = "request="+ URLEncoder.encode("register")+ "&username="+ URLEncoder.encode(username)
-                        +"&password=" +URLEncoder.encode(pwd) + "&email=" +URLEncoder.encode(email) +"&cellphone=" +URLEncoder.encode(cellphone);
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        String response = PostService.Post(registerRequest);
-                        if (response != null) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String response = PostService.Post(registerRequest);
+                            if (response != null) {
 //                            Log.d("RegiterActivity","response:"+response);
-                            int result = Integer.parseInt(response);
-                            if (result == 1) {
+                                int result = Integer.parseInt(response);
+                                if (result == 1) {
 //                                Log.d("RegiterActivity","response= "+response);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(RegisterActivity.this, "Customer account register succeeded", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                    Intent resultIntent = new Intent();
+                                    resultIntent.putExtra("username", username);
+                                    resultIntent.putExtra("pwd", pwd);
+                                    resultIntent.putExtra("type","CUSTOMER");
+                                    RegisterActivity.this.setResult(RESULT_OK, resultIntent);
+                                    finish();
+                                } else {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(RegisterActivity.this, "Username already existed", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }).start();
+                }
+
+                else if (registerMode == MERCHANT_MODE) {
+                    final String registerRequest = "request="+ URLEncoder.encode("merchantregister")+ "&username="+ URLEncoder.encode(username)
+                            +"&password=" +URLEncoder.encode(pwd) + "&email=" +URLEncoder.encode(email) +"&cellphone=" +URLEncoder.encode(cellphone);
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            response = PostService.Post(registerRequest);  // result=pk
+                            System.out.println(response);
+                            if (response != null && response.indexOf("pk=") == 0) {
+                                String pk_exp = response.split("pk=")[1].split("&N=")[0];
+                                String modulus = response.split("&N=")[1];
+                                pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
+                                editor = pref.edit();
+                                editor.putString("merchant_pk",pk_exp);
+                                editor.putString("merchant_N",modulus);
+                                editor.apply();
                                 runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(RegisterActivity.this, "Register succeeded", Toast.LENGTH_SHORT).show();
-                                    }
+                                        @Override
+                                        public void run() {
+                                            Common.showShortToast(RegisterActivity.this, "Merchant account register succeeded");
+                                        }
                                 });
                                 Intent resultIntent = new Intent();
                                 resultIntent.putExtra("username", username);
                                 resultIntent.putExtra("pwd", pwd);
+                                resultIntent.putExtra("type", "MERCHANT");
                                 RegisterActivity.this.setResult(RESULT_OK, resultIntent);
                                 finish();
                             } else {
                                 runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(RegisterActivity.this, "Username already existed", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                                        @Override
+                                        public void run() {
+                                            Common.showShortToast(RegisterActivity.this, response);
+                                        }
+                                    });
                             }
                         }
-                    }
-                }).start();
+                    }).start();
+
+
+                }
+
+
 
             }
         });
