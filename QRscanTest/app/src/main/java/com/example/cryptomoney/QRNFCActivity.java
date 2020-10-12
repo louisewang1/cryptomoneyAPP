@@ -101,9 +101,9 @@ public class QRNFCActivity extends AppCompatActivity {
 //        pref = PreferenceManager.getDefaultSharedPreferences(this);
         pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
 //        account_id = pref.getString("id","");
-        pk_exp = pref.getString("pk_exp","");
-        sk_exp = pref.getString("sk_exp","");
-        modulus =  pref.getString("modulus","");
+//        pk_exp = pref.getString("pk_exp","");
+        sk_exp = pref.getString(address+"_skexp","");
+        modulus =  pref.getString(address+"_modulus","");
 
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -216,8 +216,8 @@ public class QRNFCActivity extends AppCompatActivity {
                 Log.d("QRgeneratorActivity","string: "+base64ImageString);
                 if (base64ImageString != null && amount > 0) {
                     List<GTXScripElement> scripElements = new ArrayList<>();
-                    scripElements.add(new GTXScripElement(1, "mode= "+mode));
                     scripElements.add(new GTXScripElement(1, "amount= "+amount.toString()));
+                    scripElements.add(new GTXScripElement(1, "mode= "+mode));
                     scripElements.add(new GTXScripElement(5, base64ImageString));
                     GTX.printMixing(onPrintListener, scripElements, mDialog);
 //                    GTX.printImage(onPrintListener, base64ImageString, mDialog);

@@ -86,11 +86,11 @@ public class UserServlet extends HttpServlet {
 				String password1 = request.getParameter("password");
 				String email = request.getParameter("email");
 				String cellphone = request.getParameter("cellphone");
-				String pk = request.getParameter("pk");
-				String modulus = request.getParameter("N");
+//				String pk = request.getParameter("pk");
+//				String modulus = request.getParameter("N");
 //				System.out.println("pk= " + pk);
 //				System.out.println("byte pk= " + Base64Utils.decode(pk));
-				response.getOutputStream().write(Integer.toString(userService.register(conn,username1, password1,email,cellphone,pk,modulus)).getBytes("utf-8"));
+				response.getOutputStream().write(Integer.toString(userService.register(conn,username1, password1,email,cellphone)).getBytes("utf-8"));
 				break;
 				
 			case "transfer":
@@ -121,7 +121,8 @@ public class UserServlet extends HttpServlet {
 				int id2 = Integer.parseInt(request.getParameter("id"));
 				double value2 = Double.parseDouble(request.getParameter("value"));
 				String modulus1 = request.getParameter("N");
-				response.getOutputStream().write(userService.cryptomoney(conn, id2, value2, modulus1).getBytes("utf-8"));
+				String pk_exp = request.getParameter("pk");
+				response.getOutputStream().write(userService.cryptomoney(conn, id2, value2, modulus1,pk_exp).getBytes("utf-8"));
 				break;
 				
 			case "cryptotransaction":

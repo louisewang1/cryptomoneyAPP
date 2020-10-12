@@ -19,9 +19,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cryptomoney.utils.Base64Utils;
+import com.example.cryptomoney.utils.RSAUtils;
 
 import java.net.URLEncoder;
+import java.security.KeyPair;
 import java.security.PublicKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,9 +37,13 @@ public class CryptoActivity extends AppCompatActivity {
 
     private Integer account_id;
     private SharedPreferences pref;
-    private String modulus;
+    private SharedPreferences.Editor editor;
     private String value;
+    private String pk_exp;
+    private String sk_exp;
+    private String modulus;
     public final static int ADDR_LENGTH = 20;
+    private KeyPair keypair;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +64,9 @@ public class CryptoActivity extends AppCompatActivity {
         request = (Button) findViewById(R.id.request);
         response = (TextView) findViewById(R.id.response);
 //        pref = PreferenceManager.getDefaultSharedPreferences(this);
-        pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
-        modulus = pref.getString("modulus","");
-        Log.d("CryptoActivity","modulus= "+modulus);
+//        pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
+//        modulus = pref.getString("modulus","");
+//        Log.d("CryptoActivity","modulus= "+modulus);
 
         request.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,9 +75,20 @@ public class CryptoActivity extends AppCompatActivity {
 //                Log.d("CryptoActivity","value= "+value);
                 boolean isdouble = isNumeric(value);
                 if (isdouble != true) Common.showShortToast(CryptoActivity.this,"Invalid input");
+
                 else {
+
+//                    generate RSA key pairs
+                    keypair = RSAUtils.generateRSAKeyPair(512);
+                    RSAPublicKey publicKey = (RSAPublicKey) keypair.getPublic();
+                    RSAPrivateKey privateKey = (RSAPrivateKey) keypair.getPrivate();
+
+                    pk_exp = Base64Utils.encode(publicKey.getPublicExponent().toByteArray());
+                    sk_exp = Base64Utils.encode(privateKey.getPrivateExponent().toByteArray());
+                    modulus = Base64Utils.encode(publicKey.getModulus().toByteArray());
+
                     final String cryptoRequest ="request=" + URLEncoder.encode("crypto") + "&id="+ URLEncoder.encode(account_id.toString())
-                            +"&value="+ URLEncoder.encode(value) + "&N="+ URLEncoder.encode(modulus);
+                            +"&value="+ URLEncoder.encode(value) + "&N="+ URLEncoder.encode(modulus)+"&pk="+URLEncoder.encode(pk_exp);
 
                     new Thread(new Runnable() {
                         @Override
@@ -83,8 +101,16 @@ public class CryptoActivity extends AppCompatActivity {
                                     public void run() {
                                         response.setText("token address: " +addr);
                                         Toast.makeText(CryptoActivity.this,"Crypto transfer succeeded",Toast.LENGTH_SHORT).show();
+
+//                                        store token address and sk, N in sharedpreference
+                                        pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
+                                        editor = pref.edit();
+                                        editor.putString(addr+"_skexp",sk_exp);
+                                        editor.putString(addr+"_modulus",modulus);
+                                        editor.apply();
+
                                         Intent intent = new Intent(CryptoActivity.this,CryptoModeActivity.class);
-                                        intent.putExtra("amount",value);
+                                        intent.putExtra("amount",Double.parseDouble(value));
                                         intent.putExtra("address",addr);
                                         startActivity(intent);
                                         finish();

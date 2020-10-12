@@ -90,11 +90,11 @@ public class QRgeneratorActivity extends AppCompatActivity {
 //        pref = PreferenceManager.getDefaultSharedPreferences(this);
         pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
 //        account_id = pref.getString("id","");
-        pk_exp = pref.getString("pk_exp","");
-        sk_exp = pref.getString("sk_exp","");
-        modulus =  pref.getString("modulus","");
+//        pk_exp = pref.getString("pk_exp","");
+        sk_exp = pref.getString(address+"_skexp","");
+        modulus =  pref.getString(address+"_modulus","");
         Log.d("QRgeneratorActivity","sk exp= "+sk_exp);
-        Log.d("QRgeneratorActivity","id= "+account_id);
+//        Log.d("QRgeneratorActivity","id= "+account_id);
 
 
         Toolbar toolbar = findViewById(R.id.toolbar);

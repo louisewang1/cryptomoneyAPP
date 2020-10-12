@@ -2,8 +2,7 @@
 SQLyog Ultimate v12.14 (64 bit)
 MySQL - 5.1.30-community : Database - test
 *********************************************************************
-*/
-
+*/
 
 /*!40101 SET NAMES utf8 */;
 
@@ -30,11 +29,8 @@ CREATE TABLE `accountinfodb` (
 
 /*Data for the table `accountinfodb` */
 
-insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
-
-(1,'1',140,'',''),
-
-(2,'2',60,'','');
+insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
+(1,'1',100,'','');
 
 /*Table structure for table `cryptotransferdb` */
 
@@ -44,6 +40,8 @@ CREATE TABLE `cryptotransferdb` (
   `amount` double NOT NULL DEFAULT '0',
   `crypto_time` datetime NOT NULL,
   `address` varchar(100) NOT NULL,
+  `N` varchar(100) NOT NULL,
+  `pk` varchar(10) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_cryptotransferdb_id` (`account_id`),
   CONSTRAINT `fk_cryptotransferdb_id` FOREIGN KEY (`account_id`) REFERENCES `logindb` (`id`)
@@ -57,18 +55,13 @@ CREATE TABLE `logindb` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL,
   `pwd` varchar(100) NOT NULL,
-  `pk` varchar(500) NOT NULL,
-  `N` varchar(1000) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 /*Data for the table `logindb` */
 
-insert  into `logindb`(`id`,`username`,`pwd`,`pk`,`N`) values 
-
-(1,'1','1','AQAB','AO/Qm9XLCAfCjDpNxVaiB0XLEbdj5g4MNgb/1mS6n0mOWmk1iuQfJXs/AVEPdOepKRmKUUs+ikVSWIRbeOExadk='),
-
-(2,'2','2','AQAB','ANviCVQrr88u4GKoPUWuranG66Het30Y/P9WpghMskHM/IEanrESUQyx5K64PCoDm++1ucgDESpgfH/fTfC+ClU=');
+insert  into `logindb`(`id`,`username`,`pwd`) values 
+(1,'1','1');
 
 /*Table structure for table `transactiondb` */
 
@@ -90,17 +83,17 @@ CREATE TABLE `transactiondb` (
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `account_register`(IN username_ VARCHAR(50), IN pwd_ VARCHAR(100), IN email_ VARCHAR(100), IN cellphone_ VARCHAR(100), IN pk_ VARCHAR(500), in n_ varchar(1000), OUT result INT)
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `account_register`(IN username_ VARCHAR(50), IN pwd_ VARCHAR(100), IN email_ VARCHAR(100), IN cellphone_ VARCHAR(100), OUT result INT)
 label:BEGIN
 DECLARE account_id_ INT DEFAULT 0;
 SELECT id INTO account_id_ FROM logindb WHERE username = username_;
 IF account_id_ = 0 THEN 
-    INSERT INTO logindb(username,pwd,pk,N) VALUES(username_,pwd_,pk_,n_);
+    INSERT INTO logindb(username,pwd) VALUES(username_,pwd_);
     SELECT LAST_INSERT_ID() INTO account_id_;
     INSERT INTO accountinfodb(account_id,username) SELECT id,username FROM logindb WHERE id = account_id_;
     UPDATE accountinfodb SET email = email_, cellphone = cellphone_ WHERE account_id = account_id_ ;
-    set result = 1; # 注册成功
-    leave label;
+    SET result = 1; # 注册成功
+    LEAVE label;
 ELSE 
     SET result = 0; # 用户名已存在 
     LEAVE label;
@@ -166,21 +159,21 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `crypto_transfer`(IN account_id_ int, in value_ double, in addr_ varchar(100), out result int)
-label:begin
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `crypto_transfer`(IN account_id_ INT, IN value_ DOUBLE, IN N_ varchar(100),in pk_ varchar(10), IN addr_ VARCHAR(100), OUT result INT)
+label:BEGIN
 DECLARE time_ DATETIME;
-declare addr_exist int default 1;
+DECLARE addr_exist INT DEFAULT 1;
 SELECT COUNT(*) INTO addr_exist FROM cryptotransferdb WHERE address = addr_;
-if addr_exist = 0 then
+IF addr_exist = 0 THEN
     SELECT NOW() INTO time_;
     UPDATE accountinfodb SET balance = balance - value_ WHERE account_id = account_id_;
-    INSERT INTO cryptotransferdb(account_id,amount,crypto_time,address) VALUES(account_id_,value_,time_,addr_);
-    set result = 1;
-else 
-    set result = 0;
-    leave label;
-end if;
-end */$$
+    INSERT INTO cryptotransferdb(account_id,amount,crypto_time,address,N,pk) VALUES(account_id_,value_,time_,addr_,N_,pk_);
+    SET result = 1;
+ELSE 
+    SET result = 0;
+    LEAVE label;
+END IF;
+END */$$
 DELIMITER ;
 
 /* Procedure structure for procedure `display_info` */
@@ -241,10 +234,10 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `get_pk_N`(IN account_id_ INT, OUT pk_ VARCHAR(500), out N_ varchar(1000))
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `get_pk_N`(IN addr_ varchar(100), OUT pk_ VARCHAR(10), OUT N_ VARCHAR(1000))
 label:BEGIN
-SELECT pk INTO pk_ FROM logindb WHERE id = account_id_;
-SELECT N INTO N_ FROM logindb WHERE id = account_id_;
+SELECT pk INTO pk_ FROM cryptotransferdb WHERE address = addr_;
+SELECT N INTO N_ FROM cryptotransferdb WHERE address = addr_;
 END */$$
 DELIMITER ;
 

@@ -118,20 +118,20 @@ public class UserDAO {
       return account_info;
   }
 	
-	public int accountregister(Connection conn,String username, String pwd, String email,String cellphone, String pk,String modulus) {
+	public int accountregister(Connection conn,String username, String pwd, String email,String cellphone) {
         CallableStatement cs = null;
         try {
 //        	Connection conn = DBUtil.getConn();
-            cs =conn.prepareCall("{call account_register(?,?,?,?,?,?,?)}");
+            cs =conn.prepareCall("{call account_register(?,?,?,?,?)}");
             cs.setString(1, username);
             cs.setString(2, pwd);
             cs.setString(3, email);
             cs.setString(4,cellphone);
-            cs.setNString(5, pk);
-            cs.setNString(6, modulus);
-            cs.registerOutParameter(7,Types.INTEGER);
+//            cs.setNString(5, pk);
+//            cs.setNString(6, modulus);
+            cs.registerOutParameter(5,Types.INTEGER);
             cs.execute();
-            if (cs.getInt(7) == 1) return 1;  // success
+            if (cs.getInt(5) == 1) return 1;  // success
         } catch (Exception e){
             e.printStackTrace();
         }if (cs != null) {
@@ -206,44 +206,42 @@ public class UserDAO {
 	        return recordList;
 	    }
 	 
-	 public String cryptotransfer(Connection conn, Integer account_id, Double value,String modulus) {
+	 public String cryptotransfer(Connection conn, Integer account_id, Double value,String modulus,String pk_exp) {
 		 if (conn == null) return null;
 		 CallableStatement cs = null;
 		 String result = null;
 		 try {
-			 cs = conn.prepareCall("{call check_modulus(?,?,?)}");
+//			 cs = conn.prepareCall("{call check_modulus(?,?,?)}");
+//			 cs.setInt(1, account_id);
+//			 System.out.println("modulus= "+modulus);
+//			 cs.setString(2, modulus);
+//			 cs.registerOutParameter(3,Types.INTEGER);
+//			 cs.execute();
+//			 if (cs.getInt(3) == 1) {  // modulus matches
+			 cs = conn.prepareCall("{call check_balance(?,?,?)}");
 			 cs.setInt(1, account_id);
-			 System.out.println("modulus= "+modulus);
-			 cs.setString(2, modulus);
-			 cs.registerOutParameter(3,Types.INTEGER);
+			 cs.setDouble(2, value);
+			 cs.registerOutParameter(3, Types.INTEGER);
 			 cs.execute();
-			 if (cs.getInt(3) == 1) {  // modulus matches
-				 cs = conn.prepareCall("{call check_balance(?,?,?)}");
-				 cs.setInt(1, account_id);
-				 cs.setDouble(2, value);
-				 cs.registerOutParameter(3, Types.INTEGER);
-				 cs.execute();
-				 if (cs.getInt(3) == 1) {  // balance enough
-					 String addr;
-					 do {
-//						 System.out.println("add a record");
-						 addr = getRandomString(20);  
-						 System.out.println("token address= " + addr);
-						 cs = conn.prepareCall("{call crypto_transfer(?,?,?,?)}");
-						 cs.setInt(1, account_id);
-						 cs.setDouble(2, value);
-						 cs.setString(3, addr);
-						 cs.registerOutParameter(4, Types.INTEGER);
-						 cs.execute();
-					 }while (cs.getInt(4) != 1);
-					 return result = addr;
-				 }
-				 else {
-					 result = "not enough balance";
-				 }
-			 } else {
-				 result = "modulus doesn't match";
-			 } 
+			 if (cs.getInt(3) == 1) {  // balance enough
+				 String addr;
+				 do {
+					 addr = getRandomString(20);  
+					 System.out.println("token address= " + addr);
+					 cs = conn.prepareCall("{call crypto_transfer(?,?,?,?,?,?)}");
+					 cs.setInt(1, account_id);
+					 cs.setDouble(2, value);
+					 cs.setString(3, modulus);
+					 cs.setString(4, pk_exp);
+					 cs.setString(5, addr);
+					 cs.registerOutParameter(6, Types.INTEGER);
+					 cs.execute();
+					 }while (cs.getInt(6) != 1);
+				 return result = addr;
+			 }
+			 else {
+				 result = "not enough balance";
+			 }
 		 } catch (Exception e){
 	            e.printStackTrace();
 	     }if (cs != null) {
@@ -303,7 +301,7 @@ public class UserDAO {
 			 if (from_id > 0) {  // from_id exists
 				 System.out.println("from_id= "+from_id);
 				 cs = conn.prepareCall("{call get_pk_N(?,?,?)}");
-				 cs.setInt(1, from_id);
+				 cs.setString(1, addr);
 				 cs.registerOutParameter(2,Types.VARCHAR);
 				 cs.registerOutParameter(3,Types.VARCHAR);
 				 cs.execute();

@@ -105,42 +105,39 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
 
-                keypair = RSAUtils.generateRSAKeyPair(512);
-                RSAPublicKey publicKey = (RSAPublicKey) keypair.getPublic();
-                RSAPrivateKey privateKey = (RSAPrivateKey) keypair.getPrivate();
+//                keypair = RSAUtils.generateRSAKeyPair(512);
+//                RSAPublicKey publicKey = (RSAPublicKey) keypair.getPublic();
+//                RSAPrivateKey privateKey = (RSAPrivateKey) keypair.getPrivate();
+//
+//                // 注册成功后生成密钥对保存在sharedpreference中 //todo:不安全
+//                String pk_enc = Base64Utils.encode(publicKey.getEncoded());
+//
+//                String pk_exp = Base64Utils.encode(publicKey.getPublicExponent().toByteArray());
+//                String sk_exp = Base64Utils.encode(privateKey.getPrivateExponent().toByteArray());
+//                String modulus = Base64Utils.encode(publicKey.getModulus().toByteArray());
+//
+////                pref = PreferenceManager.getDefaultSharedPreferences(RegisterActivity.this);
+//                pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
+//                editor = pref.edit();
+//                editor.putString("pk",pk_enc);
+//                editor.putString("pk_exp",pk_exp);
+//                editor.putString("sk_exp",sk_exp);
+//                editor.putString("modulus",modulus);
+//                editor.apply();
+//                Log.d("RegisterActivity","sharedpreference OK");
+//
+//                Log.d("RegisternActivity","pk= "+Base64Utils.encode(publicKey.getEncoded()));
+//                Log.d("RegisterActivity","sk_exp= "+privateKey.getPrivateExponent().toString());
+//                Log.d("RegisterActivity","pk_exp= "+pk_exp);
+//                Log.d("RegisterActivity","N from pref= "+pref.getString("modulus",""));
+//                Log.d("RegisterActivity","sk= "+Base64Utils.encode(privateKey.getEncoded()));
 
-                // 注册成功后生成密钥对保存在sharedpreference中 //todo:不安全
-                String pk_enc = Base64Utils.encode(publicKey.getEncoded());
-//                try {
-//                    PublicKey pk2 = RSAUtils.loadPublicKey("MDwwDQYJKoZIhvcNAQEBBQADKwAwKAIhAL5J0bDBTANeWs/ITbAUisxsU1TNhx6Aw10w/NK44mulAgMBAAE=");
-//                    Log.d("RegisterActivity","pk2= "+pk2);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-
-                String pk_exp = Base64Utils.encode(publicKey.getPublicExponent().toByteArray());
-                String sk_exp = Base64Utils.encode(privateKey.getPrivateExponent().toByteArray());
-                String modulus = Base64Utils.encode(publicKey.getModulus().toByteArray());
-
-//                pref = PreferenceManager.getDefaultSharedPreferences(RegisterActivity.this);
-                pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
-                editor = pref.edit();
-                editor.putString("pk",pk_enc);
-                editor.putString("pk_exp",pk_exp);
-                editor.putString("sk_exp",sk_exp);
-                editor.putString("modulus",modulus);
-                editor.apply();
-                Log.d("RegisterActivity","sharedpreference OK");
-
-                Log.d("RegisternActivity","pk= "+Base64Utils.encode(publicKey.getEncoded()));
-                Log.d("RegisterActivity","sk_exp= "+privateKey.getPrivateExponent().toString());
-                Log.d("RegisterActivity","pk_exp= "+pk_exp);
-                Log.d("RegisterActivity","N from pref= "+pref.getString("modulus",""));
-                Log.d("RegisterActivity","sk= "+Base64Utils.encode(privateKey.getEncoded()));
+//                final String registerRequest = "request="+ URLEncoder.encode("register")+ "&username="+ URLEncoder.encode(username)
+//                        +"&password=" +URLEncoder.encode(pwd) + "&email=" +URLEncoder.encode(email) +"&cellphone=" +URLEncoder.encode(cellphone)
+//                        +"&pk=" +URLEncoder.encode(pk_exp)+"&N=" +URLEncoder.encode(modulus);
 
                 final String registerRequest = "request="+ URLEncoder.encode("register")+ "&username="+ URLEncoder.encode(username)
-                        +"&password=" +URLEncoder.encode(pwd) + "&email=" +URLEncoder.encode(email) +"&cellphone=" +URLEncoder.encode(cellphone)
-                        +"&pk=" +URLEncoder.encode(pk_exp)+"&N=" +URLEncoder.encode(modulus);
+                        +"&password=" +URLEncoder.encode(pwd) + "&email=" +URLEncoder.encode(email) +"&cellphone=" +URLEncoder.encode(cellphone);
 
                 new Thread(new Runnable() {
                     @Override
