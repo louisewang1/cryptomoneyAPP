@@ -27,6 +27,7 @@ if(rs.next())
 
 
 %>
-
+<p/>
+<input type="button" value="Generate QR code" onClick="window.location.href='QRcodeInput.jsp'">
 </body>
 </html>
