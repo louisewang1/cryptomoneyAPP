@@ -22,9 +22,14 @@ document.thisform.submit();
 }
 </script>
 
+<jsp:useBean id="crypto" class="Bean.Crypto" scope="page"/>
+
 <% 
+int id = Integer.parseInt(request.getParameter("Id"));
+System.out.println(id);
 String input = null;
-input=request.getParameter( "Input");
+input=request.getParameter("Input");
+
 System.out.println(input);
 if (input == "") input = null;
 
@@ -32,8 +37,14 @@ if (input == "") input = null;
 
 if (input != null){
 	System.out.println("get input");
-	String temp = "QRcode.jsp?Input=" + input;
-	response.sendRedirect(temp);
+	double value = Double.parseDouble(input);
+	//CryptoBean crypto = new CryptoBean();
+	String addr = crypto.generateQRcontent(value,id);
+	String private_key = crypto.getKey();
+	String modulus = crypto.getMod();
+	String ciphertext = "N="+modulus+"&d="+private_key+"&addr="+addr;
+	String new_addr = "QRcode.jsp?Input=" + ciphertext;
+	response.sendRedirect(new_addr);
 }
 %>
 

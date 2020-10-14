@@ -2,7 +2,7 @@ package Bean;
 import java.sql.*;
 public class DBBean {
     private String driverStr = "com.mysql.jdbc.Driver";
-    private String connStr = "jdbc:mysql://82.130.102.60:3306/test";
+    private String connStr = "jdbc:mysql://192.168.56.1:3306/test";
     private String dbusername = "user";
     private String dbpassword = "user";
     private Connection conn = null;

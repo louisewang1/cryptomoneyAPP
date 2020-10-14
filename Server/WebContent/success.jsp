@@ -21,6 +21,8 @@ if(rs.next())
 	out.println("Balance: " + balance + "<br/>");
 	out.println("Email: "+rs.getObject("email").toString()+"<br/>");
 	out.println("Cellphone: "+rs.getObject("cellphone").toString()+"<br/>");
+	int acc_id = rs.getInt("account_id");
+	out.println(acc_id+"<br/>");
 
 }
 
@@ -28,6 +30,11 @@ if(rs.next())
 
 %>
 <p/>
-<input type="button" value="Generate QR code" onClick="window.location.href='QRcodeInput.jsp'">
+<script>    
+    function redirect (){     
+      	document.location.href("QRcodeInput.jsp?Id=1");       
+    }    
+</script> 
+<input type="button" value="Generate QR code" onClick="redirect()">
 </body>
 </html>
