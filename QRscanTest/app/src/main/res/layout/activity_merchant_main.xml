@@ -14,10 +14,24 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-   <TextView
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:text="This is a merchant menu" />
+<!--    <Button-->
+<!--        android:id="@+id/account_info"-->
+<!--        android:layout_width="250dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="center_horizontal"-->
+<!--        android:text="Account Info"-->
+<!--        android:textSize="15sp"-->
+<!--        android:layout_margin="10dp"/>-->
+
+    <Button
+        android:id="@+id/verify"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Local Verify"
+        android:textSize="15sp"
+        android:layout_margin="10dp"/>
+
 
 
 </LinearLayout>

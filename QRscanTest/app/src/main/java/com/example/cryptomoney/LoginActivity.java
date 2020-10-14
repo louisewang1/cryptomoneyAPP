@@ -82,8 +82,10 @@ public class LoginActivity extends AppCompatActivity {
             String account = pref.getString("account","");
             String password = pref.getString("pwd","");
             String type = pref.getString("type","");
-            if (type == "CUSTOMER") customer.setChecked(true);
-            else if (type == "MERCHANT") merchant.setChecked(true);
+            if (type.equals("CUSTOMER")) customer.setChecked(true);
+            else if (type.equals("MERCHANT")) {
+                merchant.setChecked(true);
+            }
             accountEdit.setText(account);
             passwordEdit.setText(password);
             rememberPass.setChecked(true);
@@ -153,6 +155,7 @@ public class LoginActivity extends AppCompatActivity {
                                     showResponse("id = " +response);
                                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                     intent.putExtra("account_id",id);  //传递account_id
+                                    intent.putExtra("type","CUSTOMER");
                                     startActivity(intent);
                                     finish();
                                 } else {
@@ -175,7 +178,6 @@ public class LoginActivity extends AppCompatActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            // 获取输入字符串
                             final String username = accountEdit.getText().toString();
                             final String pwd = passwordEdit.getText().toString();
                             final String loginRequest = "request="+ URLEncoder.encode("merchantlogin")+ "&username="+ URLEncoder.encode(username)+"&password=" +URLEncoder.encode(pwd);
@@ -205,6 +207,7 @@ public class LoginActivity extends AppCompatActivity {
                                     showResponse("id = " +response);
                                     Intent intent = new Intent(LoginActivity.this, MerchantMainActivity.class);
                                     intent.putExtra("account_id",id);  //传递account_id
+                                    intent.putExtra("type","MERCHANT");
                                     startActivity(intent);
                                     finish();
                                 } else {

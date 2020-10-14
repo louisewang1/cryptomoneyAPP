@@ -73,6 +73,8 @@ public class QRgeneratorActivity extends AppCompatActivity {
     private String account_id;
     private String text;
     private String mode;
+    private String merchant;
+    private String enc;
 
     private final static int REQ_LOC = 10;
 
@@ -86,6 +88,7 @@ public class QRgeneratorActivity extends AppCompatActivity {
         amount = getIntent().getDoubleExtra("amount",0);
         address = getIntent().getStringExtra("address");
         mode = getIntent().getStringExtra("mode");
+        merchant =getIntent().getStringExtra("merchant");
 
 //        pref = PreferenceManager.getDefaultSharedPreferences(this);
         pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
@@ -113,7 +116,14 @@ public class QRgeneratorActivity extends AppCompatActivity {
         print = findViewById(R.id.print);
 
 //        qrstring.setText("&sk="+privatekey+"&addr="+address);
-        text = "N="+modulus+"&d="+sk_exp+"&addr="+address;
+        if (merchant.equals("None")) {
+            text = "N="+modulus+"&d="+sk_exp+"&addr="+address;
+        }
+        else {
+            enc = getIntent().getStringExtra("enc");
+            text = enc;
+        }
+
         qrimage = QrCodeGenerator.getQrCodeImage(text,200,200);
         qrimg.setImageBitmap(qrimage);
 
@@ -195,8 +205,9 @@ public class QRgeneratorActivity extends AppCompatActivity {
                 Log.d("QRgeneratorActivity","string: "+base64ImageString);
                 if (base64ImageString != null && amount > 0) {
                     List<GTXScripElement> scripElements = new ArrayList<>();
-                    scripElements.add(new GTXScripElement(1, "amount= "+amount.toString()));
                     scripElements.add(new GTXScripElement(1, "mode= "+mode));
+                    scripElements.add(new GTXScripElement(1, "amount= "+amount.toString()));
+                    scripElements.add(new GTXScripElement(1, "to merchant: "+merchant));
                     scripElements.add(new GTXScripElement(5, base64ImageString));
                     GTX.printMixing(onPrintListener, scripElements, mDialog);
 //                    GTX.printImage(onPrintListener, base64ImageString, mDialog);

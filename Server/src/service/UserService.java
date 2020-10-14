@@ -57,4 +57,10 @@ public class UserService {
    public int merchantregister(Connection conn,String username, String password, String email,String cellphone, String sk_exp,String modulus) {
 	   return userDAO.merchantregister(conn,username,password,email,cellphone,sk_exp,modulus);
    }
+   
+   public List<String> merchantlist(Connection conn) {
+	   return userDAO.merchantlist(conn);
+   }
+   
 }
+

@@ -8,26 +8,34 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cryptomoney.utils.Base64Utils;
+import com.example.cryptomoney.utils.Logger;
 import com.google.zxing.activity.CaptureActivity;
 import com.google.zxing.util.Constant;
 
 import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 
 import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 
 public class RcvModeActivity extends AppCompatActivity {
 
@@ -35,6 +43,11 @@ public class RcvModeActivity extends AppCompatActivity {
     private Button QR;
     private Button QRNFC;
     private Button NFC;
+    private String type;
+    private SharedPreferences pref;
+    private String merchant_N;
+    private String merchant_pk;
+    private TextView rcvresponse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +64,12 @@ public class RcvModeActivity extends AppCompatActivity {
 
         Intent intent_from_main = getIntent();
         account_id = intent_from_main.getIntExtra("account_id",0);
+        type = intent_from_main.getStringExtra("type");
 
         QR = findViewById(R.id.QR);
         QRNFC = findViewById(R.id.QRNFC);
         NFC = findViewById(R.id.NFC);
+        rcvresponse = findViewById(R.id.response);
 
         QR.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,6 +89,7 @@ public class RcvModeActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent_to_qrnfc = new Intent(RcvModeActivity.this,QRNFCRcvActivity.class);
                 intent_to_qrnfc.putExtra("account",account_id);
+                intent_to_qrnfc.putExtra("type",type);
                 startActivity(intent_to_qrnfc);
                 finish();
             }
@@ -96,59 +112,98 @@ public class RcvModeActivity extends AppCompatActivity {
         if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_OK) {
             Bundle bundle = data.getExtras();
             String qrstring = bundle.getString(Constant.INTENT_EXTRA_KEY_QR_SCAN);
+            Logger.d("RcvMode","qrstring="+qrstring);
 
-            if (qrstring.indexOf("N=") == 0) {
-                String N_base64 = qrstring.split("N=")[1].split("&d=")[0];
-                BigInteger N = new BigInteger(Base64Utils.decode(N_base64));
+            if (type.equals("CUSTOMER")) {
+                if (qrstring.indexOf("N=") == 0) {
+                    String N_base64 = qrstring.split("N=")[1].split("&d=")[0];
+                    BigInteger N = new BigInteger(Base64Utils.decode(N_base64));
 //                Log.d("MainActivity","N= "+N);
-                String d_base64 = qrstring.split("&d=")[1].split("&addr=")[0];
-                BigInteger d = new BigInteger(Base64Utils.decode(d_base64));
+                    String d_base64 = qrstring.split("&d=")[1].split("&addr=")[0];
+                    BigInteger d = new BigInteger(Base64Utils.decode(d_base64));
 //                Log.d("MainActivity","d= "+d);
-                String addr = qrstring.split("&addr=")[1];
+                    String addr = qrstring.split("&addr=")[1];
 //                Log.d("MainActivity","addr= "+addr);
 
-                try {
+                    try {
 //                    sk = RSAUtils.getPrivateKey(N.toString(),d.toString());
-                    KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-                    RSAPrivateKeySpec rsaPrivateKeySpec = new RSAPrivateKeySpec(N,d);
-                    PrivateKey sk = keyFactory.generatePrivate(rsaPrivateKeySpec);
+                        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+                        RSAPrivateKeySpec rsaPrivateKeySpec = new RSAPrivateKeySpec(N,d);
+                        PrivateKey sk = keyFactory.generatePrivate(rsaPrivateKeySpec);
 //                    Log.d("MainActivity","recovered sk= "+sk);
-                    Cipher cipher=Cipher.getInstance("RSA/ECB/PKCS1Padding");
-                    cipher.init(Cipher.ENCRYPT_MODE,sk);
+                        Cipher cipher=Cipher.getInstance("RSA/ECB/PKCS1Padding");
+                        cipher.init(Cipher.ENCRYPT_MODE,sk);
 //                    Log.d("MainActivity","recovered sk= "+sk_enc);
-                    String id = "ACCOUNT="+account_id.toString();
-                    byte[]  id_enc = cipher.doFinal(id.getBytes());
+                        String id = "ACCOUNT="+account_id.toString();
+                        byte[]  id_enc = cipher.doFinal(id.getBytes());
 
-                    String id_enc_str = Base64Utils.encode(id_enc);
+                        String id_enc_str = Base64Utils.encode(id_enc);
 //                    Log.d("MainActivity","id_enc= "+id_enc_str);
 //                    Log.d("MainActivity","encrypted id= "+id_enc);
 
-                    final String cryptomoneyinRequest ="request=" + URLEncoder.encode("getencrypto") +
-                            "&id_enc="+ URLEncoder.encode(id_enc_str)+"&addr="+ URLEncoder.encode(addr);
+                        final String cryptomoneyinRequest ="request=" + URLEncoder.encode("getencrypto") +
+                                "&id_enc="+ URLEncoder.encode(id_enc_str)+"&addr="+ URLEncoder.encode(addr);
 
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final String response = PostService.Post(cryptomoneyinRequest);
-                            if (response != null) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Common.showLongToast(RcvModeActivity.this,response);
-                                        finish();
-                                    }
-                                });
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                final String response = PostService.Post(cryptomoneyinRequest);
+                                if (response != null) {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Common.showLongToast(RcvModeActivity.this,response);
+                                            rcvresponse.setText(response);
+//                                            finish();
+                                        }
+                                    });
+                                }
                             }
-                        }
-                    }).start();
+                        }).start();
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                else {
+                    Common.showLongToast(RcvModeActivity.this,"QR reading failed, please scan again ");
+                    rcvresponse.setText("QR reading failed, please scan again ");
                 }
             }
 
-            else {
-                Common.showLongToast(RcvModeActivity.this,"QR reading failed, please scan again ");
+            else if (type.equals("MERCHANT")) {
+                pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
+                merchant_pk = pref.getString("merchant_pk","");
+                merchant_N = pref.getString("merchant_N","");
+
+                BigInteger pk_exp = new BigInteger(Base64Utils.decode(merchant_pk));
+                BigInteger modulus = new BigInteger(Base64Utils.decode(merchant_N));
+
+                Cipher cipher = null;
+                try {
+                    cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+                    KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+                    RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(modulus,pk_exp);
+                    PublicKey pk = keyFactory.generatePublic(rsaPublicKeySpec);
+                    cipher.init(Cipher.DECRYPT_MODE,pk);
+                    String qrstring_dec = new String(cipher.doFinal(Base64Utils.decode(qrstring)));
+                    System.out.println(qrstring_dec);
+                    if (qrstring_dec.indexOf("amount=") == 0) {
+                        Double amount = Double.parseDouble(qrstring_dec.split("amount=")[1].split("&token=")[0]);
+                        String token = qrstring_dec.split("&token=")[1];
+                        Common.showLongToast(RcvModeActivity.this,"amount="+amount+" token address="+token);
+                        rcvresponse.setText("amount="+amount+" token address="+token);
+                    }
+                    else {
+                        Common.showLongToast(RcvModeActivity.this,"invalid token");
+                        rcvresponse.setText("invalid token");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Common.showLongToast(RcvModeActivity.this,"invalid token");
+                    rcvresponse.setText("invalid token");
+                }
+
             }
         }
     }

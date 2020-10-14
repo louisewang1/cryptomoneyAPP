@@ -342,6 +342,32 @@ public class UserDAO {
 	        return recordList;
 	    }
 	 
+	 public List<String> merchantlist(Connection conn) {
+		 if (conn == null) return null;
+		 List<String> merchantList = new ArrayList<>();
+		 CallableStatement cs = null;
+	     ResultSet rs;
+	     try {
+	    	 cs =conn.prepareCall("{call merchant_list()}"); 
+	         cs.execute();
+	         rs = cs.getResultSet();
+	         int index = 1;
+			 while (rs.next()) {
+				 merchantList.add(rs.getString("username"));
+				 index ++;
+			 }
+        } catch (Exception e){
+            e.printStackTrace();
+        }if (cs != null) {
+            try {
+                cs.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return merchantList;
+	 }
+	 
 	 public String getcryptomoney(Connection conn,String id_enc, String addr) {
 		 if (conn == null) return null;
 		 CallableStatement cs = null;
@@ -395,6 +421,7 @@ public class UserDAO {
 			 }
 		 } catch (Exception e){
 	            e.printStackTrace();
+	            result = "decryption failed";
 	        }if (cs != null) {
 	            try {
 	                cs.close();

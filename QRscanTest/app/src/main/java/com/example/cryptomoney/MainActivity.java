@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
     private PublicKey pk;
     private String sk_enc;
     private SharedPreferences pref;
+    private String type;
 
     private Integer account_id;
     private static String timePattern = "yyyy-MM-dd HH:mm:ss";
@@ -131,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent_from_login = getIntent();
         account_id = intent_from_login.getIntExtra("account_id",0);
+        type = intent_from_login.getStringExtra("type");
 
         crypto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -170,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
                                 Bundle bundle = new Bundle();
                                 bundle.putSerializable("recordList", (Serializable) recordList);
                                 bundle.putInt("account_id",account_id);
+                                bundle.putString("type",type);
                                 intent.putExtras(bundle);
                                 startActivity(intent);
 
@@ -197,6 +200,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Intent intent_to_mode = new Intent(MainActivity.this,RcvModeActivity.class);
                 intent_to_mode.putExtra("account_id",account_id);
+                intent_to_mode.putExtra("type",type);
                 startActivity(intent_to_mode);
 
             }

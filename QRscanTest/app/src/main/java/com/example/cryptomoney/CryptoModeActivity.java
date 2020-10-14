@@ -18,6 +18,8 @@ public class CryptoModeActivity extends AppCompatActivity {
     private Button NFC;
     private Double value;
     private String addr;
+    private String merchant;
+    private String enc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +33,11 @@ public class CryptoModeActivity extends AppCompatActivity {
         Intent intent_from_main = getIntent();
         value = getIntent().getDoubleExtra("amount",0);
         addr = getIntent().getStringExtra("address");
-
+        merchant = getIntent().getStringExtra("merchant");
+        if (!merchant.equals("None")) {
+            enc = getIntent().getStringExtra("enc");
+//            System.out.println("xxixixienc="+enc);
+        }
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -48,6 +54,10 @@ public class CryptoModeActivity extends AppCompatActivity {
                 intent_to_QR.putExtra("amount",value);
                 intent_to_QR.putExtra("address",addr);
                 intent_to_QR.putExtra("mode","QR");
+                intent_to_QR.putExtra("merchant",merchant);
+                if (!merchant.equals("None")) {
+                    intent_to_QR.putExtra("enc",enc);
+                }
                 startActivity(intent_to_QR);
                 finish();
             }
@@ -60,6 +70,10 @@ public class CryptoModeActivity extends AppCompatActivity {
                 intent_to_QRNFC.putExtra("amount",value);
                 intent_to_QRNFC.putExtra("address",addr);
                 intent_to_QRNFC.putExtra("mode","QR&NFC");
+                intent_to_QRNFC.putExtra("merchant",merchant);
+                if (!merchant.equals("None")) {
+                    intent_to_QRNFC.putExtra("enc",enc);
+                }
                 startActivity(intent_to_QRNFC);
                 finish();
             }

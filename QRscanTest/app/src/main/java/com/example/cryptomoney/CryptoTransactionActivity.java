@@ -12,9 +12,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -32,6 +36,11 @@ public class CryptoTransactionActivity extends AppCompatActivity {
     private CryptoRecordAdapter adapter;
     private Integer account_id;
     private RecyclerView recyclerView;
+    private Spinner spinner = null;
+    private ArrayAdapter<String> merchantlistAdapter = null;
+    private String[] merchantList;
+    private String merchant_selected;
+    private String type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +54,67 @@ public class CryptoTransactionActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
         }
+        spinner = (Spinner)findViewById(R.id.spinner);
+
+        recordList =  (List<CryptoRecord>) getIntent().getSerializableExtra("recordList");
+        account_id = getIntent().getIntExtra("account_id",0);
+        type = getIntent().getStringExtra("type");
+        if (recordList == null) return;
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        adapter = new CryptoRecordAdapter(recordList);
+        recyclerView.setAdapter(adapter);
+        adapter.setid(account_id);
+
+        final String merchantlistRequest ="request=" + URLEncoder.encode("merchantlist");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final String response = PostService.Post(merchantlistRequest);
+//                System.out.println(response)
+                if (response != null) {
+                    try {
+                        List<String> array = new ArrayList<>();
+                        JSONArray jsonArray = new JSONArray(response);
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            array.add(jsonObject.getString("username"));
+                        }
+                        merchantList = new String[array.size()+1];
+                        merchantList[0] = "None";
+                        for (int i=1;i<array.size()+1;i++) {
+                            merchantList[i] = array.get(i-1);
+                        }
+//                        System.out.println(merchantList);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                merchantlistAdapter = new ArrayAdapter<String>(CryptoTransactionActivity.this,android.R.layout.simple_spinner_item,merchantList);
+                                merchantlistAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                spinner.setAdapter(merchantlistAdapter);
+
+                                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                    @Override
+                                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                                        merchant_selected = (String) ((TextView)view).getText();
+                                        System.out.println(merchant_selected);
+                                        adapter.setmerchant(merchant_selected);
+                                    }
+
+                                    @Override
+                                    public void onNothingSelected(AdapterView<?> adapterView) {
+                                    }
+                                });
+                            }
+                        });
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
 
         swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresher);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -53,15 +123,6 @@ public class CryptoTransactionActivity extends AppCompatActivity {
                 refreshcryptotransaction();
             }
         });
-
-        recordList =  (List<CryptoRecord>) getIntent().getSerializableExtra("recordList");
-        account_id = getIntent().getIntExtra("account_id",0);
-        if (recordList == null) return;
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        adapter = new CryptoRecordAdapter(recordList);
-        recyclerView.setAdapter(adapter);
 
     }
 

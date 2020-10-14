@@ -2,13 +2,21 @@ package servlet;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.KeyFactory;
 import java.security.KeyPair;
+import java.security.PrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.RSAPrivateKeySpec;
+import java.sql.CallableStatement;
 //import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
+import javax.crypto.Cipher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -145,14 +153,110 @@ public class UserServlet extends HttpServlet {
 				}
 				response.getWriter().write(array.toString());
 				break;
+			
+			case "merchantlist":
+				List<String> result3 = userService.merchantlist(conn);
+				JSONArray merchantList = new JSONArray();
+				for (int i = 0; i<result3.size(); i++) {
+					JSONObject object1 = new JSONObject();
+					object1.put("username",result3.get(i));
+					merchantList.put(object1);
+				}
+				response.getWriter().write(merchantList.toString());
+				break;
 				
 			case "crypto":
 				int id2 = Integer.parseInt(request.getParameter("id"));
 				double value2 = Double.parseDouble(request.getParameter("value"));
+				String merchant = request.getParameter("merchant");
 				String modulus1 = request.getParameter("N");
 				String pk_exp2 = request.getParameter("pk");
-				response.getOutputStream().write(userService.cryptomoney(conn, id2, value2, modulus1,pk_exp2).getBytes("utf-8"));
+				String transferresult = userService.cryptomoney(conn, id2, value2, modulus1,pk_exp2);
+//				System.out.println("transferresult="+transferresult);
+//				System.out.println(merchant.equals("None"));
+				
+				if (transferresult.equals("not enough balance") || merchant.equals("None")) {
+					response.getOutputStream().write(transferresult.getBytes("utf-8"));
+				}
+				
+				else {
+					// encrypt with merchant sk
+					CallableStatement cs = null;
+					if (conn == null) {
+						response.getOutputStream().write("connection failed".getBytes("utf-8"));
+					}
+					
+					try {
+						cs = conn.prepareCall("{call get_merchant_sk_N(?,?,?)}");
+						cs.setString(1, merchant);
+						cs.registerOutParameter(2, Types.VARCHAR);  //sk_exp
+						cs.registerOutParameter(3, Types.VARCHAR);  // N
+						cs.execute();
+
+						KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+						BigInteger d = new BigInteger(Base64Utils.decode(cs.getString(2)));
+						BigInteger N = new BigInteger(Base64Utils.decode(cs.getString(3)));
+		                RSAPrivateKeySpec rsaPrivateKeySpec = new RSAPrivateKeySpec(N,d);
+		                PrivateKey sk = keyFactory.generatePrivate(rsaPrivateKeySpec);
+		                
+		                Cipher cipher=Cipher.getInstance("RSA/ECB/PKCS1Padding");
+	                    cipher.init(Cipher.ENCRYPT_MODE,sk);
+	                    String enc_str = "amount="+value2+"&token="+transferresult;
+	                    byte[]  enc_byte = cipher.doFinal(enc_str.getBytes());
+	                    String enc_base64 = Base64Utils.encode(enc_byte);
+	                    response.getWriter().write("token="+transferresult+"&enc="+enc_base64);;
+					} catch (Exception e){
+			            e.printStackTrace();
+					}if (cs != null) {
+						try {
+							cs.close();
+						} catch (SQLException e) {
+			                e.printStackTrace();
+						}
+					}
+				}
+//				response.getOutputStream().write(userService.cryptomoney(conn, id2, value2, modulus1,pk_exp2).getBytes("utf-8"));
 				break;
+		
+			case "onlyencrypt":
+				String merchant1 = request.getParameter("merchant");
+				String addr2 = request.getParameter("addr");
+				double value3 = Double.parseDouble(request.getParameter("value"));
+				CallableStatement cs = null;
+				if (conn == null) {
+					response.getOutputStream().write("connection failed".getBytes("utf-8"));
+				}
+				
+				try {
+					cs = conn.prepareCall("{call get_merchant_sk_N(?,?,?)}");
+					cs.setString(1, merchant1);
+					cs.registerOutParameter(2, Types.VARCHAR);  //sk_exp
+					cs.registerOutParameter(3, Types.VARCHAR);  // N
+					cs.execute();
+
+					KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+					BigInteger d = new BigInteger(Base64Utils.decode(cs.getString(2)));
+					BigInteger N = new BigInteger(Base64Utils.decode(cs.getString(3)));
+	                RSAPrivateKeySpec rsaPrivateKeySpec = new RSAPrivateKeySpec(N,d);
+	                PrivateKey sk = keyFactory.generatePrivate(rsaPrivateKeySpec);
+	                
+	                Cipher cipher=Cipher.getInstance("RSA/ECB/PKCS1Padding");
+                    cipher.init(Cipher.ENCRYPT_MODE,sk);
+                    String enc_str = "amount="+value3+"&token="+addr2;
+                    byte[]  enc_byte = cipher.doFinal(enc_str.getBytes());
+                    String enc_base64 = Base64Utils.encode(enc_byte);
+                    response.getWriter().write("token="+addr2+"&enc="+enc_base64);;
+				} catch (Exception e){
+		            e.printStackTrace();
+				}if (cs != null) {
+					try {
+						cs.close();
+					} catch (SQLException e) {
+		                e.printStackTrace();
+					}
+				}
+				break;
+				
 				
 			case "cryptotransaction":
 				int id3 = Integer.parseInt(request.getParameter("id"));

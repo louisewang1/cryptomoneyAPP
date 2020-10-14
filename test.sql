@@ -30,7 +30,7 @@ CREATE TABLE `accountinfodb` (
 /*Data for the table `accountinfodb` */
 
 insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
-(1,'Alice',100,'','');
+(1,'1',58,'','');
 
 /*Table structure for table `cryptotransferdb` */
 
@@ -45,9 +45,16 @@ CREATE TABLE `cryptotransferdb` (
   PRIMARY KEY (`id`),
   KEY `fk_cryptotransferdb_id` (`account_id`),
   CONSTRAINT `fk_cryptotransferdb_id` FOREIGN KEY (`account_id`) REFERENCES `logindb` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 
 /*Data for the table `cryptotransferdb` */
+
+insert  into `cryptotransferdb`(`id`,`account_id`,`amount`,`crypto_time`,`address`,`N`,`pk`) values 
+(1,1,10,'2020-10-14 21:02:20','awC8HpCV3qdULaLn0mVu','AO35uhlGDGx3OoM6LvzkLCWY0jxFwRjDSs2lgqtv/xK5dC8KZkaRUgAxsNC62oHM49g09sL0Baq/YJUX1CY22k8=','AQAB'),
+(2,1,12,'2020-10-14 21:31:07','IRvr6XaewVd6TGdPVcGo','ANoPUGG/IlREJqmJzBWQLJ2Jxb4pXT99rfpsIObAogYGIBPdP+mIXru0ozzLAOIloAjSKsP9+onTktKQ89m5lvs=','AQAB'),
+(3,1,5,'2020-10-14 21:39:41','cGcA14aRQCZxVWP1azAC','AMpo+IA8t+2LXlRq9to8ijZVMTPrCxqAowbUm5/O1OWUFDC3e0S3dQ4OsbRQfeNHyxuaV8cMEh4PX2pwoiTS0HE=','AQAB'),
+(4,1,10,'2020-10-14 23:03:21','TR8zwXP7cf7ssUJnM7kK','ALEDpd0Kf/yuLzCPFqPqhc2yRDQeVI1bWKso91VwRsloTCIyzaKfenh1okEbNxBtmXYpq+bQjQT6x93j4qvgikU=','AQAB'),
+(5,1,5,'2020-10-14 23:04:25','OfvWryQpQkmSAUp75XSn','ALhMbq57QwjXYJgv53tffT7X0PE/E0n/G7EmQUHipRx/APj6b7aHBLsr+X6vrjsb6YjXcwF1w6Tq2XZY5QNPL9U=','AQAB');
 
 /*Table structure for table `logindb` */
 
@@ -61,7 +68,7 @@ CREATE TABLE `logindb` (
 /*Data for the table `logindb` */
 
 insert  into `logindb`(`id`,`username`,`pwd`) values 
-(1,'Alice','1');
+(1,'1','1');
 
 /*Table structure for table `merchant_infodb` */
 
@@ -78,7 +85,8 @@ CREATE TABLE `merchant_infodb` (
 /*Data for the table `merchant_infodb` */
 
 insert  into `merchant_infodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
-(1,'KFC',0,'','');
+(1,'KFC',0,'',''),
+(2,'ZARA',0,'','');
 
 /*Table structure for table `merchant_logindb` */
 
@@ -90,12 +98,13 @@ CREATE TABLE `merchant_logindb` (
   `N` varchar(100) NOT NULL,
   PRIMARY KEY (`account_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 
 /*Data for the table `merchant_logindb` */
 
 insert  into `merchant_logindb`(`account_id`,`username`,`pwd`,`sk`,`N`) values 
-(1,'KFC','1','X/zEyXVgqhCGxyJ2nASeDfO+hwNgNj3PrZN/CCvCgP8Z/E2crPkjhecs/hbweHyfSnFf4Qq9yX7+ZrWEyM//MQ==','AJT927s7d/BKm0nSH9Wsm3nLz5uzvp/Wg+H+jGvkqLsmZoBkOYYDu4VswmSFqePdqPOn87h9KjY0MLa2eiQA4wc=');
+(1,'KFC','kfc','WFhk1NpmZbJ0TqdMOhNCDdCBFXv+XIyRh7PkcV6zfneljDw02gHW2BKCprCFJxWTQTUL1RgMsKY1/m546PjKAQ==','ALhYIsw4TK70mvBx8FyWubdhiifh5/F7nZLCJyqrqaTPARhLPvzB4erJgqPIqFvzBu6GPG/l8ChT6Y67WPjcGQ8='),
+(2,'ZARA','ZARA','UyCFqvJaEoeH5OOTEtJkhC6SO8KC4crluoCc7SMjI1NaMv+nOUS66o+ihP8lcFFAMaZytI5tQYvFWWiaFfFyzQ==','AIHwC04G22N67oJhjx4RbAvpvZhEIgxO3DjfOfYYwTqFXNlmgB0bdiQUlCffa8Qtr5xfwNwcy8wa341HnP9qp+k=');
 
 /*Table structure for table `transactiondb` */
 
@@ -177,6 +186,26 @@ ELSE
     SET result = 0;
 END IF;
 END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `clear_everything` */
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `clear_everything`()
+label:begin
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE accountinfodb;
+TRUNCATE cryptotransferdb;
+TRUNCATE logindb;
+TRUNCATE merchant_infodb;
+TRUNCATE merchant_logindb;
+TRUNCATE transactiondb;
+ALTER TABLE logindb AUTO_INCREMENT=1;
+ALTER TABLE merchant_logindb AUTO_INCREMENT=1;
+ALTER TABLE transactiondb AUTO_INCREMENT=1;
+SET FOREIGN_KEY_CHECKS = 1;
+end */$$
 DELIMITER ;
 
 /* Procedure structure for procedure `cryptotran_detail` */
@@ -264,6 +293,17 @@ set result = 1; # 转账成功
 end */$$
 DELIMITER ;
 
+/* Procedure structure for procedure `get_merchant_sk_N` */
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `get_merchant_sk_N`(IN username_ VARCHAR(20), OUT sk_ VARCHAR(100), OUT N_ VARCHAR(100))
+label:BEGIN
+SELECT sk INTO sk_ FROM merchant_logindb WHERE username = username_;
+SELECT N INTO N_ FROM merchant_logindb WHERE username = username_;
+END */$$
+DELIMITER ;
+
 /* Procedure structure for procedure `get_pk_N` */
 
 DELIMITER $$
@@ -285,6 +325,16 @@ SELECT id into account_id_ from logindb where username = username_ and pwd = pwd
 if isnull(account_id_) then set account_id_ = 0;
 end if;
 end */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `merchant_list` */
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `merchant_list`()
+label:BEGIN
+SELECT username FROM merchant_infodb;
+END */$$
 DELIMITER ;
 
 /* Procedure structure for procedure `merchant_login_check` */
