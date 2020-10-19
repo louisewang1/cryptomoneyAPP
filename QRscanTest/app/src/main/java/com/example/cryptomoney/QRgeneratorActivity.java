@@ -136,9 +136,9 @@ public class QRgeneratorActivity extends AppCompatActivity {
         lvDevices.setAdapter(deviceListAdapter);
 
         // 搜索蓝牙
-        search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+//        search.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
                 if (ContextCompat.checkSelfPermission(QRgeneratorActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)  // 检查运行时权限
                         != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(QRgeneratorActivity.this,
@@ -153,19 +153,18 @@ public class QRgeneratorActivity extends AppCompatActivity {
                     GTX.searchBluetoothDevices(onBluetoothFindListener, mDialog);
                 }
 
-            }
-        });
+//        });
 
-        lvDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                tvSelectDevice.setText("选择的设备：\n" + devices.get(i).getName() + "\n" + devices.get(i).getAddress());
-                if (mDialog != null)
-                    mDialog.show();
-                // 选中设备后，开始连接该设备蓝牙
-                GTX.connectBluetoothDevice(onConnectListener, devices.get(i), mDialog);
-            }
-        });
+//        lvDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+////                tvSelectDevice.setText("选择的设备：\n" + devices.get(i).getName() + "\n" + devices.get(i).getAddress());
+//                if (mDialog != null)
+//                    mDialog.show();
+//                // 选中设备后，开始连接该设备蓝牙
+//                GTX.connectBluetoothDevice(onConnectListener, devices.get(i), mDialog);
+//            }
+//        });
 
         print.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -259,11 +258,12 @@ public class QRgeneratorActivity extends AppCompatActivity {
                 mDialog.cancel();
             if (taskCode == GTXKey.RESULT.FIND_DEVICE_GET_ONE && bluetoothDevice != null) {     //搜索到一台设备
                 if (bluetoothDevice.getName() != null && bluetoothDevice.getName().equals("MEMOBIRD GO")) {
-                    devices.add(bluetoothDevice);
+                    GTX.connectBluetoothDevice(onConnectListener, bluetoothDevice, mDialog);
+//                    devices.add(bluetoothDevice);
                 }
-                deviceListAdapter.setDeviceList(devices);
-                deviceListAdapter.notifyDataSetChanged();
-                lvDevices.setVisibility(View.VISIBLE);
+//                deviceListAdapter.setDeviceList(devices);
+//                deviceListAdapter.notifyDataSetChanged();
+//                lvDevices.setVisibility(View.VISIBLE);
             } else if (taskCode == GTXKey.RESULT.FIND_DEVICE_FINISH_TASK) {     //搜索任务正常结束
                 if (devices.size() == 0) {
                     Common.showShortToast(QRgeneratorActivity.this, "No MEMOBIRD device available");
@@ -285,7 +285,7 @@ public class QRgeneratorActivity extends AppCompatActivity {
                 mDialog.cancel();
             if (taskCode == GTXKey.RESULT.COMMON_SUCCESS) {              //成功连接设备
                 lvDevices.setVisibility(View.GONE);
-                Common.showShortToast(QRgeneratorActivity.this,"connected successfully");
+                Common.showShortToast(QRgeneratorActivity.this,"connected to a printer successfully");
                 if (GTX.getConnectDevice().getName().contains("G4")) {
                     Common.DEFAULT_IMAGE_WIDTH = Common.SIZE_576;
                 } else {

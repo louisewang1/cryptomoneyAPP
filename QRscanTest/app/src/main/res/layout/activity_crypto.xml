@@ -17,24 +17,154 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="20dp">
 
         <TextView
-            android:id="@+id/result"
-            android:text="choose a merchant to transfer: "
+            android:text="Step1: choose a merchant: "
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="10sp"/>
+            android:textSize="20sp"
+            android:layout_marginLeft="20dp"/>
 
         <Spinner
             android:id="@+id/spinner"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:scrollbarSize="@dimen/cardview_default_elevation"/>
     </LinearLayout>
+
+    <TextView
+        android:text="Step2: choose print mode: "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:layout_marginTop="25dp"
+        android:layout_marginLeft="20dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="10dp">
+
+        <RadioGroup
+            android:id="@+id/modegroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/QR"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="QR"
+                android:textAllCaps="false"
+                android:textSize="17sp"
+                android:checked="true"/>
+
+            <RadioButton
+                android:id="@+id/QRNFC"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="QR+NFC"
+                android:textAllCaps="false"
+                android:textSize="17sp" />
+
+            <RadioButton
+                android:id="@+id/NFC"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="QR+NFC"
+                android:textAllCaps="false"
+                android:textSize="17sp" />
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <TextView
+        android:text="Step3: choose a common amount:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="10dp">
+
+        <RadioGroup
+            android:id="@+id/amountgroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/ten"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="10"
+                android:textAllCaps="false"
+                android:textSize="15sp"
+                android:checked="true"/>
+
+            <RadioButton
+                android:id="@+id/twenty"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="20"
+                android:textAllCaps="false"
+                android:textSize="15sp" />
+
+            <RadioButton
+                android:id="@+id/fifty"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="50"
+                android:textAllCaps="false"
+                android:textSize="15sp" />
+
+            <RadioButton
+                android:id="@+id/hundred"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="100"
+                android:textAllCaps="false"
+                android:textSize="15sp" />
+        </RadioGroup>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:text="or input an amount:"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_marginLeft="20dp"/>
 
         <EditText
             android:layout_width="0dp"
@@ -42,16 +172,18 @@
             android:layout_weight="2"
             android:singleLine="true"
             android:hint="input amount here"
-            android:id="@+id/amount" />
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Request"
-            android:layout_weight="1"
-            android:id="@+id/request" />
+            android:id="@+id/amount"
+            android:layout_marginHorizontal="20dp"/>
 
     </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="print"
+        android:layout_marginTop="20dp"
+        android:id="@+id/request"/>
 
     <LinearLayout
         android:layout_width="match_parent"

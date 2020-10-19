@@ -86,32 +86,32 @@ public class UserDAO {
         return TYPE_CONN_FAILED;
 	}
 	
-	public int merchant_logincheck(Connection conn, String username,String password) {
-		if (conn == null) return TYPE_CONN_FAILED;
-        CallableStatement cs = null;
-        try {
-            cs =conn.prepareCall("{call merchant_login_check(?,?,?)}"); // 调用login_check(in username, in pwd, out account_id)
-            cs.setString(1,username);
-            cs.setString(2,password);
-            cs.registerOutParameter(3, Types.INTEGER);
-            cs.execute();
-//            Log.d("LoginActivity","id: " + cs.getInt(3));
-            if (cs.getInt(3) == 0) return TYPE_LOGIN_FAILED;
-            else {
-//            	userinfo.setId(cs.getInt(3));
-            	return cs.getInt(3);
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }if (cs != null) {
-            try {
-                cs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return TYPE_CONN_FAILED;
-	}
+//	public int merchant_logincheck(Connection conn, String username,String password) {
+//		if (conn == null) return TYPE_CONN_FAILED;
+//        CallableStatement cs = null;
+//        try {
+//            cs =conn.prepareCall("{call merchant_login_check(?,?,?)}"); // 调用login_check(in username, in pwd, out account_id)
+//            cs.setString(1,username);
+//            cs.setString(2,password);
+//            cs.registerOutParameter(3, Types.INTEGER);
+//            cs.execute();
+////            Log.d("LoginActivity","id: " + cs.getInt(3));
+//            if (cs.getInt(3) == 0) return TYPE_LOGIN_FAILED;
+//            else {
+////            	userinfo.setId(cs.getInt(3));
+//            	return cs.getInt(3);
+//            }
+//        } catch (Exception e){
+//            e.printStackTrace();
+//        }if (cs != null) {
+//            try {
+//                cs.close();
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        return TYPE_CONN_FAILED;
+//	}
 	
 	public Object[] displayinfo(Connection conn,int account_id) {
 //		Connection conn1 = DBUtil.getConn();
@@ -150,16 +150,19 @@ public class UserDAO {
 		CallableStatement cs = null;
         try {
 //        	Connection conn = DBUtil.getConn();
-            cs =conn.prepareCall("{call account_register(?,?,?,?,?)}");
+            cs =conn.prepareCall("{call account_register(?,?,?,?,?,?,?,?)}");
             cs.setString(1, username);
             cs.setString(2, pwd);
-            cs.setString(3, email);
-            cs.setString(4,cellphone);
+            cs.setString(3, "CUSTOMER");
+            cs.setString(4, "");
+            cs.setString(5, "");
+            cs.setString(6, email);
+            cs.setString(7,cellphone);
 //            cs.setNString(5, pk);
 //            cs.setNString(6, modulus);
-            cs.registerOutParameter(5,Types.INTEGER);
+            cs.registerOutParameter(8,Types.INTEGER);
             cs.execute();
-            if (cs.getInt(5) == 1) return 1;  // success
+            if (cs.getInt(8) == 1) return 1;  // success
         } catch (Exception e){
             e.printStackTrace();
         }if (cs != null) {
@@ -176,16 +179,17 @@ public class UserDAO {
 		 if (conn == null) return TYPE_CONN_FAILED;
 		 CallableStatement cs = null;
 		 try {
-			 cs =conn.prepareCall("{call merchant_register(?,?,?,?,?,?,?)}");
+			 cs =conn.prepareCall("{call account_register(?,?,?,?,?,?,?,?)}");
 	         cs.setString(1, username);
 	         cs.setString(2, pwd);
-	         cs.setString(3, email);
-	         cs.setString(4,cellphone);
-	         cs.setNString(5, sk_exp);
-	         cs.setNString(6, modulus);
-	         cs.registerOutParameter(7,Types.INTEGER);
+	         cs.setString(3, "MERCHANT");
+	         cs.setString(4, sk_exp);
+	         cs.setString(5, modulus);
+	         cs.setString(6,email);
+	         cs.setString(7,cellphone);
+	         cs.registerOutParameter(8,Types.INTEGER);
 	         cs.execute();
-	         if (cs.getInt(7) == 1) return 1;  // success
+	         if (cs.getInt(8) == 1) return 1;  // success
 	        } catch (Exception e){
 	            e.printStackTrace();
 	        }if (cs != null) {

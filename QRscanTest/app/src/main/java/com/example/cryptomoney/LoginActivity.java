@@ -38,9 +38,9 @@ public class LoginActivity extends AppCompatActivity {
     private Button register;
     private TextView showResponse;
     private CheckBox rememberPass;
-    private RadioGroup group;
-    private RadioButton customer, merchant;
-    private int loginMode;
+//    private RadioGroup group;
+//    private RadioButton customer, merchant;
+//    private int loginMode;
 
     public final static int TYPE_CONN_FAILED = -1;  // identify different error
     public final static int TYPE_LOGIN_FAILED = 0;
@@ -66,9 +66,9 @@ public class LoginActivity extends AppCompatActivity {
         passwordEdit = (EditText) findViewById(R.id.password);
         login = (Button) findViewById(R.id.login);
         register = (Button) findViewById(R.id.register);
-        group = (RadioGroup) findViewById(R.id.group);
-        customer = (RadioButton) findViewById(R.id.customer);
-        merchant = (RadioButton) findViewById(R.id.merchant);
+//        group = (RadioGroup) findViewById(R.id.group);
+//        customer = (RadioButton) findViewById(R.id.customer);
+//        merchant = (RadioButton) findViewById(R.id.merchant);
 
         showResponse = (TextView) findViewById(R.id.tv_show_response);
 
@@ -81,11 +81,11 @@ public class LoginActivity extends AppCompatActivity {
             // 自动填充
             String account = pref.getString("account","");
             String password = pref.getString("pwd","");
-            String type = pref.getString("type","");
-            if (type.equals("CUSTOMER")) customer.setChecked(true);
-            else if (type.equals("MERCHANT")) {
-                merchant.setChecked(true);
-            }
+//            String type = pref.getString("type","");
+//            if (type.equals("CUSTOMER")) customer.setChecked(true);
+//            else if (type.equals("MERCHANT")) {
+//                merchant.setChecked(true);
+//            }
             accountEdit.setText(account);
             passwordEdit.setText(password);
             rememberPass.setChecked(true);
@@ -99,132 +99,131 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        if (customer.isChecked())  loginMode = CUSTOMER_MODE;
-        else if (merchant.isChecked()) loginMode = MERCHANT_MODE;
+//        if (customer.isChecked())  loginMode = CUSTOMER_MODE;
+//        else if (merchant.isChecked()) loginMode = MERCHANT_MODE;
 
-        group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()  {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                switch (i) {
-                    case R.id.customer:
-                        loginMode = CUSTOMER_MODE;
-                        break;
-                    case R.id.merchant:
-                        loginMode = MERCHANT_MODE;
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
+//        group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()  {
+//            @Override
+//            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+//                switch (i) {
+//                    case R.id.customer:
+//                        loginMode = CUSTOMER_MODE;
+//                        break;
+//                    case R.id.merchant:
+//                        loginMode = MERCHANT_MODE;
+//                        break;
+//                    default:
+//                        break;
+//                }
+//            }
+//        });
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (loginMode == CUSTOMER_MODE) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            // 获取输入字符串
-                            final String username = accountEdit.getText().toString();
-                            final String pwd = passwordEdit.getText().toString();
-                            final String loginRequest = "request="+ URLEncoder.encode("customerlogin")+ "&username="+ URLEncoder.encode(username)+"&password=" +URLEncoder.encode(pwd);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // 获取输入字符串
+                        final String username = accountEdit.getText().toString();
+                        final String pwd = passwordEdit.getText().toString();
+                        final String loginRequest = "request="+ URLEncoder.encode("login")+ "&username="+ URLEncoder.encode(username)+"&password=" +URLEncoder.encode(pwd);
 
 //                        final String  response = PostService.loginByPost(username,pwd);
-                            String response = PostService.Post(loginRequest);
+                        String response = PostService.Post(loginRequest);
 //                        if(response != null){
 ////                            showResponse(response);
 ////                        }else{
 ////                            showResponse("Request Failed");
 ////                        }
-                            if (response != null) {
-                                int id = Integer.parseInt(response);
-                                Log.d("LoginActivity","id="+id);
-                                if (id > 0) {  // 登录成功
-                                    // 记住密码
-                                    editor = pref.edit();
-                                    if (rememberPass.isChecked()) {
-                                        editor.putBoolean("remember_password",true);
-                                        editor.putString("account",username);
-                                        editor.putString("pwd",pwd);
-                                        editor.putString("type","CUSTOMER");
-                                    } else {
-                                        editor.clear();
-                                    }
-                                    editor.apply();
-                                    showResponse("id = " +response);
-                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                    intent.putExtra("account_id",id);  //传递account_id
-                                    intent.putExtra("type","CUSTOMER");
-                                    startActivity(intent);
-                                    finish();
+                        if (response != null) {
+                            int id = Integer.parseInt(response);
+                            Log.d("LoginActivity","id="+id);
+                            if (id > 0) {  // 登录成功
+                                // 记住密码
+                                editor = pref.edit();
+                                if (rememberPass.isChecked()) {
+                                    editor.putBoolean("remember_password",true);
+                                    editor.putString("account",username);
+                                    editor.putString("pwd",pwd);
+//                                    editor.putString("type","CUSTOMER");
                                 } else {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            showResponse("Username or password is incorrect");
-                                        }
-                                    });
+                                    editor.clear();
                                 }
+                                editor.apply();
+                                showResponse("id = " +response);
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                intent.putExtra("account_id",id);  //传递account_id
+//                                intent.putExtra("type","CUSTOMER");
+                                startActivity(intent);
+                                finish();
                             } else {
-                                response = "failed";
-                                showResponse(response);
-                            }
-                        }
-                    }).start();
-                }
-
-                else if (loginMode == MERCHANT_MODE) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final String username = accountEdit.getText().toString();
-                            final String pwd = passwordEdit.getText().toString();
-                            final String loginRequest = "request="+ URLEncoder.encode("merchantlogin")+ "&username="+ URLEncoder.encode(username)+"&password=" +URLEncoder.encode(pwd);
-
-//                        final String  response = PostService.loginByPost(username,pwd);
-                            String response = PostService.Post(loginRequest);
-//                        if(response != null){
-////                            showResponse(response);
-////                        }else{
-////                            showResponse("Request Failed");
-////                        }
-                            if (response != null) {
-                                int id = Integer.parseInt(response);
-                                Log.d("LoginActivity","id="+id);
-                                if (id > 0) {  // 登录成功
-                                    // 记住密码
-                                    editor = pref.edit();
-                                    if (rememberPass.isChecked()) {
-                                        editor.putBoolean("remember_password",true);
-                                        editor.putString("account",username);
-                                        editor.putString("pwd",pwd);
-                                        editor.putString("type","MERCHANT");
-                                    } else {
-                                        editor.clear();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        showResponse("Username or password is incorrect");
                                     }
-                                    editor.apply();
-                                    showResponse("id = " +response);
-                                    Intent intent = new Intent(LoginActivity.this, MerchantMainActivity.class);
-                                    intent.putExtra("account_id",id);  //传递account_id
-                                    intent.putExtra("type","MERCHANT");
-                                    startActivity(intent);
-                                    finish();
-                                } else {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            showResponse("Username or password is incorrect");
-                                        }
-                                    });
-                                }
-                            } else {
-                                response = "failed";
-                                showResponse(response);
+                                });
                             }
+                        } else {
+                            response = "failed";
+                            showResponse(response);
                         }
-                    }).start();
-                }
+                    }
+                }).start();
+//                }
+
+//                else if (loginMode == MERCHANT_MODE) {
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            final String username = accountEdit.getText().toString();
+//                            final String pwd = passwordEdit.getText().toString();
+//                            final String loginRequest = "request="+ URLEncoder.encode("merchantlogin")+ "&username="+ URLEncoder.encode(username)+"&password=" +URLEncoder.encode(pwd);
+//
+////                        final String  response = PostService.loginByPost(username,pwd);
+//                            String response = PostService.Post(loginRequest);
+////                        if(response != null){
+//////                            showResponse(response);
+//////                        }else{
+//////                            showResponse("Request Failed");
+//////                        }
+//                            if (response != null) {
+//                                int id = Integer.parseInt(response);
+//                                Log.d("LoginActivity","id="+id);
+//                                if (id > 0) {  // 登录成功
+//                                    // 记住密码
+//                                    editor = pref.edit();
+//                                    if (rememberPass.isChecked()) {
+//                                        editor.putBoolean("remember_password",true);
+//                                        editor.putString("account",username);
+//                                        editor.putString("pwd",pwd);
+//                                        editor.putString("type","MERCHANT");
+//                                    } else {
+//                                        editor.clear();
+//                                    }
+//                                    editor.apply();
+//                                    showResponse("id = " +response);
+//                                    Intent intent = new Intent(LoginActivity.this, MerchantMainActivity.class);
+//                                    intent.putExtra("account_id",id);  //传递account_id
+//                                    intent.putExtra("type","MERCHANT");
+//                                    startActivity(intent);
+//                                    finish();
+//                                } else {
+//                                    runOnUiThread(new Runnable() {
+//                                        @Override
+//                                        public void run() {
+//                                            showResponse("Username or password is incorrect");
+//                                        }
+//                                    });
+//                                }
+//                            } else {
+//                                response = "failed";
+//                                showResponse(response);
+//                            }
+//                        }
+//                    }).start();
+//                }
             }
         });
     }
@@ -245,14 +244,14 @@ public class LoginActivity extends AppCompatActivity {
             accountEdit.setText(data.getStringExtra("username"));
             passwordEdit.setText(data.getStringExtra("pwd"));
 //            System.out.println(data.getStringExtra("type"));
-            if (data.getStringExtra("type").equals("CUSTOMER")) {
-                customer.setChecked(true);
-                loginMode = CUSTOMER_MODE;
-            }
-            else if (data.getStringExtra("type").equals("MERCHANT")) {
-                merchant.setChecked(true);
-                loginMode = MERCHANT_MODE;
-            }
+//            if (data.getStringExtra("type").equals("CUSTOMER")) {
+//                customer.setChecked(true);
+//                loginMode = CUSTOMER_MODE;
+//            }
+//            else if (data.getStringExtra("type").equals("MERCHANT")) {
+//                merchant.setChecked(true);
+//                loginMode = MERCHANT_MODE;
+//            }
         }
     }
 

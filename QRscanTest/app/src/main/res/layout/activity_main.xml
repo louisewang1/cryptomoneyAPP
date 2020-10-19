@@ -28,7 +28,7 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="New Normal Transfer"
+        android:text="P2P transfer"
         android:textSize="15sp"
         android:layout_margin="10dp"/>
 
@@ -37,7 +37,7 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Receive crypto transfer"
+        android:text="Receive money"
         android:textSize="15sp"
         android:layout_margin="10dp"></Button>
 
@@ -46,7 +46,7 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Normal Transaction detail"
+        android:text="p2p transaction history"
         android:textSize="15sp"
         android:layout_margin="10dp"></Button>
 
@@ -55,7 +55,7 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="new crypto transfer"
+        android:text="print money"
         android:textSize="15sp"
         android:layout_margin="10dp"></Button>
 

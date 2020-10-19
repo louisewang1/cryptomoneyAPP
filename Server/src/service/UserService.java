@@ -22,9 +22,9 @@ public class UserService {
 		return userDAO.logincheck(conn,userInfo);
 	}
 	
-	public int merchantlogin(Connection conn,String username, String password) {
-		return userDAO.merchant_logincheck(conn,username,password);
-	}
+//	public int merchantlogin(Connection conn,String username, String password) {
+//		return userDAO.merchant_logincheck(conn,username,password);
+//	}
 	
    public Object[] accountinfo(Connection conn,int account_id) {
 	   return userDAO.displayinfo(conn,account_id);

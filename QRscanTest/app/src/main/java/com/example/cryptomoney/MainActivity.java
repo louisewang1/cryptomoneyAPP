@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent_from_login = getIntent();
         account_id = intent_from_login.getIntExtra("account_id",0);
-        type = intent_from_login.getStringExtra("type");
+//        type = intent_from_login.getStringExtra("type");
 
         crypto.setOnClickListener(new View.OnClickListener() {
             @Override

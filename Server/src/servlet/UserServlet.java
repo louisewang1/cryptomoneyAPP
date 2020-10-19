@@ -71,17 +71,17 @@ public class UserServlet extends HttpServlet {
 		
 		switch (userRequest) {
 		
-			case "customerlogin":
+			case "login":
 				String username = request.getParameter("username");
 				String password = request.getParameter("password");
 				response.getOutputStream().write(Integer.toString(userService.login(conn,username, password)).getBytes("utf-8"));
 				break;
 			
-			case "merchantlogin":
-				String username3 = request.getParameter("username");
-				String password3 = request.getParameter("password");
-				response.getOutputStream().write(Integer.toString(userService.merchantlogin(conn,username3, password3)).getBytes("utf-8"));
-				break;
+//			case "merchantlogin":
+//				String username3 = request.getParameter("username");
+//				String password3 = request.getParameter("password");
+//				response.getOutputStream().write(Integer.toString(userService.merchantlogin(conn,username3, password3)).getBytes("utf-8"));
+//				break;
 				
 			case "accountinfo":
 				int id = Integer.parseInt(request.getParameter("id"));
@@ -126,7 +126,7 @@ public class UserServlet extends HttpServlet {
                     response.getWriter().write("pk="+pk_exp+"&N="+modulus);
 				}
 				else {
-					response.getWriter().write("merchant account already existed");
+					response.getWriter().write("Username already existed");
 				}
 				break;
 				
