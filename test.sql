@@ -30,10 +30,8 @@ CREATE TABLE `accountinfodb` (
 /*Data for the table `accountinfodb` */
 
 insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
-(1,'1',98,'',''),
-(2,'KFC',100,'',''),
-(3,'COOP',11,'',''),
-(4,'2',2.6,'','');
+(1,'KFC',100,'',''),
+(2,'1',100,'','');
 
 /*Table structure for table `cryptotransferdb` */
 
@@ -48,41 +46,9 @@ CREATE TABLE `cryptotransferdb` (
   PRIMARY KEY (`id`),
   KEY `fk_cryptotransferdb_id` (`account_id`),
   CONSTRAINT `fk_cryptotransferdb_id` FOREIGN KEY (`account_id`) REFERENCES `logindb` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Data for the table `cryptotransferdb` */
-
-insert  into `cryptotransferdb`(`id`,`account_id`,`amount`,`crypto_time`,`address`,`N`,`pk`) values 
-(1,3,1,'2020-10-19 11:57:12','akpvkXGzVjOa1AeIwC59','AKUNqrOJS3qfrAnvzAwGKiUmeH4XvIN7ApOwgWTgZ/WJAFTNAST5oDSB5CcnikClPeIskf6+8NOYXv6u5Wugjg0=','AQAB'),
-(2,3,2,'2020-10-19 11:59:52','7gRQutc1duypkBULue5b','AJdTCvZGxY6fkHfxgaLTlnhFPaPo5G2V3d9bY2K/Bw/nlWQ9nwaypfMtqI/uYhuYUxeN56T/BUbEIH2nduB7sr8=','AQAB'),
-(3,3,3,'2020-10-19 12:13:19','tZU2KXd11ljXXp4fjMC7','AOvD2VsyFiquKXWOr7MirHC2N+Yx+LJTpteCj0rze+FAY8VCVnHbZ9P7bnU+KjMGNkXxxlAWxZquZe7S53wp2Z0=','AQAB'),
-(4,1,1,'2020-10-19 12:24:51','FoOy0lchzQVZ9Nxsless','AMQNGVGCVNGmtAVmRjxm08KDgPGuk7ix8eQEIOrlxhOYgG2W1Yhi5Kbn/lB3v30cX0niNJF2pPS5o35G/vzd6fk=','AQAB'),
-(5,1,2,'2020-10-19 12:26:15','6CqqUgakVNV5AJNmuyhN','AKwuUJpzX00mhFmwHRnFQxc3zL1P6KvO/wJ4Izhw/8NxojGz6spfJt8gVw6zJ01rRYupFZ37dayCWSZS1pi5OsE=','AQAB'),
-(6,3,10,'2020-10-19 15:43:33','ayc72pAMsLzLJeD77u5v','AL88/oGcfFh/T76158phdC1nDc1mQyJdhc02n1gFj7YGq4+zxRdIWOOOhHtrzDwgl5g5VDBFPBeWGepHmDxp2iE=','AQAB'),
-(7,3,1,'2020-10-19 15:44:22','7DpIEZUZvOy3e8aHB988','ALOjLIX0yZCTyh2XCEqcRAjzgXldVrG2FlVGLGO1zny/EvyNbL+4xJxvHLKP19CT32Jp3MczSylNlgUHqVKa3UE=','AQAB'),
-(8,3,1,'2020-10-19 15:45:47','s7Q5Lshwkk8umG4bMeeW','AKBuJvvK9fIBnFhrDZOgrpQfgJOssG+smYuai3zfOaSMcpEYVCZQ6tUuI5NmZ0NkiJedIOpq7jhnPYEBwvUg1XU=','AQAB'),
-(9,3,10,'2020-10-19 17:07:25','VM2jBgV6DglTAnwOotYG','AOvzKQ61FfxHLBbL95MwoDJy9/ltqzoUhvbnafjo7oZve7MbRwVhiBDA97m9NU78+1gDAxrN0oAxktocz9bZWX0=','AQAB'),
-(10,3,10,'2020-10-19 17:14:23','TlVQtUnCNbrWLT5vji9j','AK6RLSuwN6rAN3UIkYQPSqm54m9EA9WlHWdI08XHb38kqD86n1d4sXnbfhW/21KORXTkrDqBuIyKrs1jXDNHb4U=','AQAB'),
-(11,3,10,'2020-10-19 17:14:28','B1NfZRAU708GCB4g1Yyj','AJyeMeBOUzI6lQpuizqftsF6SM4VEHBBv7tiTP/Z62hak7UsD03qHU6VeO1oY4JOYca3QDqYwTZKH6bAXrwwlJk=','AQAB'),
-(12,3,10,'2020-10-19 17:14:40','tjIK3nvk3N0zktZTLBS3','ALu17YAm7WpDo7t/2+m3zZakecFcgMpFDGv4vo/6ibFMcZvqXAdx98RFH5tizUP+aEymZL/nE+eoZ6enI/Wzl/s=','AQAB'),
-(13,3,10,'2020-10-19 17:16:27','OucNVzatf4YaFuxqzfmX','AJVaHVrHmPlpio1Zp7V4RTniDOfBwHX4Gw61u3b327X+r9LKK5aNklgLoDNHsq10eOyAcX9zlRZvkjh0WIFTMnM=','AQAB'),
-(14,3,10,'2020-10-19 17:16:30','evTqyF03QOXaLg0pM0Ik','ANIrEJzQvcqALmPNeiti3bMHAZ0yUXD6w2bRtogV9VYm+egxlxDk9KOJboWozIJs0Wc8SC8BLMti1tyJ2v8WUzM=','AQAB'),
-(15,3,10,'2020-10-19 17:42:10','5isKLlzYh7sAw9YqOs0y','AKINNzbdAsiSsgcdGuGkPIQM6QsY941DEWAeGTTpSUTep6vmGVQS3Bb1T/9pKcJd209NJZ0QufTqSp2+naOwChc=','AQAB'),
-(16,4,10,'2020-10-19 17:44:22','TSvDlDp0wK4z16J3dWES','AOds3PKu4NYJxraI3/VyBXbpub9tyWKA71dSdpLN/TgEak6ravtXhsGjJxTXlx0nYdY2eTgwGgh98AhdNfN3Gr8=','AQAB'),
-(17,4,10,'2020-10-19 17:44:38','ePuaga64SdVWoKsegkpK','AMhXR9K9JQs1zsIl4VjEq8tuHYUFt/TY2UhpwUwC2SLwgzQ6ITeE+1Vow89YqpCAu0V7MfgM3IyFZ2oAYoNQvik=','AQAB'),
-(18,4,10,'2020-10-19 17:48:25','snHCkNuXSLIcZLfTE2g7','ANG7FtUeM6TM4VaKAZsz0fLpBTY6nn6OKjQRRrCCEC8t06axlD8/kKeXOOp1ah4ocCpXFD8nOxnxL9OQygH0Qk0=','AQAB'),
-(19,4,10,'2020-10-19 17:48:50','TpNUpcwLakiAyVkLh3IR','AKYPTFinx7Ul94fpdpZyHXW65f5+XhnTuFnqH8nUHQ8VtKioXOT7QVKG2Iy+JzgRhJ6Dk2ePgGvhxQne0iZEGLs=','AQAB'),
-(20,4,10,'2020-10-19 17:49:17','35VdVMpDPqX446HB9vRy','AKeNDTZnvIsyVIpTPwMm5jvgOWeqL0yUcVWIEjFa/RnzCTwgcqP+zPydwEfI3zk076YN4srHDZDPAdkxoVev000=','AQAB'),
-(21,4,10,'2020-10-19 17:49:31','PqRMwyeCqs967ynj55Fe','AM2CM++ipdwexRAkpxvHyTcrW8VDhxUES7uR3hOxpDgw8uAOOMGBtDaL4DSa1EyW6OMPZ81MFMGigp5c8twHW+c=','AQAB'),
-(22,4,20,'2020-10-19 17:50:51','bhkNhc5SDm0D2jbU41Qc','AO6pLcIL7/k/6awdEWP6KJclhVaXx3+LfPA3zE9zvoR3+AqRBQ9vpI3twZR7kkjsKeb5MpRc5Y1V99YKvyz5Kqc=','AQAB'),
-(23,4,10,'2020-10-19 17:51:03','w8eVtglBuFIRuC6c9hfW','AMzcGqEMvZaXK+tjGPx87WfNCQjqZGTWFVXwmt6Vrhqyq/E3POErn4AIgqzuQVftQVwhc3Z8h6q2ASttUMkDAIs=','AQAB'),
-(24,4,1,'2020-10-19 17:51:48','miUhmEfiikgObywlM7NY','AKl4nYm7fWgOmmPHqPs7WJyY4def6ktowo8cnBNUJv0Hcn+5DuFoNArmI2Le/+pUABmfrucNc9aBgLojqL3HfZ0=','AQAB'),
-(25,4,1,'2020-10-19 17:52:31','zmYIHDxS3Qpil6C5tbXY','ANfuYZ9ER+3lOD87vMzBzIqjKbBjtTzJIp0wvUHK6VarxOOHl/q9VfnSPGxZoNrn7jMIAjyAjZL/vEUeo8ayHgk=','AQAB'),
-(26,4,1,'2020-10-19 17:53:30','xtjaWoUoqhaadwNpNLYT','ANMLtemDbEmbFe4Bafy2sl+NQktH8HHkruKt/xylrUw9zEMNngCYJYBcY6l9Csht99dL3U4yk8LM8Aqp060Bz3k=','AQAB'),
-(27,4,1,'2020-10-19 17:53:39','MO0ieFvnykQtrD8RoKjL','AKWG/m53s90kgmRmpX8x3g4ujGdM+G8a1iXQJ349f1EaFrDBy4GB8rshMyKmVZ89e9ERFtAn40K3gO3KvmV+e3M=','AQAB'),
-(28,4,1.2,'2020-10-19 17:55:25','rulZWrx9pp9v5qM2al3I','AMyJNQAr/TrypiLT/FMmcIYLDjxs28gYac9jZX2bb5KE8rqpBYCpyoTaJezcsKGwpRXjmJrsU14iskNI79fFOAU=','AQAB'),
-(29,4,1.2,'2020-10-19 17:55:46','f92Q1xAHvEPEy8PCc0Ex','AJgnmORuUiYD7GjRBnMoa+APJsiX7+G2EZ0Xb7vjBek+WX+eTl1KeJYbIK2NHb+dXhs46gXeEaF9FBt09veUK4U=','AQAB'),
-(30,4,1,'2020-10-19 18:08:06','6X4QO9HFyTa6EQjevqFn','ALe3TrNBMwk67VgR2XpAn2i8JS3Bghdd8WSz1TdumVJAbm0U5sNfrftOgbbsBjUwSYbmspmkX5QNnSDi4fJTFQ0=','AQAB');
 
 /*Table structure for table `logindb` */
 
@@ -94,15 +60,13 @@ CREATE TABLE `logindb` (
   `sk` varchar(100) DEFAULT NULL,
   `N` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 
 /*Data for the table `logindb` */
 
 insert  into `logindb`(`id`,`username`,`pwd`,`usertype`,`sk`,`N`) values 
-(1,'1','1','CUSTOMER','',''),
-(2,'KFC','kfc','MERCHANT','LHi04X9WbF62UF/77emK8giBGmN97vd9Cg9lCAGmz7+b89bC7PCfXLo6X8MxHHOaUJNZDwQUkbW1vgHwocB48Q==','AJHQX2t8IY1pUERR6/45zJwyCpcwhQbH2ed3TgRJWOc9wtkSA2omY7Vd/piTAF2Cju/MQWiEjDsqp3kQ6LvS6AU='),
-(3,'COOP','coop','MERCHANT','AIVKgJxRXHH9vBUshixalduWD1lDv2cRMu2PCULVkSpkq+IPI9Yb/5rWKPQjF+f4Hu4PTzsNtmb4eL5dMbHh/gE=','AJ93C612DLCCUXo8bmeZkqzQ44cInt2p8mxQ71pzIUEttdzAm01iRK8Gy68YaRgRaq4hHL3eJwPDmPoe9K35Gi8='),
-(4,'2','2','CUSTOMER','','');
+(1,'KFC','kfc','MERCHANT','bR2TEbSv5NKviVl7PhhRZ9F0yVZ6DxD8KQyyuTSLWntYwXxBH2+rUDS5lC0yyEjIK6fejINKdJxqluEljQt+iQ==','AI6YJBi/C8I53lmfgQi6DZRD0FDqbK0qnsQgXNAapjla/oyrzjoQTk02LwibR8YamwyTlCSOQA+RIa05Og6SdTU='),
+(2,'1','1','CUSTOMER','','');
 
 /*Table structure for table `merchant_infodb` */
 
@@ -144,13 +108,9 @@ CREATE TABLE `transactiondb` (
   PRIMARY KEY (`id`),
   KEY `fk_transactiondb_id` (`account_id`),
   CONSTRAINT `fk_transactiondb_id` FOREIGN KEY (`account_id`) REFERENCES `logindb` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Data for the table `transactiondb` */
-
-insert  into `transactiondb`(`id`,`account_id`,`tr_from_account`,`tr_to_account`,`tr_time`,`tr_value`) values 
-(1,3,3,1,'2020-10-19 12:13:41',1),
-(2,1,3,1,'2020-10-19 12:13:41',1);
 
 /* Procedure structure for procedure `account_register` */
 

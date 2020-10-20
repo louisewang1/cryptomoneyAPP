@@ -20,11 +20,11 @@
         android:layout_marginTop="20dp">
 
         <TextView
-            android:text="Step1: choose a merchant: "
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:layout_marginLeft="20dp"/>
+            android:layout_marginLeft="20dp"
+            android:text="Step1: choose a merchant: "
+            android:textSize="15sp" />
 
         <Spinner
             android:id="@+id/spinner"
@@ -37,7 +37,7 @@
         android:text="Step2: choose print mode: "
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:textSize="15sp"
         android:layout_marginTop="25dp"
         android:layout_marginLeft="20dp"/>
 
@@ -81,7 +81,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="QR+NFC"
+                android:text="NFC"
                 android:textAllCaps="false"
                 android:textSize="17sp" />
         </RadioGroup>
@@ -92,7 +92,7 @@
         android:text="Step3: choose a common amount:"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:textSize="15sp"
         android:layout_marginTop="20dp"
         android:layout_marginLeft="20dp"/>
 
@@ -117,8 +117,7 @@
                 android:gravity="center"
                 android:text="10"
                 android:textAllCaps="false"
-                android:textSize="15sp"
-                android:checked="true"/>
+                android:textSize="15sp" />
 
             <RadioButton
                 android:id="@+id/twenty"
@@ -163,7 +162,7 @@
             android:text="or input an amount:"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:layout_marginLeft="20dp"/>
 
         <EditText
@@ -193,7 +192,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Respond: " />
+            android:text="Respond: "
+            android:layout_marginLeft="20dp"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -201,5 +201,16 @@
             android:id="@+id/response" />
 
     </LinearLayout>
+
+
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:id="@+id/qrimg"
+        android:layout_marginTop="10dp"
+        android:outlineSpotShadowColor="@color/colorPrimary"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/bg_border">
+    </ImageView>
 
 </LinearLayout>

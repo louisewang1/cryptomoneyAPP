@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 
 import android.Manifest;
 import android.app.Dialog;
@@ -15,6 +16,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.nfc.FormatException;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -34,12 +36,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cryptomoney.utils.Base64Utils;
+import com.example.cryptomoney.utils.NfcUtils;
 import com.example.cryptomoney.utils.RSAUtils;
+import com.example.cryptomoney.utils.WriteDialog;
 import com.google.zxing.util.QrCodeGenerator;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URLEncoder;
 import java.security.KeyPair;
@@ -61,7 +66,7 @@ import cn.memobird.gtx.listener.OnBluetoothFindListener;
 import cn.memobird.gtx.listener.OnCodeListener;
 import cn.memobird.gtx.listener.OnImageToDitherListener;
 
-public class CryptoActivity extends AppCompatActivity {
+public class CryptoActivity extends AppCompatActivity  {
 
     private EditText amount;
     private Button request;
@@ -98,13 +103,20 @@ public class CryptoActivity extends AppCompatActivity {
     private String base64ImageString;
     private List<BluetoothDevice> devices = new ArrayList<>();
     private String text;
+    private String qrtext;
+    private String nfctext;
+    private NfcUtils nfcUtils;
+    private DialogFragment NFCDialog;
 
     private final static int REQ_LOC = 10;
+//    final String AK = "c6a5a445dc25490183f42088f4b78ccf";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crypto);
+
+//        GTX.init(getApplicationContext(), AK);  //初始化
 
         account_id = getIntent().getIntExtra("account_id",0);
 //        Log.d("CryptoActivity","id= "+account_id);
@@ -121,6 +133,9 @@ public class CryptoActivity extends AppCompatActivity {
         twenty = findViewById(R.id.twenty);
         fifty = findViewById(R.id.fifty);
         hundred = findViewById(R.id.hundred);
+        qrimg = findViewById(R.id.qrimg);
+        qrimg.setVisibility(View.GONE);
+        nfcUtils = new NfcUtils(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -137,13 +152,18 @@ public class CryptoActivity extends AppCompatActivity {
         // 定义蓝牙连接列表
 //        deviceListAdapter = new DeviceListAdapter(this, devices);
 //        lvDevices.setAdapter(deviceListAdapter);
-        if (ContextCompat.checkSelfPermission(CryptoActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)  // 检查运行时权限
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(CryptoActivity.this,
-                    new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQ_LOC);  // 申请定位权限,MUST BE FINE!
-        }else {
-            GTX.searchBluetoothDevices(onBluetoothFindListener,mDialog);
+        if (GTX.getConnectDevice() == null) {
+            if (ContextCompat.checkSelfPermission(CryptoActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)  // 检查运行时权限
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(CryptoActivity.this,
+                        new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQ_LOC);  // 申请定位权限,MUST BE FINE!
+            }else {
+                GTX.searchBluetoothDevices(onBluetoothFindListener,mDialog);
+            }
         }
+
+
+        printMode = "QR";
 
         modegroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()  {
             @Override
@@ -284,7 +304,7 @@ public class CryptoActivity extends AppCompatActivity {
                                     @Override
                                     public void run() {
                                         response.setText("token address: " + addr);
-                                        Toast.makeText(CryptoActivity.this, "start printing money....", Toast.LENGTH_SHORT).show();
+//                                        Toast.makeText(CryptoActivity.this, "start printing money....", Toast.LENGTH_SHORT).show();
 
                                         if (merchant_selected.equals("None")) {
                                             text = "N="+modulus+"&d="+sk_exp+"&addr="+addr;
@@ -295,15 +315,37 @@ public class CryptoActivity extends AppCompatActivity {
                                             qrimage = QrCodeGenerator.getQrCodeImage(text,200,200);
                                         }
 
+//                                        System.out.println(GTX.getConnectDevice());
 //                                        start printing money
-//                                        System.out.println(printMode);
                                         if (printMode.equals("QR")) {
                                             if (GTX.getConnectDevice() != null) {
                                                 printQR();
                                             }
                                             else {
-                                                Common.showShortToast(CryptoActivity.this, "please connect to the printer first");
+                                                Common.showShortToast(CryptoActivity.this, "No printer found, display QR directly");
+                                                qrimg.setVisibility(View.VISIBLE);
+                                                qrimg.setImageBitmap(qrimage);
+
                                             }
+                                        }
+                                        else if (printMode.equals("QRNFC")) {
+                                            qrtext = extractodd(text);
+                                            nfctext = extracteven(text);
+                                            if (GTX.getConnectDevice() != null) {
+                                                qrimage = QrCodeGenerator.getQrCodeImage(qrtext,200,200);
+                                                printQR();
+                                            }
+                                            else {
+                                                Common.showShortToast(CryptoActivity.this, "No printer found, display QR directly");
+                                                qrimg.setVisibility(View.VISIBLE);
+                                                qrimg.setImageBitmap(qrimage);
+                                            }
+                                            showSaveDialog();
+                                        }
+
+                                        else if (printMode.equals("NFC")) {
+                                            nfctext = text;
+                                            showSaveDialog();
                                         }
 
                                         else {
@@ -336,6 +378,24 @@ public class CryptoActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent){
+        super.onNewIntent(intent);
+        try {
+            nfcUtils.writeNFCToTag(nfctext, intent);
+            dissDialog();
+            //                    Log.d("NFCRWActivity","finish writing");
+            Common.showShortToast(this, "write to NFC successfully.");
+//            nfcstatus.setText("Status: writing successfully");
+        } catch (IOException e) {
+            Common.showShortToast(this, "write to NFC failed.");
+            //                    Log.d("NFCRWActivity","write to NFC failed：" + e.getMessage());
+        } catch (FormatException e) {
+            Common.showShortToast(this, "write to failed.");
+            //                    Log.d("NFCRWActivity","write to NFC failed：" + e.getMessage());
+        }
     }
 
     @Override
@@ -434,7 +494,7 @@ public class CryptoActivity extends AppCompatActivity {
                 if (devices.size() == 0) {
                     Common.showShortToast(CryptoActivity.this, "No MEMOBIRD device available");
                 } else {
-                    Common.showShortToast(CryptoActivity.this, "device searching finished");
+//                    Common.showShortToast(CryptoActivity.this, "device searching finished");
                 }
             } else {                                                            //其它异常
                 Common.showShortToast(CryptoActivity.this, "Error " + taskCode);
@@ -470,12 +530,65 @@ public class CryptoActivity extends AppCompatActivity {
         @Override
         public void returnResult(int taskCode) {
             if (taskCode == GTXKey.RESULT.COMMON_SUCCESS) {
-                Common.showShortToast(CryptoActivity.this, "successfully printed");
+//                Common.showShortToast(CryptoActivity.this, "successfully printed");
             } else {
                 Log.d("QRgeneratorActivity","taskCode="+taskCode);
                 Common.showShortToast(CryptoActivity.this, "Error " + taskCode);
             }
         }
     };
+
+
+
+    public String extractodd(String text) {
+        String oddtext = "";
+        for (int i=0; i<text.length();i=i+2) {
+            oddtext +=text.charAt(i);
+        }
+        System.out.println(oddtext);
+        return oddtext;
+    }
+
+    public String extracteven(String text) {
+        String eventext = "";
+        for (int i=1; i<text.length();i=i+2) {
+            eventext +=text.charAt(i);
+        }
+        System.out.println(eventext);
+        return eventext;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        Logger.e(TAG, "onResume");
+        nfcUtils.enableForegroundDispatch();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+//        Logger.e(TAG, "onPause");
+        nfcUtils.disableForegroundDispatch();
+
+    }
+
+    protected void onDestroy() {
+        super.onDestroy();
+        GTX.onDestroy();
+    }
+
+    private void dissDialog() {
+        if (NFCDialog != null &&
+                NFCDialog.getDialog() != null &&
+                NFCDialog.getDialog().isShowing()) {
+            NFCDialog.dismiss();
+        }
+    }
+
+    private void showSaveDialog() {
+        NFCDialog = new WriteDialog();
+        NFCDialog.show(getSupportFragmentManager(), "mWriteDialog");
+    }
 
 }
