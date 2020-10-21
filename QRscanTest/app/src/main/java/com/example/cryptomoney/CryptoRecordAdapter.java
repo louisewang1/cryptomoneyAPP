@@ -3,6 +3,7 @@ package com.example.cryptomoney;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Layout;
@@ -34,6 +35,10 @@ public class CryptoRecordAdapter extends RecyclerView.Adapter<CryptoRecordAdapte
     private String merchant;
     private Integer account_id;
     private String token_enc;
+    private int selectedIndex = -1;
+    private String addr;
+    private boolean selected = false;
+    private String value;
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         View recordView;
@@ -65,39 +70,51 @@ public class CryptoRecordAdapter extends RecyclerView.Adapter<CryptoRecordAdapte
             public void onClick(View view) {
                 int position = holder.getAdapterPosition();
                 CryptoRecord record = mRecordList.get(position);
-                Intent intent = new Intent(view.getContext(),CryptoModeActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-                intent.putExtra("amount",record.getValue());
-                intent.putExtra("address",record.getAddr());
-                intent.putExtra("merchant",merchant);
+//                System.out.println(record.getAddr());
+                selectedIndex = position;
+                addr = record.getAddr();
+                value = record.getValue().toString();
+                selected = true;
 
-                if (!merchant.equals("None")) {
-                    final String encryptRequest = "request=" + URLEncoder.encode("onlyencrypt") +"&merchant="+ URLEncoder.encode(merchant)+
-                            "&addr="+ URLEncoder.encode(record.getAddr())+ "&value="+ URLEncoder.encode(record.getValue().toString());
+//                System.out.println("selectedindex="+selectedIndex);
+                notifyDataSetChanged();
 
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final String serverresponse = PostService.Post(encryptRequest);
-                            if  (serverresponse != null && serverresponse.indexOf("token=") == 0) {
-                                String enc_str = serverresponse.split("&enc=")[1];
-//                                setEnc(enc_str);
-                                System.out.println("enc="+enc_str);
 
-                                Message msg = new Message();
-                                msg.obj = enc_str;
-                                handler.sendMessage(msg);
-                            }
-                        }
-                    }).start();
-//                    System.out.println("cccccenc="+getEnc());
-                    intent.putExtra("enc",token_enc);
-                }
+//                Intent intent = new Intent(view.getContext(),CryptoModeActivity.class);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+//                intent.putExtra("amount",record.getValue());
+//                intent.putExtra("address",record.getAddr());
+//                intent.putExtra("merchant",merchant);
+//
+//                if (!merchant.equals("None")) {
+//                    final String encryptRequest = "request=" + URLEncoder.encode("onlyencrypt") +"&merchant="+ URLEncoder.encode(merchant)+
+//                            "&addr="+ URLEncoder.encode(record.getAddr())+ "&value="+ URLEncoder.encode(record.getValue().toString());
+//
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            final String serverresponse = PostService.Post(encryptRequest);
+//                            if  (serverresponse != null && serverresponse.indexOf("token=") == 0) {
+//                                String enc_str = serverresponse.split("&enc=")[1];
+////                                setEnc(enc_str);
+//                                System.out.println("enc="+enc_str);
+//
+//                                Message msg = new Message();
+//                                msg.obj = enc_str;
+//                                handler.sendMessage(msg);
+//                            }
+//                        }
+//                    }).start();
+////                    System.out.println("cccccenc="+getEnc());
+//                    intent.putExtra("enc",token_enc);
+//                }
 
-                Log.d("CryptoRecordAdapter","amount= "+record.getValue());
-                Log.d("CryptoRecordAdapter","address= "+record.getAddr());
-                view.getContext().startActivity(intent);
+//                Log.d("CryptoRecordAdapter","amount= "+record.getValue());
+//                Log.d("CryptoRecordAdapter","address= "+record.getAddr());
+//                view.getContext().startActivity(intent);
             }
+
+
         });
         return holder;
     }
@@ -119,6 +136,14 @@ public class CryptoRecordAdapter extends RecyclerView.Adapter<CryptoRecordAdapte
         holder.address.setText(record.getAddr());
         holder.value.setText(record.getValue().toString());
         holder.time.setText(record.getTime());
+
+        if (position == selectedIndex) {
+            holder.recordView.setBackgroundColor(Color.GRAY);
+        }
+        else {
+            holder.recordView.setBackgroundColor(Color.WHITE);
+        }
+
     }
 
     @Override
@@ -144,4 +169,23 @@ public class CryptoRecordAdapter extends RecyclerView.Adapter<CryptoRecordAdapte
         return this.token_enc;
     }
 
+    public String getaddr() {
+        return addr;
+    }
+
+//    public void setaddr(String addr) {
+//        this.addr = addr;
+//    }
+
+    public boolean getselected() {
+        return selected;
+    }
+
+    public String getvalue() {
+        return value;
+    }
+
+    public void setSelectedIndex(int position) {
+        selectedIndex = position;
+    }
 }

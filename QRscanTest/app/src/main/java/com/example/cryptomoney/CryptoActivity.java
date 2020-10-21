@@ -7,6 +7,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.Manifest;
 import android.app.Dialog;
@@ -107,6 +110,10 @@ public class CryptoActivity extends AppCompatActivity  {
     private String nfctext;
     private NfcUtils nfcUtils;
     private DialogFragment NFCDialog;
+    private List<CryptoRecord> recordList;
+    private SwipeRefreshLayout swipeRefresh;
+    private CryptoRecordAdapter recordadapter;
+    private RecyclerView recyclerView;
 
     private final static int REQ_LOC = 10;
 //    final String AK = "c6a5a445dc25490183f42088f4b78ccf";
@@ -122,7 +129,7 @@ public class CryptoActivity extends AppCompatActivity  {
 //        Log.d("CryptoActivity","id= "+account_id);
         amount = (EditText) findViewById(R.id.amount);
         request = (Button) findViewById(R.id.request);
-        response = (TextView) findViewById(R.id.response);
+//        response = (TextView) findViewById(R.id.response);
         spinner = (Spinner)findViewById(R.id.spinner);
         modegroup = findViewById(R.id.modegroup);
         QR = findViewById(R.id.QR);
@@ -148,6 +155,21 @@ public class CryptoActivity extends AppCompatActivity  {
 //        GTX.init(getApplicationContext(), AK);  //初始化
 
         mDialog = Common.showLoadingDialog(CryptoActivity.this);
+        recordList =  (List<CryptoRecord>) getIntent().getSerializableExtra("recordList");
+        if (recordList == null) return;
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recordadapter = new CryptoRecordAdapter(recordList);
+        recyclerView.setAdapter(recordadapter);
+        recordadapter.setid(account_id);
+        swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresher);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshcryptotransaction();
+            }
+        });
 
         // 定义蓝牙连接列表
 //        deviceListAdapter = new DeviceListAdapter(this, devices);
@@ -259,11 +281,111 @@ public class CryptoActivity extends AppCompatActivity  {
             @Override
             public void onClick(View view) {
                 value = amount.getText().toString();
-                if (!moneyselect.equals("") && value.equals("")) value = moneyselect;
-//                Log.d("CryptoActivity","value= "+value);
+                if (!moneyselect.equals("") && value.equals("") && !recordadapter.getselected() ) {
+                    value = moneyselect;
+                }
                 boolean isdouble = isNumeric(value);
-                if (!isdouble) Common.showShortToast(CryptoActivity.this,"Invalid input");
 
+//                a past record selected
+                if (recordadapter.getselected()) {
+//                    System.out.println("choose a past record");
+                    addr = recordadapter.getaddr();
+                    value = recordadapter.getvalue();
+                    pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
+                    sk_exp = pref.getString(addr + "_skexp", "");
+                    modulus = pref.getString(addr + "_modulus", "");
+
+                    if (merchant_selected.equals("None")) {
+                        text = "N=" + modulus + "&d=" + sk_exp + "&addr=" + addr;
+                        qrimage = QrCodeGenerator.getQrCodeImage(text, 200, 200);
+
+                        if (printMode.equals("QR")) {
+                            if (GTX.getConnectDevice() != null) {
+                                printQR();
+                            } else {
+                                Common.showShortToast(CryptoActivity.this, "No printer found, display QR directly");
+                                qrimg.setVisibility(View.VISIBLE);
+                                qrimg.setImageBitmap(qrimage);
+
+                            }
+                        } else if (printMode.equals("QRNFC")) {
+                            qrtext = extractodd(text);
+                            nfctext = extracteven(text);
+                            if (GTX.getConnectDevice() != null) {
+                                qrimage = QrCodeGenerator.getQrCodeImage(qrtext, 200, 200);
+                                printQR();
+                            } else {
+                                Common.showShortToast(CryptoActivity.this, "No printer found, display QR directly");
+                                qrimg.setVisibility(View.VISIBLE);
+                                qrimg.setImageBitmap(qrimage);
+                            }
+                            showSaveDialog();
+                        } else if (printMode.equals("NFC")) {
+                            nfctext = text;
+                            showSaveDialog();
+                        }
+
+//                        recordadapter.setSelectedIndex(-1);
+//                        amount.setText("");
+//                        amountgroup.clearCheck();
+
+
+                    } else {
+                        final String encryptRequest = "request=" + URLEncoder.encode("onlyencrypt") + "&merchant=" + URLEncoder.encode(merchant_selected) +
+                                "&addr=" + URLEncoder.encode(addr) + "&value=" + URLEncoder.encode(value);
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                final String serverresponse = PostService.Post(encryptRequest);
+                                if (serverresponse != null && serverresponse.indexOf("token=") == 0) {
+                                    enc = serverresponse.split("&enc=")[1];
+                                    text = enc;
+                                    qrimage = QrCodeGenerator.getQrCodeImage(text, 200, 200);
+                                }
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+
+                                        if (printMode.equals("QR")) {
+                                            if (GTX.getConnectDevice() != null) {
+                                                printQR();
+                                            } else {
+                                                Common.showShortToast(CryptoActivity.this, "No printer found, display QR directly");
+//                                                recyclerView.setVisibility(View.GONE);
+                                                qrimg.setVisibility(View.VISIBLE);
+                                                qrimg.setImageBitmap(qrimage);
+
+                                            }
+                                        } else if (printMode.equals("QRNFC")) {
+                                            qrtext = extractodd(text);
+                                            nfctext = extracteven(text);
+                                            if (GTX.getConnectDevice() != null) {
+                                                qrimage = QrCodeGenerator.getQrCodeImage(qrtext, 200, 200);
+                                                printQR();
+                                            } else {
+                                                Common.showShortToast(CryptoActivity.this, "No printer found, display QR directly");
+                                                qrimg.setVisibility(View.VISIBLE);
+                                                qrimg.setImageBitmap(qrimage);
+                                            }
+                                            showSaveDialog();
+                                        } else if (printMode.equals("NFC")) {
+                                            nfctext = text;
+                                            showSaveDialog();
+                                        }
+//                                        recordadapter.setSelectedIndex(-1);
+//                                        amount.setText("");
+//                                        amountgroup.clearCheck();
+                                    }
+                                });
+                            }
+                        }).start();
+
+
+                    }
+                }
+
+
+                else if (!isdouble) Common.showShortToast(CryptoActivity.this,"Invalid input");
                 else {
 //                    generate RSA key pairs
                     keypair = RSAUtils.generateRSAKeyPair(512);
@@ -303,7 +425,7 @@ public class CryptoActivity extends AppCompatActivity  {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        response.setText("token address: " + addr);
+//                                        response.setText("token address: " + addr);
 //                                        Toast.makeText(CryptoActivity.this, "start printing money....", Toast.LENGTH_SHORT).show();
 
                                         if (merchant_selected.equals("None")) {
@@ -316,13 +438,14 @@ public class CryptoActivity extends AppCompatActivity  {
                                         }
 
 //                                        System.out.println(GTX.getConnectDevice());
-//                                        start printing money
+//                                        start printing mone
                                         if (printMode.equals("QR")) {
                                             if (GTX.getConnectDevice() != null) {
                                                 printQR();
                                             }
                                             else {
                                                 Common.showShortToast(CryptoActivity.this, "No printer found, display QR directly");
+//                                                recyclerView.setVisibility(View.GONE);
                                                 qrimg.setVisibility(View.VISIBLE);
                                                 qrimg.setImageBitmap(qrimage);
 
@@ -351,15 +474,11 @@ public class CryptoActivity extends AppCompatActivity  {
                                         else {
                                             Common.showShortToast(CryptoActivity.this, "please choose a print mode first");
                                         }
-//                                        Intent intent = new Intent(CryptoActivity.this, CryptoModeActivity.class);
-//                                        intent.putExtra("amount", Double.parseDouble(value));
-//                                        intent.putExtra("address", addr);
-//                                        intent.putExtra("merchant", merchant_selected);
-//                                        if (serverresponse.indexOf("token=") == 0) {
-//                                            intent.putExtra("enc", enc);
-//                                        }
-//                                        startActivity(intent);
-//                                        finish();
+
+//                                        recordadapter.setSelectedIndex(-1);
+//                                        amount.setText("");
+//                                        amountgroup.clearCheck();
+//                                        qrimg.setVisibility(View.GONE);
                                     }
                                 });
                             }
@@ -367,7 +486,8 @@ public class CryptoActivity extends AppCompatActivity  {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        response.setText(serverresponse);
+                                        Common.showShortToast(CryptoActivity.this,serverresponse);
+//                                        response.setText(serverresponse);
                                     }
                                 });
                             }
@@ -589,6 +709,45 @@ public class CryptoActivity extends AppCompatActivity  {
     private void showSaveDialog() {
         NFCDialog = new WriteDialog();
         NFCDialog.show(getSupportFragmentManager(), "mWriteDialog");
+    }
+
+    public void refreshcryptotransaction() {
+        final String cryptotransactionRequest ="request=" + URLEncoder.encode("cryptotransaction") + "&id="+ URLEncoder.encode(account_id.toString());
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final String response = PostService.Post(cryptotransactionRequest);
+                if (response != null) {
+
+                    try {
+                        Thread.sleep(1500);
+//                        List<Record> recordList = new ArrayList<>();
+                        recordList.clear();
+                        JSONArray jsonArray = new JSONArray(response);
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            CryptoRecord record = new CryptoRecord();
+                            record.setIndex(jsonObject.getInt("index"));
+                            record.setAddr(jsonObject.getString("address"));
+                            record.setTime(jsonObject.getString( "time"));
+                            record.setValue(jsonObject.getDouble("value"));
+                            recordList.add(record);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (recordList == null) return;
+                            recordadapter.notifyDataSetChanged();
+                            swipeRefresh.setRefreshing(false);
+                        }
+                    });
+                }
+            }
+        }).start();
     }
 
 }

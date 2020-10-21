@@ -137,9 +137,45 @@ public class MainActivity extends AppCompatActivity {
         crypto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,CryptoActivity.class); // 启动TransferActivity,传入account_id
-                intent.putExtra("account_id",account_id);
-                startActivity(intent);
+                final String cryptotransactionRequest ="request=" + URLEncoder.encode("cryptotransaction") + "&id="+ URLEncoder.encode(account_id.toString());
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final String response = PostService.Post(cryptotransactionRequest);
+                        if (response != null) {
+
+                            try {
+                                List<CryptoRecord> recordList = new ArrayList<>();
+//                                SimpleDateFormat sdf = new SimpleDateFormat(timePattern);
+                                JSONArray jsonArray = new JSONArray(response);
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    CryptoRecord record = new CryptoRecord();
+                                    record.setIndex(jsonObject.getInt("index"));
+                                    record.setAddr(jsonObject.getString("address"));
+                                    record.setTime(jsonObject.getString( "time"));
+                                    record.setValue(jsonObject.getDouble("value"));
+                                    recordList.add(record);
+                                }
+
+                                Intent intent = new Intent(MainActivity.this,CryptoActivity.class);
+                                Bundle bundle = new Bundle();
+                                bundle.putSerializable("recordList", (Serializable) recordList);
+                                bundle.putInt("account_id",account_id);
+//                                bundle.putString("type",type);
+                                intent.putExtras(bundle);
+                                startActivity(intent);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }).start();
+//                Intent intent = new Intent(MainActivity.this,CryptoActivity.class); // 启动TransferActivity,传入account_id
+//                intent.putExtra("account_id",account_id);
+//                startActivity(intent);
             }
         });
 

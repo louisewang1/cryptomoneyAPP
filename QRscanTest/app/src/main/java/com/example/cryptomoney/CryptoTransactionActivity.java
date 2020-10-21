@@ -67,6 +67,7 @@ public class CryptoTransactionActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         adapter.setid(account_id);
 
+
         final String merchantlistRequest ="request=" + URLEncoder.encode("merchantlist");
         new Thread(new Runnable() {
             @Override

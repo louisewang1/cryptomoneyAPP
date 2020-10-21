@@ -49,6 +49,7 @@
             android:layout_gravity="center_horizontal"
             android:textAlignment="center"  >
         </TextView>
+        />
 
     </LinearLayout>
 

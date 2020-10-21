@@ -43,4 +43,5 @@ public class CryptoRecord implements Serializable {
     public void setTime(String time) {
         this.time = time;
     }
+
 }

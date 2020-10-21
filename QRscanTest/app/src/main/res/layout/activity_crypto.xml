@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="10dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -38,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="15sp"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="10dp"
         android:layout_marginLeft="20dp"/>
 
     <LinearLayout
@@ -62,7 +62,7 @@
                 android:gravity="center"
                 android:text="QR"
                 android:textAllCaps="false"
-                android:textSize="17sp"
+                android:textSize="15sp"
                 android:checked="true"/>
 
             <RadioButton
@@ -73,7 +73,7 @@
                 android:gravity="center"
                 android:text="QR+NFC"
                 android:textAllCaps="false"
-                android:textSize="17sp" />
+                android:textSize="15sp" />
 
             <RadioButton
                 android:id="@+id/NFC"
@@ -83,7 +83,7 @@
                 android:gravity="center"
                 android:text="NFC"
                 android:textAllCaps="false"
-                android:textSize="17sp" />
+                android:textSize="15sp" />
         </RadioGroup>
 
     </LinearLayout>
@@ -93,7 +93,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="15sp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="5dp"
         android:layout_marginLeft="20dp"/>
 
     <LinearLayout
@@ -176,41 +176,148 @@
 
     </LinearLayout>
 
-    <Button
+    <TextView
+        android:text="or choose a past reccord (swipe to refresh):"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="print"
-        android:layout_marginTop="20dp"
-        android:id="@+id/request"/>
+        android:textSize="15sp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp"/>
+
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Respond: "
-            android:layout_marginLeft="20dp"/>
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="5dp">
 
-        <TextView
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.6"
+                android:text="No."
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:layout_gravity="center_horizontal"
+                android:textAlignment="center">
+            </TextView>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:text="Amount"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:layout_gravity="center_horizontal"
+                android:textAlignment="center" >
+            </TextView>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="Address"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:layout_gravity="center_horizontal"
+                android:textAlignment="center" >
+            </TextView>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="Time"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:layout_gravity="center_horizontal"
+                android:textAlignment="center">
+            </TextView>
+        </LinearLayout>
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresher"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="5"
+            android:layout_marginLeft="5dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <Button
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/response" />
+            android:layout_height="0dp"
+            android:layout_weight="1.5"
+            android:layout_gravity="center"
+            android:text="print"
+            android:layout_marginTop="10dp"
+            android:id="@+id/request"/>
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0dp"-->
+<!--            android:layout_weight="0.5"-->
+<!--            android:orientation="horizontal" >-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Respond: "-->
+<!--                android:layout_marginLeft="20dp"/>-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:id="@+id/response" />-->
+
+<!--        </LinearLayout>-->
+
+        <ImageView
+            android:layout_width="200dp"
+            android:layout_height="0dp"
+            android:layout_weight="5"
+            android:id="@+id/qrimg"
+            android:layout_marginTop="10dp"
+            android:outlineSpotShadowColor="@color/colorPrimary"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/bg_border">
+        </ImageView>
+
 
     </LinearLayout>
 
 
-    <ImageView
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:id="@+id/qrimg"
-        android:layout_marginTop="10dp"
-        android:outlineSpotShadowColor="@color/colorPrimary"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/bg_border">
-    </ImageView>
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal" >-->
+
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Respond: "-->
+<!--            android:layout_marginLeft="20dp"/>-->
+
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:id="@+id/response" />-->
+
+<!--    </LinearLayout>-->
+
+
+
 
 </LinearLayout>
