@@ -2,7 +2,8 @@
 SQLyog Ultimate v12.14 (64 bit)
 MySQL - 5.1.30-community : Database - test
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -29,8 +30,9 @@ CREATE TABLE `accountinfodb` (
 
 /*Data for the table `accountinfodb` */
 
-insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
-(1,'KFC',100,'',''),
+insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
+
+(1,'KFC',100,'',''),
 (2,'1',100,'','');
 
 /*Table structure for table `cryptotransferdb` */
@@ -64,8 +66,10 @@ CREATE TABLE `logindb` (
 
 /*Data for the table `logindb` */
 
-insert  into `logindb`(`id`,`username`,`pwd`,`usertype`,`sk`,`N`) values 
-(1,'KFC','kfc','MERCHANT','bR2TEbSv5NKviVl7PhhRZ9F0yVZ6DxD8KQyyuTSLWntYwXxBH2+rUDS5lC0yyEjIK6fejINKdJxqluEljQt+iQ==','AI6YJBi/C8I53lmfgQi6DZRD0FDqbK0qnsQgXNAapjla/oyrzjoQTk02LwibR8YamwyTlCSOQA+RIa05Og6SdTU='),
+insert  into `logindb`(`id`,`username`,`pwd`,`usertype`,`sk`,`N`) values 
+
+(1,'KFC','kfc','MERCHANT','bR2TEbSv5NKviVl7PhhRZ9F0yVZ6DxD8KQyyuTSLWntYwXxBH2+rUDS5lC0yyEjIK6fejINKdJxqluEljQt+iQ==','AI6YJBi/C8I53lmfgQi6DZRD0FDqbK0qnsQgXNAapjla/oyrzjoQTk02LwibR8YamwyTlCSOQA+RIa05Og6SdTU='),
+
 (2,'1','1','CUSTOMER','','');
 
 /*Table structure for table `merchant_infodb` */

@@ -40,6 +40,8 @@
         <activity android:name=".RegisterActivity" />
         <activity android:name=".TransactionActivity" />
         <activity android:name=".TransferActivity" />
+        <activity android:name=".RequestActivity" />
+        <activity android:name=".RequestMoney" />
         <activity android:name=".AccountActivity" />
         <activity android:name=".LoginActivity">
             <intent-filter>

@@ -62,5 +62,9 @@ public class UserService {
 	   return userDAO.merchantlist(conn);
    }
    
+   public int addmoney(Connection conn,int account_id, double value) {
+	   return userDAO.addmoney(conn, account_id, value);
+   }
+   
 }
 

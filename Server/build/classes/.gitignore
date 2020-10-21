@@ -1,1 +1,4 @@
-/build/
+/util/
+/servlet/
+/service/
+/dao/

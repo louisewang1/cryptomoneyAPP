@@ -278,6 +278,13 @@ public class UserServlet extends HttpServlet {
 				String id_enc = request.getParameter("id_enc");
 				String addr = request.getParameter("addr");
 				response.getOutputStream().write(userService.getcryptomoney(conn, id_enc, addr).getBytes("utf-8"));
+				break;
+			
+			case "addmoney":
+				int to_id = Integer.parseInt(request.getParameter("to_account"));
+				double val = Double.parseDouble(request.getParameter("value"));
+				response.getOutputStream().write(userService.addmoney(conn, to_id, val));
+				
 			default:
 				break;
 				

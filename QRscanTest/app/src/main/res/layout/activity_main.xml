@@ -59,6 +59,14 @@
         android:textSize="15sp"
         android:layout_margin="10dp"></Button>
 
+    <Button
+        android:id="@+id/request"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Request Money"
+        android:textSize="15sp"
+        android:layout_margin="10dp"></Button>
 
 
 

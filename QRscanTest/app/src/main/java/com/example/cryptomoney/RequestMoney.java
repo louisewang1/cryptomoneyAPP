@@ -37,9 +37,11 @@ import java.security.spec.RSAPublicKeySpec;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 
-public class RcvModeActivity extends AppCompatActivity {
+public class RequestMoney extends AppCompatActivity {
 
     private Integer account_id;
+    private Integer payer_id;
+    private Double value;
     private Button QR;
     private Button QRNFC;
     private Button NFC;
@@ -64,8 +66,8 @@ public class RcvModeActivity extends AppCompatActivity {
 
         Intent intent_from_main = getIntent();
         account_id = intent_from_main.getIntExtra("account_id",0);
-        type = intent_from_main.getStringExtra("type");
-
+        value = intent_from_main.getDoubleExtra("value", 0);
+        Double amount_received = new Double(0);
 
         QR = findViewById(R.id.QR);
         QRNFC = findViewById(R.id.QRNFC);
@@ -75,9 +77,9 @@ public class RcvModeActivity extends AppCompatActivity {
         QR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(RcvModeActivity.this, Manifest.permission.CAMERA)
+                if (ContextCompat.checkSelfPermission(RequestMoney.this, Manifest.permission.CAMERA)
                         != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(RcvModeActivity.this,
+                    ActivityCompat.requestPermissions(RequestMoney.this,
                             new String[] {Manifest.permission.CAMERA}, Constant.REQ_PERM_CAMERA);
                 }else {
                     openCamera();
@@ -85,17 +87,11 @@ public class RcvModeActivity extends AppCompatActivity {
             }
         });
 
-        QRNFC.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent_to_qrnfc = new Intent(RcvModeActivity.this,QRNFCRcvActivity.class);
-                intent_to_qrnfc.putExtra("account",account_id);
-                intent_to_qrnfc.putExtra("type",type);
-                startActivity(intent_to_qrnfc);
-                finish();
-            }
-        });
 
+        Intent intent_to_request = new Intent(RequestMoney.this, RequestActivity.class);
+        intent_to_request.putExtra("received", amount_received);
+        intent_to_request.putExtra("payer", payer_id);
+        startActivityForResult(intent_to_request, 1);
     }
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {  //权限请求结果回调
@@ -154,7 +150,7 @@ public class RcvModeActivity extends AppCompatActivity {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            Common.showLongToast(RcvModeActivity.this,response);
+                                            Common.showLongToast(RequestMoney.this,response);
                                             rcvresponse.setText(response);
 //                                            finish();
                                         }
@@ -168,7 +164,7 @@ public class RcvModeActivity extends AppCompatActivity {
                     }
                 }
                 else {
-                    Common.showLongToast(RcvModeActivity.this,"QR reading failed, please scan again ");
+                    Common.showLongToast(RequestMoney.this,"QR reading failed, please scan again ");
                     rcvresponse.setText("QR reading failed, please scan again ");
                 }
             }
@@ -193,16 +189,16 @@ public class RcvModeActivity extends AppCompatActivity {
                     if (qrstring_dec.indexOf("amount=") == 0) {
                         Double amount = Double.parseDouble(qrstring_dec.split("amount=")[1].split("&token=")[0]);
                         String token = qrstring_dec.split("&token=")[1];
-                        Common.showLongToast(RcvModeActivity.this,"amount="+amount+" token address="+token);
+                        Common.showLongToast(RequestMoney.this,"amount="+amount+" token address="+token);
                         rcvresponse.setText("amount="+amount+" token address="+token);
                     }
                     else {
-                        Common.showLongToast(RcvModeActivity.this,"invalid token");
+                        Common.showLongToast(RequestMoney.this,"invalid token");
                         rcvresponse.setText("invalid token");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Common.showLongToast(RcvModeActivity.this,"invalid token");
+                    Common.showLongToast(RequestMoney.this,"invalid token");
                     rcvresponse.setText("invalid token");
                 }
 
@@ -212,7 +208,7 @@ public class RcvModeActivity extends AppCompatActivity {
 
     private void openCamera() {
         try {
-            Intent intent = new Intent(RcvModeActivity.this, CaptureActivity.class);
+            Intent intent = new Intent(RequestMoney.this, CaptureActivity.class);
             startActivityForResult(intent, Constant.REQ_QR_CODE);
         } catch (SecurityException e) {
             e.printStackTrace();

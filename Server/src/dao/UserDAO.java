@@ -447,6 +447,29 @@ public class UserDAO {
 	     }
 	     return sb.toString();
 	 }
+	 
+	public int addmoney(Connection conn, Integer account_id, Double value) {
+	        if (conn == null) return TYPE_CONN_FAILED;
+	        CallableStatement cs = null;
+	        try {
+	            cs =conn.prepareCall("{call add_balance(?,?,?)}");
+	            cs.setInt(1, account_id);
+	            cs.setDouble(2, value);
+	            cs.registerOutParameter(3, Types.INTEGER);
+	            cs.execute();
+//	            Log.d("MainActivity","transaction result: " + cs.getInt(4));
+	            return 1;
+	        } catch (Exception e){
+	            e.printStackTrace();
+	        }if (cs != null) {
+	            try {
+	                cs.close();
+	            } catch (SQLException e) {
+	                e.printStackTrace();
+	            }
+	        }
+	        return TYPE_CONN_FAILED;
+	 }
 	
 }
 
