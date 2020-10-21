@@ -66,7 +66,7 @@ public class RequestActivity extends AppCompatActivity{
                     Intent intent = new Intent(RequestActivity.this,RcvModeActivity.class); // 启动TransferActivity,传入account_id
                     intent.putExtra("account_id",account_id);
                     intent.putExtra("value",value);
-                    startActivity(intent);
+                    startActivityForResult(intent, 100);
 
 
 
@@ -113,9 +113,11 @@ public class RequestActivity extends AppCompatActivity{
             });
         }
         else {
-            sqloperation2 = "request=" + URLEncoder.encode("addmoney") + "&to_account=" + URLEncoder.encode(payer_id.toString())
-                    + "&value=" + URLEncoder.encode(amount_received.toString());
-            run(sqloperation2);
+            if (amount_received > 0) {
+                sqloperation2 = "request=" + URLEncoder.encode("addmoney") + "&to_account=" + URLEncoder.encode(payer_id.toString())
+                        + "&value=" + URLEncoder.encode(amount_received.toString());
+                run(sqloperation2);
+            }
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

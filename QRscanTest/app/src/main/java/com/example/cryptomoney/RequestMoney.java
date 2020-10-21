@@ -40,11 +40,13 @@ import javax.crypto.NoSuchPaddingException;
 public class RequestMoney extends AppCompatActivity {
 
     private Integer account_id;
-    private Integer payer_id;
+    private Integer payer_id = 0;
     private Double value;
+    private Double amount_received;
     private Button QR;
     private Button QRNFC;
     private Button NFC;
+    private Button finish;
     private String type;
     private SharedPreferences pref;
     private String merchant_N;
@@ -67,12 +69,13 @@ public class RequestMoney extends AppCompatActivity {
         Intent intent_from_main = getIntent();
         account_id = intent_from_main.getIntExtra("account_id",0);
         value = intent_from_main.getDoubleExtra("value", 0);
-        Double amount_received = new Double(0);
+        amount_received = new Double(0);
 
         QR = findViewById(R.id.QR);
         QRNFC = findViewById(R.id.QRNFC);
         NFC = findViewById(R.id.NFC);
         rcvresponse = findViewById(R.id.response);
+        finish = findViewById(R.id.finish);
 
         QR.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,11 +90,16 @@ public class RequestMoney extends AppCompatActivity {
             }
         });
 
-
-        Intent intent_to_request = new Intent(RequestMoney.this, RequestActivity.class);
-        intent_to_request.putExtra("received", amount_received);
-        intent_to_request.putExtra("payer", payer_id);
-        startActivityForResult(intent_to_request, 1);
+        finish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent_to_request = new Intent();
+                intent_to_request.putExtra("received", amount_received);
+                intent_to_request.putExtra("payer", payer_id);
+                setResult(RESULT_OK, intent_to_request);
+                finish();
+            }
+        });
     }
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {  //权限请求结果回调
@@ -139,7 +147,7 @@ public class RequestMoney extends AppCompatActivity {
 //                    Log.d("MainActivity","id_enc= "+id_enc_str);
 //                    Log.d("MainActivity","encrypted id= "+id_enc);
 
-                        final String cryptomoneyinRequest ="request=" + URLEncoder.encode("getencrypto") +
+                        final String cryptomoneyinRequest ="request=" + URLEncoder.encode("useencrypto") +
                                 "&id_enc="+ URLEncoder.encode(id_enc_str)+"&addr="+ URLEncoder.encode(addr);
 
                         new Thread(new Runnable() {
@@ -152,6 +160,9 @@ public class RequestMoney extends AppCompatActivity {
                                         public void run() {
                                             Common.showLongToast(RequestMoney.this,response);
                                             rcvresponse.setText(response);
+
+                                            Double token_value = Double.parseDouble(response);
+                                            amount_received += token_value;
 //                                            finish();
                                         }
                                     });
