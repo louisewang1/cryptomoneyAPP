@@ -33,15 +33,6 @@
         android:layout_margin="10dp"/>
 
     <Button
-        android:id="@+id/qrscan"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Receive money"
-        android:textSize="15sp"
-        android:layout_margin="10dp"></Button>
-
-    <Button
         android:id="@+id/tr_detail"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
@@ -60,13 +51,25 @@
         android:layout_margin="10dp"></Button>
 
     <Button
-        android:id="@+id/cryptotr_detail"
+        android:id="@+id/qrscan"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="crypto record in transit"
+        android:text="Receive money"
         android:textSize="15sp"
         android:layout_margin="10dp"></Button>
+
+
+
+
+<!--    <Button-->
+<!--        android:id="@+id/cryptotr_detail"-->
+<!--        android:layout_width="250dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="center_horizontal"-->
+<!--        android:text="crypto record in transit"-->
+<!--        android:textSize="15sp"-->
+<!--        android:layout_margin="10dp"></Button>-->
 
 
 </LinearLayout>

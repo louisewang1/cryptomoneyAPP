@@ -114,6 +114,7 @@ public class CryptoActivity extends AppCompatActivity  {
     private SwipeRefreshLayout swipeRefresh;
     private CryptoRecordAdapter recordadapter;
     private RecyclerView recyclerView;
+    private Button reset;
 
     private final static int REQ_LOC = 10;
 //    final String AK = "c6a5a445dc25490183f42088f4b78ccf";
@@ -143,6 +144,7 @@ public class CryptoActivity extends AppCompatActivity  {
         qrimg = findViewById(R.id.qrimg);
         qrimg.setVisibility(View.GONE);
         nfcUtils = new NfcUtils(this);
+        reset = findViewById(R.id.reset);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -276,6 +278,16 @@ public class CryptoActivity extends AppCompatActivity  {
                 }
             }
         }).start();
+
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                qrimg.setVisibility(View.GONE);
+                amountgroup.clearCheck();
+                recordadapter.setSelectedIndex(-1);
+                amount.setText("");
+            }
+        });
 
         request.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -712,6 +724,7 @@ public class CryptoActivity extends AppCompatActivity  {
     }
 
     public void refreshcryptotransaction() {
+        recordadapter.setSelectedIndex(-1);
         final String cryptotransactionRequest ="request=" + URLEncoder.encode("cryptotransaction") + "&id="+ URLEncoder.encode(account_id.toString());
 
         new Thread(new Runnable() {

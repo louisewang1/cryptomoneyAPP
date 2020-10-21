@@ -177,7 +177,7 @@
     </LinearLayout>
 
     <TextView
-        android:text="or choose a past reccord (swipe to refresh):"
+        android:text="or choose a past reccord (swipe to refresh or unselect):"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="15sp"
@@ -256,33 +256,32 @@
                 />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-        <Button
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1.5"
             android:layout_gravity="center"
-            android:text="print"
-            android:layout_marginTop="10dp"
-            android:id="@+id/request"/>
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            android:layout_weight="1.5"
+            android:layout_marginTop="10dp">
 
-<!--        <LinearLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="0dp"-->
-<!--            android:layout_weight="0.5"-->
-<!--            android:orientation="horizontal" >-->
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="print"
+                android:id="@+id/request"
+                android:layout_marginRight="40dp"/>
 
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Respond: "-->
-<!--                android:layout_marginLeft="20dp"/>-->
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="reset"
+                android:id="@+id/reset"/>
 
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:id="@+id/response" />-->
 
-<!--        </LinearLayout>-->
+
+        </LinearLayout>
+
+
 
         <ImageView
             android:layout_width="200dp"
@@ -290,32 +289,12 @@
             android:layout_weight="5"
             android:id="@+id/qrimg"
             android:layout_marginTop="10dp"
-            android:outlineSpotShadowColor="@color/colorPrimary"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/bg_border">
+            android:layout_gravity="center_horizontal">
         </ImageView>
 
 
     </LinearLayout>
 
-
-<!--    <LinearLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:orientation="horizontal" >-->
-
-<!--        <TextView-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Respond: "-->
-<!--            android:layout_marginLeft="20dp"/>-->
-
-<!--        <TextView-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:id="@+id/response" />-->
-
-<!--    </LinearLayout>-->
 
 
 
