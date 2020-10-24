@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import entity.UserInfo;
@@ -33,6 +34,7 @@ public class UserDAO {
     public final static int TYPE_SELF_FAILED = -3;
     public final static int TYPE_BALANCE_FAILED = -4;
     public final static int TYPE_PK_FAILED = -5;
+    public final static int MAX_DECRYPT_BLOCK = 64;
     
     private static String timePattern = "yyyy-MM-dd HH:mm:ss";
 	
@@ -436,6 +438,211 @@ public class UserDAO {
 	        return result;
 	 }
 	 
+	 public String addnewcontract(Connection conn, int account_id, double value, String modulus, String pk_exp) {
+		 if (conn == null) return null;
+		 CallableStatement cs = null;
+		 String result = null;
+		 String contract_addr;
+		 try {
+			 do {
+				 contract_addr = getRandomString(20); 
+				 cs =conn.prepareCall("{call create_contract(?,?,?,?,?,?)}"); 
+		    	 cs.setString(1,contract_addr);
+		    	 cs.setString(2, modulus);
+		    	 cs.setString(3, pk_exp);
+		    	 cs.setInt(4, account_id);
+		    	 cs.setDouble(5, value);
+				 cs.registerOutParameter(6,Types.INTEGER);
+		         cs.execute();
+			 }while(cs.getInt(6) != 1);
+			 System.out.println("contract_addr= "+contract_addr);
+			 result = contract_addr;      
+        } catch (Exception e){
+            e.printStackTrace();
+        }if (cs != null) {
+            try {
+                cs.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+		 
+	 }
+	 
+//	 request=recordtoken&contract_addr=...&enc=<>
+	 public String recordnewtoken(Connection conn, String contract_addr, String enc) {
+		 String result = "failed";
+		 if (conn == null) {
+			result = "connection error";
+			return result;
+		 }
+		 CallableStatement cs = null;
+		 String token_addr;
+		 // get contract details from contract_addr
+		 try {
+			 cs = conn.prepareCall("{call get_contract_detail(?,?,?,?,?,?)}");
+			 cs.setString(1,contract_addr);
+			 cs.registerOutParameter(2,Types.VARCHAR);  //pk_exp
+			 cs.registerOutParameter(3,Types.VARCHAR);  // N
+			 cs.registerOutParameter(4,Types.INTEGER);  // rcver_id
+			 cs.registerOutParameter(5,Types.DOUBLE);  // request_amount
+			 cs.registerOutParameter(6,Types.DOUBLE);  // current_amount
+			 cs.execute();
+			 
+			 int rcver_id = cs.getInt(4);
+			 double request_amount = cs.getDouble(5);
+			 double current_amount = cs.getDouble(6);
+			 
+			 // restore contract_pk
+			 BigInteger pk_exp = new BigInteger(Base64Utils.decode(cs.getString(2)));
+			 BigInteger modulus = new BigInteger(Base64Utils.decode(cs.getString(3)));
+			 System.out.println("pk_exp= "+pk_exp);
+			 System.out.println("modulus= "+modulus);
+			 
+			 Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+		     KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+	         RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(modulus,pk_exp);
+	         PublicKey pk = keyFactory.generatePublic(rsaPublicKeySpec);
+	         
+	         // get token_addr with contract_pk
+			 cipher.init(Cipher.DECRYPT_MODE,pk);
+			 // block decrypt
+			 int inputLen = Base64Utils.decode(enc).length;
+		     int offSet = 0;
+		     byte[] resultBytes = {};
+             byte[] cache = {};
+		        while (inputLen - offSet > 0) {
+		            if (inputLen - offSet > MAX_DECRYPT_BLOCK) {
+		                cache = cipher.doFinal(Base64Utils.decode(enc), offSet, MAX_DECRYPT_BLOCK);
+		                offSet += MAX_DECRYPT_BLOCK;
+		            } else {
+		                cache = cipher.doFinal(Base64Utils.decode(enc), offSet, inputLen - offSet);   
+		                offSet = inputLen;
+		            }
+		            resultBytes = Arrays.copyOf(resultBytes, resultBytes.length + cache.length);
+                    System.arraycopy(cache, 0, resultBytes, resultBytes.length - cache.length, cache.length);
+		        }
+		        
+//			 String dec = new String(cipher.doFinal(Base64Utils.decode(enc)));
+		     String dec = new String(resultBytes);
+			 System.out.println("dec= "+dec);
+			 
+			 // dec =  token_addr + "&ENC_ID=" + enc_id;
+			 token_addr = dec.split("&ENC_ID=")[0];
+			 System.out.println("token_addr= "+token_addr);
+			 String enc_id = dec.split("&ENC_ID=")[1];
+			 
+			 // check if token addr is valid
+			 cs = conn.prepareCall("{call addr_to_id(?,?)}");
+			 cs.setString(1, token_addr);
+			 cs.registerOutParameter(2,Types.INTEGER);
+			 cs.execute();
+			 int from_id = cs.getInt(2);
+			 if (from_id > 0) {  // from_id exists
+				 // get token_pk from token_addr and delete this token
+				 cs = conn.prepareCall("{call get_token_detail(?,?,?,?,?)}");
+				 cs.setString(1, token_addr);
+				 cs.registerOutParameter(2,Types.VARCHAR); // pk_exp
+				 cs.registerOutParameter(3,Types.VARCHAR); // N
+				 cs.registerOutParameter(4,Types.INTEGER); // sender_id
+				 cs.registerOutParameter(5,Types.DOUBLE); // send_amount
+				 
+				 cs.execute();
+				 pk_exp = new BigInteger(Base64Utils.decode(cs.getString(2)));
+				 modulus = new BigInteger(Base64Utils.decode(cs.getString(3)));
+				 System.out.println("pk_exp= "+pk_exp);
+				 System.out.println("modulus= "+modulus);
+				 
+				 int sender_id = cs.getInt(4);
+				 double send_amount = cs.getDouble(5);	
+				 
+				 if (from_id != sender_id) {
+					 result = "receiver error";
+					 //TODO: return all money
+					 return result;
+				 }
+				 
+				 // restore token_sk
+				 rsaPublicKeySpec = new RSAPublicKeySpec(modulus,pk_exp);
+	             pk = keyFactory.generatePublic(rsaPublicKeySpec);
+	             
+				 cipher.init(Cipher.DECRYPT_MODE,pk);
+				 String dec_id = new String(cipher.doFinal(Base64Utils.decode(enc_id)));
+				 System.out.println("id_dec= "+dec_id);
+				 
+				 // dec_id = ACCOUNT= + rcver_id;
+				 if (dec_id.startsWith("ACCOUNT=")) {
+					 int rcver_id2 = Integer.parseInt(dec_id.split("=")[1]);
+					 System.out.println("rcver_id2= "+rcver_id2);
+					 if (rcver_id2 != rcver_id) {
+						 result = "invalid receiver";
+						 //TODO: return all money
+					 }
+					 
+					 else {
+						 // compare request_amount & current_amount + send_amount
+						 // if not enough
+						 if (current_amount + send_amount < request_amount) {
+							 
+							 // add new record in table contractrecord 
+							 cs = conn.prepareCall("{call add_new_token(?,?,?,?)}");
+							 cs.setString(1, contract_addr);
+							 cs.setInt(2, sender_id);
+							 cs.setDouble(3, send_amount);
+							 cs.registerOutParameter(4,Types.INTEGER); // result
+							 cs.execute();
+							 
+							 if (cs.getInt(4) == 1) {
+								 // update current_amount in table contract
+								 cs = conn.prepareCall("{call update_current_amount(?,?,?)}");
+								 cs.setString(1,contract_addr);
+//								 System.out.println("new_amount= "+new_amount);
+								 cs.setDouble(2,current_amount+send_amount);
+								 cs.registerOutParameter(3,Types.INTEGER); // result
+								 cs.execute();
+								 if (cs.getInt(3) == 1) {
+									 result = "not enough";
+								 }
+							 }
+						 }
+						 // if enough or need return change
+						 else {
+							 double change = current_amount + send_amount - request_amount;
+							 // add money to rcver and return change to sender
+							 cs = conn.prepareCall("{call finish_contract(?,?,?,?,?,?)}");
+							 cs.setString(1, contract_addr);
+							 cs.setDouble(2,request_amount);
+							 cs.setInt(3,sender_id);
+							 cs.setInt(4, rcver_id);
+							 cs.setDouble(5,change);
+							 cs.registerOutParameter(6,Types.INTEGER);
+							 cs.execute();
+							 if (cs.getInt(6) == 1) {
+								 result = "enough";
+							 }
+						 }
+					 }
+				 }
+			 }
+			 else {
+				 result = "invalid token addres";
+				//TODO: return all money
+			 }
+		 } catch (Exception e){
+	            e.printStackTrace();
+	            result = "decryption error";
+	            //TODO: return all money
+	        }if (cs != null) {
+	            try {
+	                cs.close();
+	            } catch (SQLException e) {
+	                e.printStackTrace();
+	            }
+	        }
+	        return result;
+	 }
+	 
 	//generate random address
 	 public static String getRandomString(int length){
 	     String str="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -448,28 +655,30 @@ public class UserDAO {
 	     return sb.toString();
 	 }
 	 
-	public int addmoney(Connection conn, Integer account_id, Double value) {
-	        if (conn == null) return TYPE_CONN_FAILED;
-	        CallableStatement cs = null;
-	        try {
-	            cs =conn.prepareCall("{call add_balance(?,?,?)}");
-	            cs.setInt(1, account_id);
-	            cs.setDouble(2, value);
-	            cs.registerOutParameter(3, Types.INTEGER);
-	            cs.execute();
-//	            Log.d("MainActivity","transaction result: " + cs.getInt(4));
-	            return 1;
-	        } catch (Exception e){
-	            e.printStackTrace();
-	        }if (cs != null) {
-	            try {
-	                cs.close();
-	            } catch (SQLException e) {
-	                e.printStackTrace();
-	            }
-	        }
-	        return TYPE_CONN_FAILED;
-	 }
+
+	 
+//	public int addmoney(Connection conn, Integer account_id, Double value) {
+//	        if (conn == null) return TYPE_CONN_FAILED;
+//	        CallableStatement cs = null;
+//	        try {
+//	            cs =conn.prepareCall("{call add_balance(?,?,?)}");
+//	            cs.setInt(1, account_id);
+//	            cs.setDouble(2, value);
+//	            cs.registerOutParameter(3, Types.INTEGER);
+//	            cs.execute();
+////	            Log.d("MainActivity","transaction result: " + cs.getInt(4));
+//	            return 1;
+//	        } catch (Exception e){
+//	            e.printStackTrace();
+//	        }if (cs != null) {
+//	            try {
+//	                cs.close();
+//	            } catch (SQLException e) {
+//	                e.printStackTrace();
+//	            }
+//	        }
+//	        return TYPE_CONN_FAILED;
+//	 }
 	
 }
 

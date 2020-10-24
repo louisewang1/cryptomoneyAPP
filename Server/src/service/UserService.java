@@ -62,8 +62,16 @@ public class UserService {
 	   return userDAO.merchantlist(conn);
    }
    
-   public int addmoney(Connection conn,int account_id, double value) {
-	   return userDAO.addmoney(conn, account_id, value);
+//   public int addmoney(Connection conn,int account_id, double value) {
+//	   return userDAO.addmoney(conn, account_id, value);
+//   }
+   
+   public String addnewcontract(Connection conn, int account_id, double value, String modulus, String pk_exp) {
+	   return userDAO.addnewcontract(conn,account_id,value,modulus,pk_exp);
+   }
+   
+   public String recordnewtoken(Connection conn, String contract_addr, String enc) {
+	   return userDAO.recordnewtoken(conn,contract_addr,enc);
    }
    
 }

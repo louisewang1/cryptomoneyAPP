@@ -11,25 +11,23 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tv_read_nfc"
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_centerInParent="true"
             android:layout_margin="20dp"
             android:gravity="center"
+            android:hint="Please near a new NFC tag"
             android:textColor="@android:color/black"
-            android:textSize="16sp"
-            tools:text="999999" />
+            android:textSize="16sp" />
 
         <Button
-            android:id="@+id/btn_read_nfc_ok"
+            android:id="@+id/btn_write_nfc_cancle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_margin="20dp"
-            android:background="@android:color/holo_red_light"
-            android:text="确定"
-            android:textColor="@android:color/white"
+            android:text="Cancel"
             android:textSize="16sp" />
+
     </LinearLayout>
 </FrameLayout>

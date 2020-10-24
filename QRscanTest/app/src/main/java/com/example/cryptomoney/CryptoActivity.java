@@ -115,16 +115,17 @@ public class CryptoActivity extends AppCompatActivity  {
     private CryptoRecordAdapter recordadapter;
     private RecyclerView recyclerView;
     private Button reset;
+    private Boolean showdialog = false;
 
     private final static int REQ_LOC = 10;
-//    final String AK = "c6a5a445dc25490183f42088f4b78ccf";
+    final String AK = "c6a5a445dc25490183f42088f4b78ccf";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crypto);
 
-//        GTX.init(getApplicationContext(), AK);  //初始化
+        GTX.init(getApplicationContext(), AK);  //初始化
 
         account_id = getIntent().getIntExtra("account_id",0);
 //        Log.d("CryptoActivity","id= "+account_id);
@@ -331,9 +332,11 @@ public class CryptoActivity extends AppCompatActivity  {
                                 qrimg.setVisibility(View.VISIBLE);
                                 qrimg.setImageBitmap(qrimage);
                             }
+                            showdialog = true;
                             showSaveDialog();
                         } else if (printMode.equals("NFC")) {
                             nfctext = text;
+                            showdialog = true;
                             showSaveDialog();
                         }
 
@@ -379,9 +382,11 @@ public class CryptoActivity extends AppCompatActivity  {
                                                 qrimg.setVisibility(View.VISIBLE);
                                                 qrimg.setImageBitmap(qrimage);
                                             }
+                                            showdialog = true;
                                             showSaveDialog();
                                         } else if (printMode.equals("NFC")) {
                                             nfctext = text;
+                                            showdialog = true;
                                             showSaveDialog();
                                         }
 //                                        recordadapter.setSelectedIndex(-1);
@@ -475,11 +480,13 @@ public class CryptoActivity extends AppCompatActivity  {
                                                 qrimg.setVisibility(View.VISIBLE);
                                                 qrimg.setImageBitmap(qrimage);
                                             }
+                                            showdialog = true;
                                             showSaveDialog();
                                         }
 
                                         else if (printMode.equals("NFC")) {
                                             nfctext = text;
+                                            showdialog = true;
                                             showSaveDialog();
                                         }
 
@@ -515,19 +522,23 @@ public class CryptoActivity extends AppCompatActivity  {
     @Override
     protected void onNewIntent(Intent intent){
         super.onNewIntent(intent);
-        try {
-            nfcUtils.writeNFCToTag(nfctext, intent);
-            dissDialog();
-            //                    Log.d("NFCRWActivity","finish writing");
-            Common.showShortToast(this, "write to NFC successfully.");
+        if (showdialog) {
+            try {
+                nfcUtils.writeNFCToTag(nfctext, intent);
+                dissDialog();
+                showdialog = false;
+                //                    Log.d("NFCRWActivity","finish writing");
+                Common.showShortToast(this, "write to NFC successfully.");
 //            nfcstatus.setText("Status: writing successfully");
-        } catch (IOException e) {
-            Common.showShortToast(this, "write to NFC failed.");
-            //                    Log.d("NFCRWActivity","write to NFC failed：" + e.getMessage());
-        } catch (FormatException e) {
-            Common.showShortToast(this, "write to failed.");
-            //                    Log.d("NFCRWActivity","write to NFC failed：" + e.getMessage());
+            } catch (IOException e) {
+                Common.showShortToast(this, "write to NFC failed.");
+                //                    Log.d("NFCRWActivity","write to NFC failed：" + e.getMessage());
+            } catch (FormatException e) {
+                Common.showShortToast(this, "write to failed.");
+                //                    Log.d("NFCRWActivity","write to NFC failed：" + e.getMessage());
+            }
         }
+
     }
 
     @Override

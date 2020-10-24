@@ -186,6 +186,10 @@ public class CryptoRecordAdapter extends RecyclerView.Adapter<CryptoRecordAdapte
     }
 
     public void setSelectedIndex(int position) {
+
         selectedIndex = position;
+        if (selectedIndex == -1) {
+            selected = false;
+        }
     }
 }

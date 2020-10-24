@@ -16,21 +16,41 @@ CREATE DATABASE /*!32312 IF NOT EXISTS*/`test` /*!40100 DEFAULT CHARACTER SET la
 
 USE `test`;
 
+/*Table structure for table `logindb` */
+
+CREATE TABLE `logindb` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(50) NOT NULL,
+  `pwd` VARCHAR(100) NOT NULL,
+  `usertype` VARCHAR(10) NOT NULL,
+  `sk` VARCHAR(100) DEFAULT NULL,
+  `N` VARCHAR(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=INNODB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+
+/*Data for the table `logindb` */
+
+INSERT  INTO `logindb`(`id`,`username`,`pwd`,`usertype`,`sk`,`N`) VALUES 
+
+(1,'KFC','kfc','MERCHANT','bR2TEbSv5NKviVl7PhhRZ9F0yVZ6DxD8KQyyuTSLWntYwXxBH2+rUDS5lC0yyEjIK6fejINKdJxqluEljQt+iQ==','AI6YJBi/C8I53lmfgQi6DZRD0FDqbK0qnsQgXNAapjla/oyrzjoQTk02LwibR8YamwyTlCSOQA+RIa05Og6SdTU='),
+
+(2,'1','1','CUSTOMER','','');
+
 /*Table structure for table `accountinfodb` */
 
 CREATE TABLE `accountinfodb` (
-  `account_id` int(11) NOT NULL,
-  `username` varchar(50) NOT NULL,
-  `balance` double NOT NULL DEFAULT '100',
-  `email` varchar(100) DEFAULT NULL,
-  `cellphone` varchar(100) DEFAULT NULL,
+  `account_id` INT(11) NOT NULL,
+  `username` VARCHAR(50) NOT NULL,
+  `balance` DOUBLE NOT NULL DEFAULT '100',
+  `email` VARCHAR(100) DEFAULT NULL,
+  `cellphone` VARCHAR(100) DEFAULT NULL,
   PRIMARY KEY (`account_id`),
   CONSTRAINT `fk_accountinfo_id` FOREIGN KEY (`account_id`) REFERENCES `logindb` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=INNODB DEFAULT CHARSET=latin1;
 
 /*Data for the table `accountinfodb` */
 
-insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
+INSERT  INTO `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) VALUES 
 
 (1,'KFC',100,'',''),
 (2,'1',100,'','');
@@ -38,81 +58,61 @@ insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphon
 /*Table structure for table `cryptotransferdb` */
 
 CREATE TABLE `cryptotransferdb` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `account_id` int(11) NOT NULL,
-  `amount` double NOT NULL DEFAULT '0',
-  `crypto_time` datetime NOT NULL,
-  `address` varchar(100) NOT NULL,
-  `N` varchar(100) NOT NULL,
-  `pk` varchar(10) NOT NULL,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `account_id` INT(11) NOT NULL,
+  `amount` DOUBLE NOT NULL DEFAULT '0',
+  `crypto_time` DATETIME NOT NULL,
+  `address` VARCHAR(100) NOT NULL,
+  `N` VARCHAR(100) NOT NULL,
+  `pk` VARCHAR(10) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_cryptotransferdb_id` (`account_id`),
   CONSTRAINT `fk_cryptotransferdb_id` FOREIGN KEY (`account_id`) REFERENCES `logindb` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=INNODB DEFAULT CHARSET=latin1;
 
 /*Data for the table `cryptotransferdb` */
-
-/*Table structure for table `logindb` */
-
-CREATE TABLE `logindb` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(50) NOT NULL,
-  `pwd` varchar(100) NOT NULL,
-  `usertype` varchar(10) NOT NULL,
-  `sk` varchar(100) DEFAULT NULL,
-  `N` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
-
-/*Data for the table `logindb` */
-
-insert  into `logindb`(`id`,`username`,`pwd`,`usertype`,`sk`,`N`) values 
-
-(1,'KFC','kfc','MERCHANT','bR2TEbSv5NKviVl7PhhRZ9F0yVZ6DxD8KQyyuTSLWntYwXxBH2+rUDS5lC0yyEjIK6fejINKdJxqluEljQt+iQ==','AI6YJBi/C8I53lmfgQi6DZRD0FDqbK0qnsQgXNAapjla/oyrzjoQTk02LwibR8YamwyTlCSOQA+RIa05Og6SdTU='),
-
-(2,'1','1','CUSTOMER','','');
-
-/*Table structure for table `merchant_infodb` */
-
-CREATE TABLE `merchant_infodb` (
-  `account_id` int(11) NOT NULL,
-  `username` varchar(50) NOT NULL,
-  `balance` double NOT NULL DEFAULT '0',
-  `email` varchar(50) DEFAULT NULL,
-  `cellphone` varchar(20) DEFAULT NULL,
-  KEY `fk_merchant_info_id` (`account_id`),
-  CONSTRAINT `fk_merchant_info_id` FOREIGN KEY (`account_id`) REFERENCES `merchant_logindb` (`account_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-/*Data for the table `merchant_infodb` */
 
 /*Table structure for table `merchant_logindb` */
 
 CREATE TABLE `merchant_logindb` (
-  `account_id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(20) NOT NULL,
-  `pwd` varchar(50) NOT NULL,
-  `sk` varchar(100) NOT NULL,
-  `N` varchar(100) NOT NULL,
+  `account_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(20) NOT NULL,
+  `pwd` VARCHAR(50) NOT NULL,
+  `sk` VARCHAR(100) NOT NULL,
+  `N` VARCHAR(100) NOT NULL,
   PRIMARY KEY (`account_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=INNODB DEFAULT CHARSET=latin1;
 
 /*Data for the table `merchant_logindb` */
+
+/*Table structure for table `merchant_infodb` */
+
+CREATE TABLE `merchant_infodb` (
+  `account_id` INT(11) NOT NULL,
+  `username` VARCHAR(50) NOT NULL,
+  `balance` DOUBLE NOT NULL DEFAULT '0',
+  `email` VARCHAR(50) DEFAULT NULL,
+  `cellphone` VARCHAR(20) DEFAULT NULL,
+  KEY `fk_merchant_info_id` (`account_id`),
+  CONSTRAINT `fk_merchant_info_id` FOREIGN KEY (`account_id`) REFERENCES `merchant_logindb` (`account_id`)
+) ENGINE=INNODB DEFAULT CHARSET=latin1;
+
+/*Data for the table `merchant_infodb` */
 
 /*Table structure for table `transactiondb` */
 
 CREATE TABLE `transactiondb` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `account_id` int(11) NOT NULL,
-  `tr_from_account` int(11) NOT NULL,
-  `tr_to_account` int(11) NOT NULL,
-  `tr_time` datetime NOT NULL,
-  `tr_value` double NOT NULL DEFAULT '0',
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `account_id` INT(11) NOT NULL,
+  `tr_from_account` INT(11) NOT NULL,
+  `tr_to_account` INT(11) NOT NULL,
+  `tr_time` DATETIME NOT NULL,
+  `tr_value` DOUBLE NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `fk_transactiondb_id` (`account_id`),
   CONSTRAINT `fk_transactiondb_id` FOREIGN KEY (`account_id`) REFERENCES `logindb` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=INNODB DEFAULT CHARSET=latin1;
 
 /*Data for the table `transactiondb` */
 
@@ -356,3 +356,122 @@ DELIMITER ;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS contract;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE IF NOT EXISTS contract (
+    contract_addr VARCHAR(20) PRIMARY KEY,
+    contract_N VARCHAR(100) NOT NULL,
+    contract_pk VARCHAR(100) NOT NULL,
+    rcver_id INT NOT NULL,
+    contract_value DOUBLE NOT NULL
+)
+
+DROP TABLE IF EXISTS contractrecord;
+CREATE TABLE IF NOT EXISTS contractrecord (
+    contract_addr VARCHAR(20),
+    sender_id INT NOT NULL,
+    amount DOUBLE NOT NULL,
+    CONSTRAINT fk_contractrecord FOREIGN KEY (contract_addr) REFERENCES contract(contract_addr)
+)
+
+DROP TABLE IF EXISTS merchant_infodb;
+DROP TABLE IF EXISTS merchant_logindb;
+
+DROP PROCEDURE IF EXISTS create_contract;
+DELIMITER $
+CREATE PROCEDURE create_contract(IN addr_ VARCHAR(20), IN N_ VARCHAR(100), IN pk_ VARCHAR(100), IN id_ INT, IN value_ DOUBLE, OUT result INT)
+label:BEGIN
+DECLARE addr_exist INT DEFAULT 1;
+SELECT COUNT(*) INTO addr_exist FROM contract WHERE contract_addr = addr_;
+IF addr_exist = 0 THEN
+    INSERT INTO contract(contract_addr,contract_N,contract_pk,rcver_id,contract_value,current_value) VALUES (addr_,N_,pk_,id_,value_,0);
+    SET result = 1;
+ELSE 
+    SET result = 0;
+    LEAVE label;
+END IF;
+END $
+
+DROP PROCEDURE IF EXISTS clear_everything;
+DELIMITER $
+CREATE PROCEDURE clear_everything()
+label:BEGIN
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE accountinfodb;
+TRUNCATE cryptotransferdb;
+TRUNCATE logindb;
+TRUNCATE transactiondb;
+TRUNCATE contract;
+TRUNCATE contractrecord;
+ALTER TABLE logindb AUTO_INCREMENT=1;
+ALTER TABLE transactiondb AUTO_INCREMENT=1;
+SET FOREIGN_KEY_CHECKS = 1;
+END $
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS get_contract_detail;
+DELIMITER $
+CREATE PROCEDURE get_contract_detail(IN addr_ VARCHAR(20), OUT pk_ VARCHAR(100), OUT N_ VARCHAR(100),OUT id_ INT, OUT value_ DOUBLE, OUT value2_ DOUBLE)
+label:BEGIN
+SELECT contract_pk INTO pk_ FROM contract WHERE contract_addr = addr_;
+SELECT contract_N INTO N_ FROM contract WHERE contract_addr = addr_;
+SELECT rcver_id INTO id_ FROM contract WHERE contract_addr = addr_;
+SELECT contract_value INTO value_ FROM contract WHERE contract_addr = addr_;
+SELECT current_value INTO value2_ FROM contract WHERE contract_addr = addr_;
+END $
+DELIMITER ;
+
+
+
+DROP PROCEDURE IF EXISTS get_token_detail;
+DELIMITER $
+CREATE PROCEDURE get_token_detail(IN addr_ VARCHAR(20), OUT pk_ VARCHAR(100), OUT N_ VARCHAR(100), OUT id_ INT, OUT value_ DOUBLE)
+label:BEGIN
+SELECT pk INTO pk_ FROM cryptotransferdb WHERE address = addr_;
+SELECT N INTO N_ FROM cryptotransferdb WHERE address = addr_;
+SELECT account_id INTO id_ FROM cryptotransferdb WHERE address = addr_;
+SELECT amount INTO value_ FROM cryptotransferdb WHERE address = addr_;
+DELETE FROM cryptotransferdb WHERE address = addr_;
+END $
+DELIMITER ;
+
+ALTER TABLE contract ADD COLUMN current_value DOUBLE NOT NULL;
+
+
+DROP PROCEDURE IF EXISTS add_new_token;
+DELIMITER $
+CREATE PROCEDURE add_new_token (IN addr_ VARCHAR(20), IN id_ INT, IN value_ DOUBLE, OUT result INT)
+label:BEGIN
+INSERT INTO contractrecord(contract_addr,sender_id,amount) VALUES(addr_,id_,value_);
+SET result = 1;
+END $
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS update_current_amount;
+DELIMITER $
+CREATE PROCEDURE update_current_amount(IN addr_ VARCHAR(20), IN value_ DOUBLE, OUT result INT)
+label:BEGIN
+UPDATE contract SET current_value = value_ WHERE contract_addr = addr_;
+SET result = 1;
+END $
+DELIMITER ;
+
+CALL clear_everything();
+
+DROP PROCEDURE IF EXISTS finish_contract;
+DELIMITER $
+CREATE PROCEDURE finish_contract(IN contract_addr_ VARCHAR(20), IN request_amount_ DOUBLE, IN sender_ INT, IN rcver_ INT, IN change_ DOUBLE, OUT result INT)
+label:BEGIN
+UPDATE accountinfodb SET balance = balance + request_amount_ WHERE account_id = rcver_;
+UPDATE accountinfodb SET balance = balance + change_ WHERE account_id = sender_;
+SET FOREIGN_KEY_CHECKS = 0;
+DELETE FROM contract WHERE contract_addr = contract_addr_;
+DELETE FROM contractrecord WHERE contract_addr = contract_addr_;
+SET result = 1;
+END $
+DELIMITER ;
+
+-- call clear_everything();
+

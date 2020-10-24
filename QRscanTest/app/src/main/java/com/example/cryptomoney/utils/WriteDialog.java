@@ -1,17 +1,13 @@
 package com.example.cryptomoney.utils;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -62,13 +58,14 @@ public class WriteDialog extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.layout_nfc_write, container);
+        View view = inflater.inflate(R.layout.layout_nfc_dialog, container);
 //        etWrite = view.findViewById(R.id.et_write_nfc);
         btnCancle = view.findViewById(R.id.btn_write_nfc_cancle);
         btnCancle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dismiss();
+                //todo: send cancel message to server
             }
         });
 //        etWrite.addTextChangedListener(new TextWatcher() {

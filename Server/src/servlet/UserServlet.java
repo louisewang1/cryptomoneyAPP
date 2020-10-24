@@ -280,10 +280,27 @@ public class UserServlet extends HttpServlet {
 				response.getOutputStream().write(userService.getcryptomoney(conn, id_enc, addr).getBytes("utf-8"));
 				break;
 			
-			case "addmoney":
-				int to_id = Integer.parseInt(request.getParameter("to_account"));
-				double val = Double.parseDouble(request.getParameter("value"));
-				response.getOutputStream().write(userService.addmoney(conn, to_id, val));
+//			case "addmoney":
+//				int to_id = Integer.parseInt(request.getParameter("to_account"));
+//				double val = Double.parseDouble(request.getParameter("value"));
+//				response.getOutputStream().write(userService.addmoney(conn, to_id, val));
+				
+			// create and return new contract address	
+			case "newcontract":
+				int id4 = Integer.parseInt(request.getParameter("id"));
+				double value4 = Double.parseDouble(request.getParameter("value"));
+				String modulus4 = request.getParameter("N");
+				String pk_exp4 = request.getParameter("pk");
+				String contract_addr = userService.addnewcontract(conn,id4,value4,modulus4,pk_exp4);
+				response.getWriter().write(contract_addr);
+				break;
+				
+//			request=recordtoken&contract_addr=...&enc=<>
+			case "recordtoken":
+				String contract_addr1 = request.getParameter("contract_addr");
+				String enc1 = request.getParameter("enc");
+				response.getWriter().write(userService.recordnewtoken(conn,contract_addr1,enc1));
+				break;
 				
 			default:
 				break;
