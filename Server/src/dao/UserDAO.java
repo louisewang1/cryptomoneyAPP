@@ -393,8 +393,8 @@ public class UserDAO {
 				 cs.execute();
 				 BigInteger pk_exp = new BigInteger(Base64Utils.decode(cs.getString(2)));
 				 BigInteger modulus = new BigInteger(Base64Utils.decode(cs.getString(3)));
-				 System.out.println("pk_exp= "+pk_exp);
-				 System.out.println("modulus= "+modulus);
+				 System.out.println("token_pk_exp= "+pk_exp);
+				 System.out.println("token_modulus= "+modulus);
 				 System.out.println("id_enc= "+id_enc);
 				 
 				 Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
@@ -471,7 +471,7 @@ public class UserDAO {
 	 }
 	 
 //	 request=recordtoken&contract_addr=...&enc=<>
-	 public String recordnewtoken(Connection conn, String contract_addr, String enc) {
+	 public String recordnewtoken(Connection conn, String contract_addr, String enc) throws SQLException {
 		 String result = "failed";
 		 if (conn == null) {
 			result = "connection error";
@@ -495,10 +495,11 @@ public class UserDAO {
 			 double current_amount = cs.getDouble(6);
 			 
 			 // restore contract_pk
+			 
 			 BigInteger pk_exp = new BigInteger(Base64Utils.decode(cs.getString(2)));
 			 BigInteger modulus = new BigInteger(Base64Utils.decode(cs.getString(3)));
-			 System.out.println("pk_exp= "+pk_exp);
-			 System.out.println("modulus= "+modulus);
+			 System.out.println("contract_pk_exp= "+pk_exp);
+			 System.out.println("contract_modulus= "+modulus);
 			 
 			 Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		     KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -549,17 +550,23 @@ public class UserDAO {
 				 cs.registerOutParameter(5,Types.DOUBLE); // send_amount
 				 
 				 cs.execute();
+				 
 				 pk_exp = new BigInteger(Base64Utils.decode(cs.getString(2)));
 				 modulus = new BigInteger(Base64Utils.decode(cs.getString(3)));
-				 System.out.println("pk_exp= "+pk_exp);
-				 System.out.println("modulus= "+modulus);
+				 System.out.println("token_pk_exp= "+pk_exp);
+				 System.out.println("token_modulus= "+modulus);
 				 
 				 int sender_id = cs.getInt(4);
 				 double send_amount = cs.getDouble(5);	
 				 
 				 if (from_id != sender_id) {
-					 result = "receiver error";
-					 //TODO: return all money
+					 cs = conn.prepareCall("{call return_money(?,?)}");
+					 cs.setString(1, contract_addr);
+					 cs.registerOutParameter(2,Types.INTEGER);  //result
+					 cs.execute();
+					 if (cs.getInt(2) == 1) {
+						 result = "sender error, contract cancelled";
+					 }
 					 return result;
 				 }
 				 
@@ -576,8 +583,13 @@ public class UserDAO {
 					 int rcver_id2 = Integer.parseInt(dec_id.split("=")[1]);
 					 System.out.println("rcver_id2= "+rcver_id2);
 					 if (rcver_id2 != rcver_id) {
-						 result = "invalid receiver";
-						 //TODO: return all money
+						 cs = conn.prepareCall("{call return_money(?,?)}");
+						 cs.setString(1, contract_addr);
+						 cs.registerOutParameter(2,Types.INTEGER);  //result
+						 cs.execute();
+						 if (cs.getInt(2) == 1) {
+							 result = "invalid receiver, contract cancelled";
+						 }
 					 }
 					 
 					 else {
@@ -626,13 +638,18 @@ public class UserDAO {
 				 }
 			 }
 			 else {
-				 result = "invalid token addres";
-				//TODO: return all money
+				 result = "expired token";
 			 }
 		 } catch (Exception e){
 	            e.printStackTrace();
 	            result = "decryption error";
-	            //TODO: return all money
+	            cs = conn.prepareCall("{call return_money(?,?)}");
+				 cs.setString(1, contract_addr);
+				 cs.registerOutParameter(2,Types.INTEGER);  //result
+				 cs.execute();
+				 if (cs.getInt(2) == 1) {
+					 result = "invalid token addres, contract cancelled";
+				 }
 	        }if (cs != null) {
 	            try {
 	                cs.close();
@@ -643,6 +660,173 @@ public class UserDAO {
 	        return result;
 	 }
 	 
+	 public String cancelcontract(Connection conn, String contract_addr, String enc) throws SQLException {
+		 String result = "failed";
+		 if (conn == null) {
+			result = "connection error";
+			return result;
+		 }
+		 CallableStatement cs = null;
+		 try {
+			 // get contract_pk from contract_addr
+			 cs = conn.prepareCall("{call get_contract_detail(?,?,?,?,?,?)}");
+			 cs.setString(1,contract_addr);
+			 cs.registerOutParameter(2,Types.VARCHAR);  //pk_exp
+			 cs.registerOutParameter(3,Types.VARCHAR);  // N
+			 cs.registerOutParameter(4,Types.INTEGER);  // rcver_id
+			 cs.registerOutParameter(5,Types.DOUBLE);  // request_amount
+			 cs.registerOutParameter(6,Types.DOUBLE);  // current_amount
+			 cs.execute();
+			 
+			 // restore contract_pk
+			 if (cs.getString(2) == null) {
+				 result = "contract address not found";
+				 return result;
+			 }
+			 
+			 BigInteger pk_exp = new BigInteger(Base64Utils.decode(cs.getString(2)));
+			 BigInteger modulus = new BigInteger(Base64Utils.decode(cs.getString(3)));
+			 System.out.println("contract_pk_exp= "+pk_exp);
+			 System.out.println("contract_modulus= "+modulus);
+			 
+			 Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+		     KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+	         RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(modulus,pk_exp);
+	         PublicKey pk = keyFactory.generatePublic(rsaPublicKeySpec);
+			// decrypty enc -> dec = CANCEL
+	         cipher.init(Cipher.DECRYPT_MODE,pk);
+			 String cancel_dec = new String(cipher.doFinal(Base64Utils.decode(enc)));
+			 System.out.println("cancel_dec= "+cancel_dec);
+			 
+			 if(cancel_dec.equals("CANCEL")) {
+				 cs = conn.prepareCall("{call return_money(?,?)}");
+				 cs.setString(1, contract_addr);
+				 cs.registerOutParameter(2,Types.INTEGER);  //result
+				 cs.execute();
+				 if (cs.getInt(2) == 1) {
+					 result = "cancelled";
+				 }
+				 
+			 }
+			 
+		 } catch (Exception e){
+	            e.printStackTrace();
+	            cs = conn.prepareCall("{call return_money(?,?)}");
+				 cs.setString(1, contract_addr);
+				 cs.registerOutParameter(2,Types.INTEGER);  //result
+				 cs.execute();
+				 if (cs.getInt(2) == 1) {
+					 result = "decryption error, contract cancelled";
+				 }
+	        }if (cs != null) {
+	            try {
+	                cs.close();
+	            } catch (SQLException e) {
+	                e.printStackTrace();
+	            }
+	        }
+	        return result;
+	 }
+	 
+	 public String changeamount(Connection conn, String contract_addr, String enc) throws SQLException {
+		 String result = "failed";
+		 if (conn == null) {
+			result = "connection error";
+			return result;
+		 }
+		 CallableStatement cs = null;
+		 try {
+			 // get contract_pk from contract_addr
+			 cs = conn.prepareCall("{call get_contract_detail(?,?,?,?,?,?)}");
+			 cs.setString(1,contract_addr);
+			 cs.registerOutParameter(2,Types.VARCHAR);  //pk_exp
+			 cs.registerOutParameter(3,Types.VARCHAR);  // N
+			 cs.registerOutParameter(4,Types.INTEGER);  // rcver_id
+			 cs.registerOutParameter(5,Types.DOUBLE);  // request_amount
+			 cs.registerOutParameter(6,Types.DOUBLE);  // current_amount
+			 cs.execute();
+			 
+			 double current_amount = cs.getDouble(6);
+			 int rcver_id = cs.getInt(4);
+			 
+			 // restore contract_pk
+			 if (cs.getString(2) == null) {
+				 result = "contract address not found";
+				 return result;
+			 }
+			 
+			 BigInteger pk_exp = new BigInteger(Base64Utils.decode(cs.getString(2)));
+			 BigInteger modulus = new BigInteger(Base64Utils.decode(cs.getString(3)));
+			 System.out.println("contract_pk_exp= "+pk_exp);
+			 System.out.println("contract_modulus= "+modulus);
+			 
+			 Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+		     KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+	         RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(modulus,pk_exp);
+	         PublicKey pk = keyFactory.generatePublic(rsaPublicKeySpec);
+			// decrypty enc -> dec = new_amount
+	         cipher.init(Cipher.DECRYPT_MODE,pk);
+			 String new_amount = new String(cipher.doFinal(Base64Utils.decode(enc)));
+			 double new_request_amount = Double.parseDouble(new_amount);
+			 System.out.println("changeamount_dec= "+new_request_amount);
+			 
+			 // update new request amount
+			 cs = conn.prepareCall("{call update_request_amount(?,?,?)}");
+			 cs.setString(1,contract_addr);
+			 cs.setDouble(2, new_request_amount);
+			 cs.registerOutParameter(3,Types.INTEGER); //result
+			 cs.execute();
+			 
+			 if (cs.getInt(3) == 1) {
+				 // check if current_money is enough
+				 if (current_amount >= new_request_amount) {
+					 // find last sender
+					 cs = conn.prepareCall("{call find_last_sender(?,?)}");
+					 cs.setString(1, contract_addr);
+					 cs.registerOutParameter(2,Types.INTEGER);
+					 cs.execute();
+					 int sender_id = cs.getInt(2);
+					 if (sender_id > 0) {
+						 double change = current_amount - new_request_amount;
+						 // add money to rcver and return change to sender
+						 cs = conn.prepareCall("{call finish_contract(?,?,?,?,?,?)}");
+						 cs.setString(1, contract_addr);
+						 cs.setDouble(2,new_request_amount);
+						 cs.setInt(3,sender_id);
+						 cs.setInt(4, rcver_id);
+						 cs.setDouble(5,change);
+						 cs.registerOutParameter(6,Types.INTEGER);
+						 cs.execute();
+						 if (cs.getInt(6) == 1) {
+							 result = "enough for new amount";
+						 }
+					 } 
+				 }
+				 else {
+					 result = "amount changed";
+				 }
+				 
+			 }
+			 
+		 } catch (Exception e){
+	            e.printStackTrace();
+	            cs = conn.prepareCall("{call return_money(?,?)}");
+				 cs.setString(1, contract_addr);
+				 cs.registerOutParameter(2,Types.INTEGER);  //result
+				 cs.execute();
+				 if (cs.getInt(2) == 1) {
+					 result = "decryption error, contract cancelled";
+				 }
+	        }if (cs != null) {
+	            try {
+	                cs.close();
+	            } catch (SQLException e) {
+	                e.printStackTrace();
+	            }
+	        }
+	        return result; 
+		 
+	 }
 	//generate random address
 	 public static String getRandomString(int length){
 	     String str="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

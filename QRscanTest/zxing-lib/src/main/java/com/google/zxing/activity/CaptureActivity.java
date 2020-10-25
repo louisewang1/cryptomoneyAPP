@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.os.Vibrator;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
 
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -40,6 +41,7 @@ import com.google.zxing.decoding.CaptureActivityHandler;
 import com.google.zxing.decoding.InactivityTimer;
 import com.google.zxing.decoding.RGBLuminanceSource;
 import com.google.zxing.qrcode.QRCodeReader;
+import com.google.zxing.util.BackDialog;
 import com.google.zxing.util.BitmapUtil;
 import com.google.zxing.util.Constant;
 import com.google.zxing.view.ViewfinderView;
@@ -54,9 +56,10 @@ import java.util.Vector;
  *
  * @author Ryan.Tang
  */
-public class CaptureActivity extends AppCompatActivity implements Callback {
+public class CaptureActivity extends AppCompatActivity implements Callback, BackDialog.MsgListener {
 
     private static final int REQUEST_CODE_SCAN_GALLERY = 100;
+    private static final int RESULT_CHANGED = 2 ;
 
     private CaptureActivityHandler handler;
     private ViewfinderView viewfinderView;
@@ -74,6 +77,12 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
     private boolean vibrate;
     private ProgressDialog mProgress;
     private Bitmap scanBitmap;
+
+    private DialogFragment mDialog;
+    private String new_amount;
+    private String contract_addr;
+    private String contract_sk_exp;
+    private String contract_modulus;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -113,6 +122,12 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
 
         hasSurface = false;
         inactivityTimer = new InactivityTimer(this);
+
+        Intent intent_from_requst = getIntent();
+        contract_addr = intent_from_requst.getStringExtra("contract_addr");
+        contract_sk_exp = intent_from_requst.getStringExtra("contract_sk_exp");
+        contract_modulus = intent_from_requst.getStringExtra("contract_modulus");
+        System.out.println("conract addr in captureactivity= "+contract_addr);
 
     }
 
@@ -396,4 +411,78 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
         }
         return true;
     }
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        showBackDialog();
+    }
+
+    private void showBackDialog() {
+        mDialog = new BackDialog();
+        Bundle bundle = new Bundle();
+        bundle.putString("contract_addr",contract_addr);
+        bundle.putString("contract_sk_exp",contract_sk_exp);
+        bundle.putString("contract_modulus",contract_modulus);
+        mDialog.setArguments(bundle);
+        mDialog.show(getSupportFragmentManager(), "mDialog");
+    }
+
+//    private void dissDialog() {
+//        if (mDialog != null &&
+//                mDialog.getDialog() != null &&
+//                mDialog.getDialog().isShowing()) {
+//            mDialog.dismiss();
+//        }
+//    }
+
+//    @Override
+//    public void result(String msg) {
+//        new_amount = msg;
+//        if (!isNumeric(new_amount)) {
+//            Common.showShortToast(CaptureActivity.this,"invalid input");
+//        }
+//
+//    }
+//
+    @Override
+    public void cancelresult(Boolean iscancel) {
+        if (iscancel) {
+            Intent resultIntent = new Intent();
+            CaptureActivity.this.setResult(RESULT_CANCELED, resultIntent);
+            finish();
+        }
+    }
+
+    @Override
+    public void finishresult(Boolean isfinish) {
+        if(isfinish) {
+            Intent resultIntent = new Intent();
+            CaptureActivity.this.setResult(RESULT_CANCELED, resultIntent);
+            finish();
+        }
+    }
+
+    //
+    @Override
+    public void changeamount(Boolean ischange, String new_amount) {
+        if (ischange) {
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("new_amount",new_amount);
+            CaptureActivity.this.setResult(RESULT_CHANGED, resultIntent);
+            finish();
+
+        }
+    }
+//
+//
+//    public static boolean isNumeric(String str){
+//        Pattern pattern = Pattern.compile("[0-9]+[.]{0,1}[0-9]*[dD]{0,1}");
+//        Matcher isNum = pattern.matcher(str);
+//        if( !isNum.matches() ){
+//            return false;
+//        }
+//        return true;
+//    }
+
 }

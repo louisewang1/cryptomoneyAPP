@@ -47,6 +47,7 @@ import static java.lang.Math.min;
 
 public class RequestActivity extends AppCompatActivity{
 
+    private static final int RESULT_CHANGED = 2;
     private Button request;
     private Integer account_id;
     private Connection conn = null;
@@ -64,7 +65,9 @@ public class RequestActivity extends AppCompatActivity{
     private Boolean scanfinish = false;
     private Boolean showDialog = false;
     private String response;
-
+    private String contract_pk_exp;
+    private String contract_sk_exp;
+    private String contract_modulus;
     public final static int MAX_ENCRYPT_BLOCK = 32;
 
 
@@ -112,13 +115,13 @@ public class RequestActivity extends AppCompatActivity{
                     contract_pk = (RSAPublicKey) keypair.getPublic();
                     contract_sk = (RSAPrivateKey) keypair.getPrivate();
 
-                    String pk_exp = Base64Utils.encode(contract_pk.getPublicExponent().toByteArray());
-                    String sk_exp = Base64Utils.encode(contract_sk.getPrivateExponent().toByteArray());
-                    String modulus = Base64Utils.encode(contract_pk.getModulus().toByteArray());
+                    contract_pk_exp = Base64Utils.encode(contract_pk.getPublicExponent().toByteArray());
+                    contract_sk_exp = Base64Utils.encode(contract_sk.getPrivateExponent().toByteArray());
+                    contract_modulus = Base64Utils.encode(contract_pk.getModulus().toByteArray());
 
                     // send account_id, request_amount, contract_pk to server
                     final String newContractRequest ="request=" + URLEncoder.encode("newcontract") +"&id="+ URLEncoder.encode(account_id.toString())+
-                            "&value="+ URLEncoder.encode(value.toString()) + "&N="+ URLEncoder.encode(modulus)+"&pk="+URLEncoder.encode(pk_exp);
+                            "&value="+ URLEncoder.encode(value.toString()) + "&N="+ URLEncoder.encode(contract_modulus)+"&pk="+URLEncoder.encode(contract_pk_exp);
 
                     new Thread(new Runnable() {
                         @Override
@@ -140,7 +143,7 @@ public class RequestActivity extends AppCompatActivity{
                                     @Override
                                     public void run() {
                                         System.out.println("contract addr= "+contract_addr);
-                                        Common.showShortToast(RequestActivity.this,"new constract established, start receiving first token");
+//                                        Common.showShortToast(RequestActivity.this,"new constract established, start receiving first token");
 //                                        showSaveDialog();
                                         openCamera();
                                     }
@@ -171,6 +174,16 @@ public class RequestActivity extends AppCompatActivity{
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
         // QR scan result call back
+        // cancel contract
+        if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_CANCELED) {
+            finish();
+        }
+
+        if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_CHANGED) {
+            value = Double.parseDouble(data.getStringExtra("new_amount"));
+            openCamera();
+        }
+
         if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_OK) {
             Bundle bundle = data.getExtras();
             qrstring = bundle.getString(Constant.INTENT_EXTRA_KEY_QR_SCAN);
@@ -280,6 +293,9 @@ public class RequestActivity extends AppCompatActivity{
     private void openCamera() {
         try {
             Intent intent = new Intent(RequestActivity.this, CaptureActivity.class);
+            intent.putExtra("contract_addr",contract_addr);
+            intent.putExtra("contract_sk_exp",contract_sk_exp);
+            intent.putExtra("contract_modulus",contract_modulus);
             startActivityForResult(intent, Constant.REQ_QR_CODE);
         } catch (SecurityException e) {
             e.printStackTrace();
@@ -309,7 +325,7 @@ public class RequestActivity extends AppCompatActivity{
             super.onNewIntent(intent);
             nfcstring = nfcUtils.readMessage(intent);
             dissDialog();
-            Common.showShortToast(this, "NFC reading successfully.");
+//            Common.showShortToast(this, "NFC reading successfully.");
             fullstring = getfullstring(qrstring,nfcstring);
             scanfinish = true;
             showDialog = false;
@@ -413,9 +429,9 @@ public class RequestActivity extends AppCompatActivity{
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if (response.equals("not enough")) {
+                                    if (response.equals("not enough") || response.equals("expired token")) {
                                         // start rcving next token
-                                        Common.showLongToast(RequestActivity.this, "not enough, start receiving next token");
+                                        Common.showLongToast(RequestActivity.this, response);
                                         openCamera();
                                     } else if (response.equals("enough")) {
                                         // contract succeeded, finish
@@ -424,6 +440,7 @@ public class RequestActivity extends AppCompatActivity{
                                     }
                                     else {
                                         Common.showShortToast(RequestActivity.this,response);
+                                        finish();
                                     }
                                 }
                             });

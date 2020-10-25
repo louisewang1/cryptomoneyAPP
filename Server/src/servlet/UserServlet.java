@@ -299,8 +299,36 @@ public class UserServlet extends HttpServlet {
 			case "recordtoken":
 				String contract_addr1 = request.getParameter("contract_addr");
 				String enc1 = request.getParameter("enc");
+			try {
 				response.getWriter().write(userService.recordnewtoken(conn,contract_addr1,enc1));
+			} catch (IOException | SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 				break;
+				
+			case "cancelcontract":
+//				request = cancelcontract&contract_addr=...&enc=...
+				String contract_addr2 = request.getParameter("contract_addr");
+				String enc2 = request.getParameter("enc");
+			try {
+				response.getWriter().write(userService.cancelcontract(conn,contract_addr2,enc2));
+			} catch (IOException | SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+				break;
+				
+			case "changeamount":
+//				request = changeamount&contract_addr=...&enc=...
+				String contract_addr3 = request.getParameter("contract_addr");
+				String enc3 = request.getParameter("enc");
+			try {
+				response.getWriter().write(userService.changeamount(conn,contract_addr3,enc3));
+			} catch (IOException | SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 				
 			default:
 				break;

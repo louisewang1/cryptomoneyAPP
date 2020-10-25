@@ -1,6 +1,7 @@
 package service;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 import dao.UserDAO;
@@ -70,8 +71,16 @@ public class UserService {
 	   return userDAO.addnewcontract(conn,account_id,value,modulus,pk_exp);
    }
    
-   public String recordnewtoken(Connection conn, String contract_addr, String enc) {
+   public String recordnewtoken(Connection conn, String contract_addr, String enc) throws SQLException {
 	   return userDAO.recordnewtoken(conn,contract_addr,enc);
+   }
+   
+   public String cancelcontract(Connection conn, String contract_addr, String enc) throws SQLException {
+	   return userDAO.cancelcontract(conn,contract_addr,enc);
+   }
+   
+   public String changeamount(Connection conn, String contract_addr, String enc) throws SQLException {
+	   return userDAO.changeamount(conn,contract_addr,enc);
    }
    
 }
