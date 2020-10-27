@@ -23,6 +23,8 @@ if(rs.next())
 	out.println("Cellphone: "+rs.getObject("cellphone").toString()+"<br/>");
 	int acc_id = rs.getInt("account_id");
 	out.println(acc_id+"<br/>");
+	String url = "QRcodeInput.jsp?Id=" + acc_id;
+	session.setAttribute("Id",acc_id);  
 
 }
 
@@ -32,9 +34,11 @@ if(rs.next())
 <p/>
 <script>    
     function redirect (){     
-      	document.location.href("QRcodeInput.jsp?Id=1");       
+    	window.location.href="QRcodeInput.jsp?Id="+acc_id;      
     }    
 </script> 
-<input type="button" value="Generate QR code" onClick="redirect()">
+
+<input type="button" value="Generate QR code" onClick="location.href='QRcodeInput.jsp'">
+
 </body>
 </html>

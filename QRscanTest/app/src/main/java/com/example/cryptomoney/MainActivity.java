@@ -99,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Button request; //botton for merchants to request money from customers
 
+    private Button Setting;
+
     private PrivateKey sk;
     private PublicKey pk;
     private String sk_enc;
@@ -133,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
 //        execute = (Button) findViewById(R.id.execute);
 //        scanreturn = (EditText) findViewById(R.id.scan_result);
         request = (Button) findViewById(R.id.request);
-
+        Setting = (Button) findViewById(R.id.setting);
         Intent intent_from_login = getIntent();
         account_id = intent_from_login.getIntExtra("account_id",0);
 //        type = intent_from_login.getStringExtra("type");
@@ -351,6 +353,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this,RequestActivity.class); // 启动TransferActivity,传入account_id
                 intent.putExtra("account_id",account_id);
+                startActivity(intent);
+            }
+        });
+
+        Setting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,SettingActivity.class); // 启动TransferActivity,传入account_id
                 startActivity(intent);
             }
         });

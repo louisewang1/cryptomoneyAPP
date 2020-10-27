@@ -24,9 +24,10 @@ document.thisform.submit();
 
 <jsp:useBean id="crypto" class="Bean.Crypto" scope="page"/>
 
-<% 
-int id = Integer.parseInt(request.getParameter("Id"));
-System.out.println(id);
+<%
+int id = Integer.parseInt(session.getAttribute("Id").toString());
+//int id = Integer.parseInt(request.getParameter("Id"));
+System.out.println("current id is "+id);
 String input = null;
 input=request.getParameter("Input");
 
