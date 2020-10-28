@@ -27,9 +27,9 @@ int BLACK = 0xFF000000;
 
 int WHITE = 0xFFFFFFFF;  
 
-String input=request.getParameter( "Input"); //get text from user
 
-String text = input; 
+String text = session.getAttribute("Input").toString(); 
+System.out.println(text);
 String exts = ""; 
 File f = new File(getServletContext().getRealPath("/")+exts);
 		System.out.println(getServletContext().getRealPath("/"));

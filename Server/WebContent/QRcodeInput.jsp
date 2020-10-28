@@ -44,7 +44,8 @@ if (input != null){
 	String private_key = crypto.getKey();
 	String modulus = crypto.getMod();
 	String ciphertext = "N="+modulus+"&d="+private_key+"&addr="+addr;
-	String new_addr = "QRcode.jsp?Input=" + ciphertext;
+	String new_addr = "QRcode.jsp";
+	session.setAttribute("Input",ciphertext);  
 	response.sendRedirect(new_addr);
 }
 %>
