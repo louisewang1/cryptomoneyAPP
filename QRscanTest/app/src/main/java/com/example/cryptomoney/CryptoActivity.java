@@ -19,7 +19,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.nfc.FormatException;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -39,8 +43,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cryptomoney.utils.Base64Utils;
+import com.example.cryptomoney.utils.ImgUtils;
 import com.example.cryptomoney.utils.NfcUtils;
 import com.example.cryptomoney.utils.RSAUtils;
+import com.example.cryptomoney.utils.StringBitmapParameter;
 import com.example.cryptomoney.utils.WriteDialog;
 import com.google.zxing.util.QrCodeGenerator;
 
@@ -69,8 +75,11 @@ import cn.memobird.gtx.listener.OnBluetoothFindListener;
 import cn.memobird.gtx.listener.OnCodeListener;
 import cn.memobird.gtx.listener.OnImageToDitherListener;
 
+import static com.example.cryptomoney.utils.BitmapUtil.StringListtoBitmap;
+
 public class CryptoActivity extends AppCompatActivity  {
 
+    private static final int REQUEST_CODE_SAVE_IMG = 3 ;
     private EditText amount;
     private Button request;
     private TextView response;
@@ -116,6 +125,7 @@ public class CryptoActivity extends AppCompatActivity  {
     private RecyclerView recyclerView;
     private Button reset;
     private Boolean showdialog = false;
+    private Bitmap finalbitmap;
 
     private final static int REQ_LOC = 10;
     final String AK = "c6a5a445dc25490183f42088f4b78ccf";
@@ -312,6 +322,28 @@ public class CryptoActivity extends AppCompatActivity  {
                         text = "N=" + modulus + "&d=" + sk_exp + "&addr=" + addr;
                         qrimage = QrCodeGenerator.getQrCodeImage(text, 200, 200);
 
+                        // convert string to bitmap
+                        StringBitmapParameter valuebitpic = new StringBitmapParameter(value);
+                        StringBitmapParameter merchantpic = new StringBitmapParameter(merchant_selected);
+                        ArrayList<StringBitmapParameter> tobitmap = new ArrayList<StringBitmapParameter>();
+                        tobitmap.add(valuebitpic);
+                        tobitmap.add(merchantpic);
+                        Bitmap textbitmap = StringListtoBitmap(CryptoActivity.this,tobitmap);
+
+                        // merge bitmaps
+                        finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
+
+//                        // save to album
+                        if (ContextCompat.checkSelfPermission(CryptoActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)  // 检查运行时权限
+                                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(CryptoActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)  // 检查运行时权限
+                                != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(CryptoActivity.this,
+                                    new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_SAVE_IMG);  // 申请定位权限,MUST BE FINE!
+                        }else {
+                            saveImage();
+                        }
+//                        requestPermission();
+
                         if (printMode.equals("QR")) {
                             if (GTX.getConnectDevice() != null) {
                                 printQR();
@@ -360,6 +392,26 @@ public class CryptoActivity extends AppCompatActivity  {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        // convert string to bitmap
+                                        StringBitmapParameter valuebitpic = new StringBitmapParameter(value);
+                                        StringBitmapParameter merchantpic = new StringBitmapParameter(merchant_selected);
+                                        ArrayList<StringBitmapParameter> tobitmap = new ArrayList<StringBitmapParameter>();
+                                        tobitmap.add(valuebitpic);
+                                        tobitmap.add(merchantpic);
+                                        Bitmap textbitmap = StringListtoBitmap(CryptoActivity.this,tobitmap);
+
+                                        // merge bitmaps
+                                        finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
+
+                                        // save to album
+                                        if (ContextCompat.checkSelfPermission(CryptoActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)  // 检查运行时权限
+                                                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(CryptoActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)  // 检查运行时权限
+                                                != PackageManager.PERMISSION_GRANTED) {
+                                            ActivityCompat.requestPermissions(CryptoActivity.this,
+                                                    new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_SAVE_IMG);  // 申请定位权限,MUST BE FINE!
+                                        }else {
+                                            saveImage();
+                                        }
 
                                         if (printMode.equals("QR")) {
                                             if (GTX.getConnectDevice() != null) {
@@ -452,6 +504,27 @@ public class CryptoActivity extends AppCompatActivity  {
                                         else {
                                             text = enc;
                                             qrimage = QrCodeGenerator.getQrCodeImage(text,200,200);
+                                        }
+
+                                        // convert string to bitmap
+                                        StringBitmapParameter valuebitpic = new StringBitmapParameter(value);
+                                        StringBitmapParameter merchantpic = new StringBitmapParameter(merchant_selected);
+                                        ArrayList<StringBitmapParameter> tobitmap = new ArrayList<StringBitmapParameter>();
+                                        tobitmap.add(valuebitpic);
+                                        tobitmap.add(merchantpic);
+                                        Bitmap textbitmap = StringListtoBitmap(CryptoActivity.this,tobitmap);
+
+                                        // merge bitmaps
+                                        finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
+
+                                        // save to album
+                                        if (ContextCompat.checkSelfPermission(CryptoActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)  // 检查运行时权限
+                                                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(CryptoActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)  // 检查运行时权限
+                                                != PackageManager.PERMISSION_GRANTED) {
+                                            ActivityCompat.requestPermissions(CryptoActivity.this,
+                                                    new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_SAVE_IMG);  // 申请定位权限,MUST BE FINE!
+                                        }else {
+                                            saveImage();
                                         }
 
 //                                        System.out.println(GTX.getConnectDevice());
@@ -561,7 +634,8 @@ public class CryptoActivity extends AppCompatActivity  {
     }
 
     private void printQR() {
-        GTX.doImageToDither(onDitherListener,qrimage,mDialog, Common.DEFAULT_IMAGE_WIDTH,true);
+        GTX.doImageToDither(onDitherListener,finalbitmap,mDialog, Common.DEFAULT_IMAGE_WIDTH,true);
+//        GTX.doImageToDither(onDitherListener,qrimage,mDialog, Common.DEFAULT_IMAGE_WIDTH,true);
 //        GTX.doImageToDither(qrimage,mDialog,Common.DEFAULT_IMAGE_WIDTH,true);
         new Thread(new Runnable() {
             @Override
@@ -574,9 +648,17 @@ public class CryptoActivity extends AppCompatActivity  {
                 Log.d("QRgeneratorActivity","string: "+base64ImageString);
                 if (base64ImageString != null && Double.parseDouble(value) > 0) {
                     List<GTXScripElement> scripElements = new ArrayList<>();
-                    scripElements.add(new GTXScripElement(1, "mode= "+printMode));
-                    scripElements.add(new GTXScripElement(1, "amount= "+value));
-                    scripElements.add(new GTXScripElement(1, "to merchant: "+merchant_selected));
+//                    scripElements.add(new GTXScripElement(1, "mode= "+printMode));
+
+//                    GTXScripElement elementvalue = new GTXScripElement(1, value);
+//                    elementvalue.setBold(true);
+//                    elementvalue.setFontSize(5);
+//                    scripElements.add(elementvalue);
+//                    GTXScripElement elementmerchant = new GTXScripElement(1, "merchant: "+merchant_selected);
+//                    elementmerchant.setBold(true);
+//                    elementmerchant.setFontSize(5);
+//                    scripElements.add(elementmerchant);
+//                    scripElements.add(new GTXScripElement(1, "to merchant: "+merchant_selected))
                     scripElements.add(new GTXScripElement(5, base64ImageString));
                     GTX.printMixing(onPrintListener, scripElements, mDialog);
 //                    GTX.printImage(onPrintListener, base64ImageString, mDialog);
@@ -609,6 +691,10 @@ public class CryptoActivity extends AppCompatActivity  {
 //            if (mDialog != null)
 //                mDialog.show();
             GTX.searchBluetoothDevices(onBluetoothFindListener, mDialog);
+        }
+        else if (requestCode == REQUEST_CODE_SAVE_IMG && grantResults.length > 0 &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            saveImage();
         }
         else {
 //            if (mDialog != null)
@@ -773,5 +859,55 @@ public class CryptoActivity extends AppCompatActivity  {
             }
         }).start();
     }
+
+    public static Bitmap mergeBitmap_TB(Bitmap topBitmap, Bitmap bottomBitmap, boolean isBaseMax) {
+
+        if (topBitmap == null || topBitmap.isRecycled()
+                || bottomBitmap == null || bottomBitmap.isRecycled()) {
+//            JDLog.logError(TAG, "topBitmap=" + topBitmap + ";bottomBitmap=" + bottomBitmap);
+            return null;
+        }
+        int width = 0;
+        if (isBaseMax) {
+            width = topBitmap.getWidth() > bottomBitmap.getWidth() ? topBitmap.getWidth() : bottomBitmap.getWidth();
+        } else {
+            width = topBitmap.getWidth() < bottomBitmap.getWidth() ? topBitmap.getWidth() : bottomBitmap.getWidth();
+        }
+        Bitmap tempBitmapT = topBitmap;
+        Bitmap tempBitmapB = bottomBitmap;
+
+        if (topBitmap.getWidth() != width) {
+            tempBitmapT = Bitmap.createScaledBitmap(topBitmap, width, (int)(topBitmap.getHeight()*1f/topBitmap.getWidth()*width), false);
+        } else if (bottomBitmap.getWidth() != width) {
+            tempBitmapB = Bitmap.createScaledBitmap(bottomBitmap, width, (int)(bottomBitmap.getHeight()*1f/bottomBitmap.getWidth()*width), false);
+        }
+
+        int height = tempBitmapT.getHeight() + tempBitmapB.getHeight();
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+
+        Rect topRect = new Rect(0, 0, tempBitmapT.getWidth(), tempBitmapT.getHeight());
+        Rect bottomRect  = new Rect(0, 0, tempBitmapB.getWidth(), tempBitmapB.getHeight());
+
+        Rect bottomRectT  = new Rect(0, tempBitmapT.getHeight(), width, height);
+
+        canvas.drawBitmap(tempBitmapT, topRect, topRect, null);
+        canvas.drawBitmap(tempBitmapB, bottomRect, bottomRectT, null);
+        return bitmap;
+    }
+
+
+    //保存图片
+    private void saveImage() {
+        Bitmap bitmap = finalbitmap;
+        boolean isSaveSuccess = ImgUtils.saveImageToGallery(CryptoActivity.this, bitmap);
+        if (isSaveSuccess) {
+            Toast.makeText(CryptoActivity.this, "save to system album successfully", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(CryptoActivity.this, "save to system album failed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
 }

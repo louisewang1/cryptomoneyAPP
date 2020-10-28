@@ -190,7 +190,7 @@ public class RequestActivity extends AppCompatActivity{
             System.out.println("qrstring= "+qrstring);
 
             // only QR
-            if (qrstring.indexOf("N=") == 0) {
+            if (qrstring.indexOf("N=") == 0 && qrstring.indexOf("&d=") != -1 && qrstring.indexOf("&addr=") != -1) {
                 fullstring = qrstring;
                 scanfinish = true;
                 sendtokenaddr();
@@ -368,91 +368,98 @@ public class RequestActivity extends AppCompatActivity{
         if (scanfinish) {
             // get fullstring and extract sk, addr
             System.out.println("full string= " + fullstring);
-            String N_base64 = fullstring.split("N=")[1].split("&d=")[0];
-            BigInteger N = new BigInteger(Base64Utils.decode(N_base64));
-            String d_base64 = fullstring.split("&d=")[1].split("&addr=")[0];
-            BigInteger d = new BigInteger(Base64Utils.decode(d_base64));
+            if (fullstring.indexOf("N=") == 0 && fullstring.indexOf("&d=") != -1 && fullstring.indexOf("&addr=") != -1) {
+                String N_base64 = fullstring.split("N=")[1].split("&d=")[0];
+                BigInteger N = new BigInteger(Base64Utils.decode(N_base64));
+                String d_base64 = fullstring.split("&d=")[1].split("&addr=")[0];
+                BigInteger d = new BigInteger(Base64Utils.decode(d_base64));
 
-            String token_addr = fullstring.split("&addr=")[1];
-            System.out.println("token addr= " + token_addr);
+                String token_addr = fullstring.split("&addr=")[1];
+                System.out.println("token addr= " + token_addr);
 
-            try {
-                // extract token sk from N,d
-                KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-                RSAPrivateKeySpec rsaPrivateKeySpec = new RSAPrivateKeySpec(N, d);
-                PrivateKey token_sk = keyFactory.generatePrivate(rsaPrivateKeySpec);
+                try {
+                    // extract token sk from N,d
+                    KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+                    RSAPrivateKeySpec rsaPrivateKeySpec = new RSAPrivateKeySpec(N, d);
+                    PrivateKey token_sk = keyFactory.generatePrivate(rsaPrivateKeySpec);
 
-                // encrypt rcver account id  with token sk -> enc_id
-                Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-                cipher.init(Cipher.ENCRYPT_MODE, token_sk);
-                String rcver_id = "ACCOUNT=" + account_id.toString();
-                byte[] enc_bytes = cipher.doFinal(rcver_id.getBytes());
-                String enc_id = Base64Utils.encode(enc_bytes);
+                    // encrypt rcver account id  with token sk -> enc_id
+                    Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+                    cipher.init(Cipher.ENCRYPT_MODE, token_sk);
+                    String rcver_id = "ACCOUNT=" + account_id.toString();
+                    byte[] enc_bytes = cipher.doFinal(rcver_id.getBytes());
+                    String enc_id = Base64Utils.encode(enc_bytes);
 
-                // encrypt {token_addr, enc_id} with contract sk
-                cipher.init(Cipher.ENCRYPT_MODE, contract_sk);
-                String plain_str = token_addr + "&ENC_ID=" + enc_id;
+                    // encrypt {token_addr, enc_id} with contract sk
+                    cipher.init(Cipher.ENCRYPT_MODE, contract_sk);
+                    String plain_str = token_addr + "&ENC_ID=" + enc_id;
 
-                // block cipher
-                int inputLength = plain_str.getBytes().length;
+                    // block cipher
+                    int inputLength = plain_str.getBytes().length;
 //                System.out.println("input length：" + inputLength);
-                int offSet = 0;
-                byte[] resultBytes = {};
-                byte[] cache = {};
-                while (inputLength - offSet > 0) {
-                    if (inputLength - offSet > MAX_ENCRYPT_BLOCK) {
-                        cache = cipher.doFinal(plain_str.getBytes(), offSet, MAX_ENCRYPT_BLOCK);
-                        offSet += MAX_ENCRYPT_BLOCK;
-                    } else {
-                        cache = cipher.doFinal(plain_str.getBytes(), offSet, inputLength - offSet);
-                        offSet = inputLength;
+                    int offSet = 0;
+                    byte[] resultBytes = {};
+                    byte[] cache = {};
+                    while (inputLength - offSet > 0) {
+                        if (inputLength - offSet > MAX_ENCRYPT_BLOCK) {
+                            cache = cipher.doFinal(plain_str.getBytes(), offSet, MAX_ENCRYPT_BLOCK);
+                            offSet += MAX_ENCRYPT_BLOCK;
+                        } else {
+                            cache = cipher.doFinal(plain_str.getBytes(), offSet, inputLength - offSet);
+                            offSet = inputLength;
+                        }
+                        resultBytes = Arrays.copyOf(resultBytes, resultBytes.length + cache.length);
+                        System.arraycopy(cache, 0, resultBytes, resultBytes.length - cache.length, cache.length);
                     }
-                    resultBytes = Arrays.copyOf(resultBytes, resultBytes.length + cache.length);
-                    System.arraycopy(cache, 0, resultBytes, resultBytes.length - cache.length, cache.length);
-                }
 //                enc_bytes = cipher.doFinal(plain_str.getBytes());
 //                System.out.println("output length= "+resultBytes.length);
-                String enc_str = Base64Utils.encode(resultBytes);
+                    String enc_str = Base64Utils.encode(resultBytes);
 
-                // final string sent to server: {contract_addr,{token_addr,{rcver_id}_tokensk_contractsk}}
-                final String recordtokenRequest = "request=" + URLEncoder.encode("recordtoken") +
-                        "&contract_addr=" + URLEncoder.encode(contract_addr) + "&enc=" + URLEncoder.encode(enc_str);
-                System.out.println("recordtokenRequest= "+recordtokenRequest);
+                    // final string sent to server: {contract_addr,{token_addr,{rcver_id}_tokensk_contractsk}}
+                    final String recordtokenRequest = "request=" + URLEncoder.encode("recordtoken") +
+                            "&contract_addr=" + URLEncoder.encode(contract_addr) + "&enc=" + URLEncoder.encode(enc_str);
+                    System.out.println("recordtokenRequest= "+recordtokenRequest);
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // server response will be "enough" or "not enough"
-                        response = PostService.Post(recordtokenRequest);
-                        System.out.println("response= "+response);
-                        if (response != null) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (response.equals("not enough") || response.equals("expired token")) {
-                                        // start rcving next token
-                                        Common.showLongToast(RequestActivity.this, response);
-                                        openCamera();
-                                    } else if (response.equals("enough")) {
-                                        // contract succeeded, finish
-                                        Common.showLongToast(RequestActivity.this, value + " received successfully");
-                                        finish();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // server response will be "enough" or "not enough"
+                            response = PostService.Post(recordtokenRequest);
+                            System.out.println("response= "+response);
+                            if (response != null) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (response.equals("not enough") || response.equals("expired token")) {
+                                            // start rcving next token
+                                            Common.showLongToast(RequestActivity.this, response);
+                                            openCamera();
+                                        } else if (response.equals("enough")) {
+                                            // contract succeeded, finish
+                                            Common.showLongToast(RequestActivity.this, value + " received successfully");
+                                            finish();
+                                        }
+                                        else {
+                                            Common.showShortToast(RequestActivity.this,response);
+                                            finish();
+                                        }
                                     }
-                                    else {
-                                        Common.showShortToast(RequestActivity.this,response);
-                                        finish();
-                                    }
-                                }
-                            });
+                                });
 
+                            }
                         }
-                    }
-                }).start();
+                    }).start();
 
-            } catch (Exception e) {
-                e.printStackTrace();
-                Common.showShortToast(RequestActivity.this,response);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Common.showShortToast(RequestActivity.this,response);
+                }
             }
+            else {
+                Common.showShortToast(RequestActivity.this, "Invalid message,scan again");
+                openCamera();
+            }
+
         }
 
     }
