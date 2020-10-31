@@ -18,7 +18,7 @@ import static android.graphics.Typeface.defaultFromStyle;
 public class BitmapUtil {
     private final static int WIDTH = 384;
     private final static float SMALL_TEXT = 23;
-    private final static float LARGE_TEXT = 50;
+    private final static float LARGE_TEXT = 60;
     private final static int START_RIGHT = WIDTH;
     private final static int START_LEFT = 0;
     private final static int START_CENTER = WIDTH / 2;

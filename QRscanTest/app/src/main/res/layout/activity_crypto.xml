@@ -176,92 +176,91 @@
 
     </LinearLayout>
 
-    <TextView
-        android:text="or choose a past reccord (swipe to refresh or unselect):"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="15sp"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="20dp"/>
+<!--    <TextView-->
+<!--        android:text="or choose a past reccord (swipe to refresh or unselect):"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:textSize="15sp"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:layout_marginLeft="20dp"/>-->
 
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:orientation="vertical">-->
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="5dp">
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            android:layout_marginLeft="5dp">-->
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.6"
-                android:text="No."
-                android:textStyle="bold"
-                android:textSize="15sp"
-                android:layout_gravity="center_horizontal"
-                android:textAlignment="center">
-            </TextView>
+<!--            <TextView-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="0.6"-->
+<!--                android:text="No."-->
+<!--                android:textStyle="bold"-->
+<!--                android:textSize="15sp"-->
+<!--                android:layout_gravity="center_horizontal"-->
+<!--                android:textAlignment="center">-->
+<!--            </TextView>-->
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:text="Amount"
-                android:textStyle="bold"
-                android:textSize="15sp"
-                android:layout_gravity="center_horizontal"
-                android:textAlignment="center" >
-            </TextView>
+<!--            <TextView-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1.5"-->
+<!--                android:text="Amount"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textSize="15sp"-->
+<!--                android:layout_gravity="center_horizontal"-->
+<!--                android:textAlignment="center" >-->
+<!--            </TextView>-->
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:text="Address"
-                android:textStyle="bold"
-                android:textSize="15sp"
-                android:layout_gravity="center_horizontal"
-                android:textAlignment="center" >
-            </TextView>
+<!--            <TextView-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="3"-->
+<!--                android:text="Address"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textSize="15sp"-->
+<!--                android:layout_gravity="center_horizontal"-->
+<!--                android:textAlignment="center" >-->
+<!--            </TextView>-->
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="Time"
-                android:textStyle="bold"
-                android:textSize="15sp"
-                android:layout_gravity="center_horizontal"
-                android:textAlignment="center">
-            </TextView>
-        </LinearLayout>
+<!--            <TextView-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="2"-->
+<!--                android:text="Time"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textSize="15sp"-->
+<!--                android:layout_gravity="center_horizontal"-->
+<!--                android:textAlignment="center">-->
+<!--            </TextView>-->
+<!--        </LinearLayout>-->
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipe_refresher"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="5"
-            android:layout_marginLeft="5dp">
+<!--        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout-->
+<!--            android:id="@+id/swipe_refresher"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0dp"-->
+<!--            android:layout_weight="5"-->
+<!--            android:layout_marginLeft="5dp">-->
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                />
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+<!--            <androidx.recyclerview.widget.RecyclerView-->
+<!--                android:id="@+id/recycler_view"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                />-->
+<!--        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_gravity="center"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_weight="1.5"
             android:layout_marginTop="10dp">
 
             <Button
@@ -277,23 +276,18 @@
                 android:text="reset"
                 android:id="@+id/reset"/>
 
-
-
         </LinearLayout>
 
 
 
         <ImageView
             android:layout_width="200dp"
-            android:layout_height="0dp"
-            android:layout_weight="5"
+            android:layout_height="200dp"
             android:id="@+id/qrimg"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="40dp"
             android:layout_gravity="center_horizontal">
         </ImageView>
 
-
-    </LinearLayout>
 
 
 

@@ -21,10 +21,11 @@ android:orientation="vertical">
 
         <TextView
             android:id="@+id/result"
-            android:text="Step1: Choose a merchant to transfer: "
+            android:text="Step1: Choose a merchant: "
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="10sp"
+            android:textSize="15sp"
+            android:layout_marginLeft="20dp"
             android:layout_marginBottom="20dp"/>
 
         <Spinner
@@ -34,10 +35,66 @@ android:orientation="vertical">
     </LinearLayout>
 
     <TextView
+        android:text="Step2: choose print mode: "
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Step2: Please click the record to print"
-        android:textSize="18sp"/>
+        android:textSize="15sp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="10dp">
+
+        <RadioGroup
+            android:id="@+id/modegroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/QR"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="QR"
+                android:textAllCaps="false"
+                android:textSize="15sp"
+                android:checked="true"/>
+
+            <RadioButton
+                android:id="@+id/QRNFC"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="QR+NFC"
+                android:textAllCaps="false"
+                android:textSize="15sp" />
+
+            <RadioButton
+                android:id="@+id/NFC"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="NFC"
+                android:textAllCaps="false"
+                android:textSize="15sp" />
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Step3: pick a past record to print (swipe to refresh or unpick)"
+        android:textSize="15sp"
+        android:layout_marginLeft="20dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -92,13 +149,43 @@ android:orientation="vertical">
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
     android:id="@+id/swipe_refresher"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="200dp">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="print"
+            android:id="@+id/request"
+            android:layout_marginRight="40dp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="reset"
+            android:id="@+id/reset"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:id="@+id/qrimg"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center_horizontal">
+    </ImageView>
 
 
 </LinearLayout>

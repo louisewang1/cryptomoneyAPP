@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         transaction = (Button) findViewById(R.id.tr_detail);
 //        qrgenerate = (Button) findViewById(R.id.qrgenerate);
         crypto = (Button) findViewById(R.id.crypto);
-//        crypto_tr = (Button) findViewById(R.id.cryptotr_detail);
+        crypto_tr = (Button) findViewById(R.id.cryptotr_detail);
 //        execute = (Button) findViewById(R.id.execute);
 //        scanreturn = (EditText) findViewById(R.id.scan_result);
         request = (Button) findViewById(R.id.request);
@@ -185,47 +185,47 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        crypto_tr.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                final String cryptotransactionRequest ="request=" + URLEncoder.encode("cryptotransaction") + "&id="+ URLEncoder.encode(account_id.toString());
-//
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        final String response = PostService.Post(cryptotransactionRequest);
-//                        if (response != null) {
-//
-//                            try {
-//                                List<CryptoRecord> recordList = new ArrayList<>();
-////                                SimpleDateFormat sdf = new SimpleDateFormat(timePattern);
-//                                JSONArray jsonArray = new JSONArray(response);
-//                                for (int i = 0; i < jsonArray.length(); i++) {
-//                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-//                                    CryptoRecord record = new CryptoRecord();
-//                                    record.setIndex(jsonObject.getInt("index"));
-//                                    record.setAddr(jsonObject.getString("address"));
-//                                    record.setTime(jsonObject.getString( "time"));
-//                                    record.setValue(jsonObject.getDouble("value"));
-//                                    recordList.add(record);
-//                                }
-//
-//                                Intent intent = new Intent(MainActivity.this,CryptoTransactionActivity.class);
-//                                Bundle bundle = new Bundle();
-//                                bundle.putSerializable("recordList", (Serializable) recordList);
-//                                bundle.putInt("account_id",account_id);
-//                                bundle.putString("type",type);
-//                                intent.putExtras(bundle);
-//                                startActivity(intent);
-//
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//                    }
-//                }).start();
-//            }
-//        });
+        crypto_tr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final String cryptotransactionRequest ="request=" + URLEncoder.encode("cryptotransaction") + "&id="+ URLEncoder.encode(account_id.toString());
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final String response = PostService.Post(cryptotransactionRequest);
+                        if (response != null) {
+
+                            try {
+                                List<CryptoRecord> recordList = new ArrayList<>();
+//                                SimpleDateFormat sdf = new SimpleDateFormat(timePattern);
+                                JSONArray jsonArray = new JSONArray(response);
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    CryptoRecord record = new CryptoRecord();
+                                    record.setIndex(jsonObject.getInt("index"));
+                                    record.setAddr(jsonObject.getString("address"));
+                                    record.setTime(jsonObject.getString( "time"));
+                                    record.setValue(jsonObject.getDouble("value"));
+                                    recordList.add(record);
+                                }
+
+                                Intent intent = new Intent(MainActivity.this,CryptoTransactionActivity.class);
+                                Bundle bundle = new Bundle();
+                                bundle.putSerializable("recordList", (Serializable) recordList);
+                                bundle.putInt("account_id",account_id);
+                                bundle.putString("type",type);
+                                intent.putExtras(bundle);
+                                startActivity(intent);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }).start();
+            }
+        });
 
 //        qrgenerate.setOnClickListener(new View.OnClickListener() {
 //
