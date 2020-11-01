@@ -1,12 +1,15 @@
 package com.example.cryptomoney;
 
 import android.Manifest;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Bundle;
@@ -56,6 +59,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.cryptomoney.utils.Base64Utils;
+import com.example.cryptomoney.utils.DBHelper;
 import com.example.cryptomoney.utils.RSAUtils;
 import com.google.zxing.Result;
 import com.google.zxing.activity.CaptureActivity;
@@ -123,6 +127,57 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
         }
+
+        DBHelper dbHelper = new DBHelper(this, "test.db", null, 1);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        // get tokens from local db
+        Cursor cursor = db.query("Tokens",null,null,null,null,null,null);
+        if(cursor.moveToFirst()){
+            do{
+                String addr = cursor.getString(cursor.getColumnIndex("addr"));
+                double amount = cursor.getDouble(cursor.getColumnIndex("amount"));
+                Log.d("MainActivity", "get offline tokens: " + addr + "  " + amount);
+
+                // send to server
+                final String transferRequest = "request=" + URLEncoder.encode("useofflinetoken") + "&to_id=" + URLEncoder.encode(account_id.toString())
+                        + "&amount=" + URLEncoder.encode(String.valueOf(amount)) + "&addr=" + URLEncoder.encode(addr);
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final String response = PostService.Post(transferRequest);
+                        if (response != null) {
+                            switch (response) {
+                                case "connection failed":
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Common.showShortToast(MainActivity.this, "Connection Error");
+                                            finish();
+                                        }
+                                    });
+                                    break;
+                                default:
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Common.showShortToast(MainActivity.this, "Offline token added successful." + response);
+                                        }
+                                    });
+                                    break;
+                            }
+                        }
+
+                    }
+                }).start();
+
+            }while(cursor.moveToNext());
+            db.execSQL("Delete from Tokens");
+        }
+
+        cursor.close();
+
 
         qrscan = (Button) findViewById(R.id.qrscan);
 //        NFC_read = (Button) findViewById(R.id.nfctag);

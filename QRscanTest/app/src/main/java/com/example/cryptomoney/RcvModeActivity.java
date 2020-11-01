@@ -8,10 +8,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -21,10 +23,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cryptomoney.utils.Base64Utils;
+import com.example.cryptomoney.utils.DBHelper;
 import com.example.cryptomoney.utils.Logger;
 import com.google.zxing.activity.CaptureActivity;
 import com.google.zxing.util.Constant;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.security.KeyFactory;
@@ -195,6 +201,14 @@ public class RcvModeActivity extends AppCompatActivity {
                         String token = qrstring_dec.split("&token=")[1];
                         Common.showLongToast(RcvModeActivity.this,"amount="+amount+" token address="+token);
                         rcvresponse.setText("amount="+amount+" token address="+token);
+
+                        DBHelper dbHelper = new DBHelper(this, "test.db", null, 1);
+                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+                        ContentValues values = new ContentValues();
+                        values.put("addr", token);
+                        values.put("amount", amount);
+                        db.insert("Tokens", null, values);
+
                     }
                     else {
                         Common.showLongToast(RcvModeActivity.this,"invalid token");

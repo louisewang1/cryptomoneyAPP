@@ -329,6 +329,17 @@ public class UserServlet extends HttpServlet {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			case "useofflinetoken":
+				Integer to_id = Integer.parseInt(request.getParameter("to_id"));
+				String address = request.getParameter("addr");
+				Double amount = Double.parseDouble(request.getParameter("amount"));
+				try {
+					response.getWriter().write(userService.offlinetoken(conn,to_id, amount,address));
+				} catch (IOException | SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				
 			default:
 				break;

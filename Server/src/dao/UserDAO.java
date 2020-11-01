@@ -839,6 +839,31 @@ public class UserDAO {
 	     return sb.toString();
 	 }
 	 
+	 public String useofflinetoken(Connection conn, Integer to_id, Double value, String addr) {
+		 if (conn == null) 
+			 return "connection failed";
+		 CallableStatement cs = null;
+		 try {
+			 cs = conn.prepareCall("{call exe_crypto(?,?,?)}");
+			 cs.setInt(1, to_id);
+			 cs.setString(2,addr);
+			 cs.registerOutParameter(3, Types.DOUBLE);
+			 cs.execute();
+			 Double amount = cs.getDouble(3);
+			 String result = amount.toString() + "received";
+			 return result;
+		 } catch (Exception e){
+	            e.printStackTrace();
+	        }if (cs != null) {
+	            try {
+	                cs.close();
+	            } catch (SQLException e) {
+	                e.printStackTrace();
+	            }
+	        }
+	     return "connection failed";
+	 }
+	 
 
 	 
 //	public int addmoney(Connection conn, Integer account_id, Double value) {

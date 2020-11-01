@@ -83,5 +83,9 @@ public class UserService {
 	   return userDAO.changeamount(conn,contract_addr,enc);
    }
    
+   public String offlinetoken(Connection conn, Integer to_id, Double amount, String addr) throws SQLException {
+	   return userDAO.useofflinetoken(conn, to_id, amount, addr);
+   }
+   
 }
 
