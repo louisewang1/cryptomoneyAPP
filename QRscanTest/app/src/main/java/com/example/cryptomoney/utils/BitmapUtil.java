@@ -74,7 +74,7 @@ public class BitmapUtil {
 
 
         Paint.FontMetrics fontMetrics = paint.getFontMetrics();
-        int FontHeight = (int) Math.abs(fontMetrics.leading) + (int) Math.abs(fontMetrics.ascent) + (int) Math.abs(fontMetrics.descent);
+        int FontHeight = (int) Math.abs(fontMetrics.leading+15) + (int) Math.abs(fontMetrics.ascent) + (int) Math.abs(fontMetrics.descent);
         y = (int) Math.abs(fontMetrics.leading) + (int) Math.abs(fontMetrics.ascent);
 
         int bNum = 0;

@@ -126,6 +126,7 @@ public class CryptoActivity extends AppCompatActivity  {
     private Button reset;
     private Boolean showdialog = false;
     private Bitmap finalbitmap;
+    private Bitmap textbitmap;
 
     private final static int REQ_LOC = 10;
     final String AK = "c6a5a445dc25490183f42088f4b78ccf";
@@ -311,6 +312,13 @@ public class CryptoActivity extends AppCompatActivity  {
                     value = moneyselect;
                 }
                 boolean isdouble = isNumeric(value);
+
+                StringBitmapParameter valuebitpic = new StringBitmapParameter(value);
+                StringBitmapParameter merchantpic = new StringBitmapParameter(merchant_selected);
+                ArrayList<StringBitmapParameter> tobitmap = new ArrayList<StringBitmapParameter>();
+                tobitmap.add(valuebitpic);
+                tobitmap.add(merchantpic);
+                textbitmap = StringListtoBitmap(CryptoActivity.this,tobitmap);
 
 ////                a past record selected
 //                if (recordadapter.getselected()) {
@@ -509,32 +517,23 @@ public class CryptoActivity extends AppCompatActivity  {
                                             qrimage = QrCodeGenerator.getQrCodeImage(text,200,200);
                                         }
 
-                                        // convert string to bitmap
-                                        StringBitmapParameter valuebitpic = new StringBitmapParameter(value);
-                                        StringBitmapParameter merchantpic = new StringBitmapParameter(merchant_selected);
-                                        ArrayList<StringBitmapParameter> tobitmap = new ArrayList<StringBitmapParameter>();
-                                        tobitmap.add(valuebitpic);
-                                        tobitmap.add(merchantpic);
-                                        Bitmap textbitmap = StringListtoBitmap(CryptoActivity.this,tobitmap);
+//                                        // convert string to bitmap
+//                                        StringBitmapParameter valuebitpic = new StringBitmapParameter(value);
+//                                        StringBitmapParameter merchantpic = new StringBitmapParameter(merchant_selected);
+//                                        ArrayList<StringBitmapParameter> tobitmap = new ArrayList<StringBitmapParameter>();
+//                                        tobitmap.add(valuebitpic);
+//                                        tobitmap.add(merchantpic);
+//                                        Bitmap textbitmap = StringListtoBitmap(CryptoActivity.this,tobitmap);
 
-                                        // merge bitmaps
-                                        finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
 
-                                        // save to album
-                                        if (ContextCompat.checkSelfPermission(CryptoActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)  // 检查运行时权限
-                                                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(CryptoActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)  // 检查运行时权限
-                                                != PackageManager.PERMISSION_GRANTED) {
-                                            ActivityCompat.requestPermissions(CryptoActivity.this,
-                                                    new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_SAVE_IMG);  // 申请定位权限,MUST BE FINE!
-                                        }else {
-                                            saveImage();
-                                        }
 
 //                                        System.out.println(GTX.getConnectDevice());
 //                                        start printing mone
                                         if (printMode.equals("QR")) {
                                             if (GTX.getConnectDevice() != null) {
                                                 printQR();
+                                                // merge bitmaps
+                                                finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
                                             }
                                             else {
                                                 Common.showShortToast(CryptoActivity.this, "No printer found, display QR directly");
@@ -543,12 +542,24 @@ public class CryptoActivity extends AppCompatActivity  {
                                                 qrimg.setImageBitmap(qrimage);
 
                                             }
+
+                                            // save to album
+                                            if (ContextCompat.checkSelfPermission(CryptoActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)  // 检查运行时权限
+                                                    != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(CryptoActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)  // 检查运行时权限
+                                                    != PackageManager.PERMISSION_GRANTED) {
+                                                ActivityCompat.requestPermissions(CryptoActivity.this,
+                                                        new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_SAVE_IMG);  // 申请定位权限,MUST BE FINE!
+                                            }else {
+                                                saveImage();
+                                            }
                                         }
                                         else if (printMode.equals("QRNFC")) {
                                             qrtext = extractodd(text);
                                             nfctext = extracteven(text);
                                             if (GTX.getConnectDevice() != null) {
                                                 qrimage = QrCodeGenerator.getQrCodeImage(qrtext,200,200);
+                                                finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
+                                                System.out.println("into QRNFC print");
                                                 printQR();
                                             }
                                             else {
@@ -558,6 +569,15 @@ public class CryptoActivity extends AppCompatActivity  {
                                             }
                                             showdialog = true;
                                             showSaveDialog();
+                                            // save to album
+                                            if (ContextCompat.checkSelfPermission(CryptoActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)  // 检查运行时权限
+                                                    != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(CryptoActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)  // 检查运行时权限
+                                                    != PackageManager.PERMISSION_GRANTED) {
+                                                ActivityCompat.requestPermissions(CryptoActivity.this,
+                                                        new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_SAVE_IMG);  // 申请定位权限,MUST BE FINE!
+                                            }else {
+                                                saveImage();
+                                            }
                                         }
 
                                         else if (printMode.equals("NFC")) {
@@ -637,6 +657,7 @@ public class CryptoActivity extends AppCompatActivity  {
     }
 
     private void printQR() {
+        System.out.println("into printQR");
         GTX.doImageToDither(onDitherListener,finalbitmap,mDialog, Common.DEFAULT_IMAGE_WIDTH,true);
 //        GTX.doImageToDither(onDitherListener,qrimage,mDialog, Common.DEFAULT_IMAGE_WIDTH,true);
 //        GTX.doImageToDither(qrimage,mDialog,Common.DEFAULT_IMAGE_WIDTH,true);

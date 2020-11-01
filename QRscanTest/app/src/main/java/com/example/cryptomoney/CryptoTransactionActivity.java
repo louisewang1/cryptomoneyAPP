@@ -257,22 +257,13 @@ public class CryptoTransactionActivity extends AppCompatActivity {
                         tobitmap.add(merchantpic);
                         Bitmap textbitmap = StringListtoBitmap(CryptoTransactionActivity.this,tobitmap);
 
-                        // merge bitmaps
-                        finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
-
-//                        // save to album
-                        if (ContextCompat.checkSelfPermission(CryptoTransactionActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)  // 检查运行时权限
-                                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(CryptoTransactionActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)  // 检查运行时权限
-                                != PackageManager.PERMISSION_GRANTED) {
-                            ActivityCompat.requestPermissions(CryptoTransactionActivity.this,
-                                    new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_SAVE_IMG);  // 申请定位权限,MUST BE FINE!
-                        }else {
-                            saveImage();
-                        }
 //                        requestPermission();
 
                         if (printMode.equals("QR")) {
                             if (GTX.getConnectDevice() != null) {
+
+                                // merge bitmaps
+                                finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
                                 printQR();
                             } else {
                                 Common.showShortToast(CryptoTransactionActivity.this, "No printer found, display QR directly");
@@ -280,11 +271,23 @@ public class CryptoTransactionActivity extends AppCompatActivity {
                                 qrimg.setImageBitmap(qrimage);
 
                             }
+                            // save to album
+                            if (ContextCompat.checkSelfPermission(CryptoTransactionActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)  // 检查运行时权限
+                                    != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(CryptoTransactionActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)  // 检查运行时权限
+                                    != PackageManager.PERMISSION_GRANTED) {
+                                ActivityCompat.requestPermissions(CryptoTransactionActivity.this,
+                                        new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_SAVE_IMG);  // 申请定位权限,MUST BE FINE!
+                            }else {
+                                saveImage();
+                            }
+
                         } else if (printMode.equals("QRNFC")) {
                             qrtext = extractodd(text);
                             nfctext = extracteven(text);
                             if (GTX.getConnectDevice() != null) {
                                 qrimage = QrCodeGenerator.getQrCodeImage(qrtext, 200, 200);
+                                // merge bitmaps
+                                finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
                                 printQR();
                             } else {
                                 Common.showShortToast(CryptoTransactionActivity.this, "No printer found, display QR directly");
@@ -293,6 +296,15 @@ public class CryptoTransactionActivity extends AppCompatActivity {
                             }
                             showdialog = true;
                             showSaveDialog();
+                            // save to album
+                            if (ContextCompat.checkSelfPermission(CryptoTransactionActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)  // 检查运行时权限
+                                    != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(CryptoTransactionActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)  // 检查运行时权限
+                                    != PackageManager.PERMISSION_GRANTED) {
+                                ActivityCompat.requestPermissions(CryptoTransactionActivity.this,
+                                        new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_SAVE_IMG);  // 申请定位权限,MUST BE FINE!
+                            }else {
+                                saveImage();
+                            }
                         } else if (printMode.equals("NFC")) {
                             nfctext = text;
                             showdialog = true;
