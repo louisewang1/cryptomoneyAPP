@@ -513,7 +513,6 @@ public class CryptoActivity extends AppCompatActivity  {
                                             qrimage = QrCodeGenerator.getQrCodeImage(text,200,200);
                                         }
                                         else {
-                                            System.out.println("into text=enc");
                                             text = enc;
                                             qrimage = QrCodeGenerator.getQrCodeImage(text,200,200);
                                         }
