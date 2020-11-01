@@ -269,6 +269,7 @@ public class CryptoTransactionActivity extends AppCompatActivity {
                                 Common.showShortToast(CryptoTransactionActivity.this, "No printer found, display QR directly");
                                 qrimg.setVisibility(View.VISIBLE);
                                 qrimg.setImageBitmap(qrimage);
+                                finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
 
                             }
                             // save to album
@@ -293,6 +294,7 @@ public class CryptoTransactionActivity extends AppCompatActivity {
                                 Common.showShortToast(CryptoTransactionActivity.this, "No printer found, display QR directly");
                                 qrimg.setVisibility(View.VISIBLE);
                                 qrimg.setImageBitmap(qrimage);
+                                finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
                             }
                             showdialog = true;
                             showSaveDialog();

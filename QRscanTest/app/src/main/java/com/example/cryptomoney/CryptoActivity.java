@@ -513,6 +513,7 @@ public class CryptoActivity extends AppCompatActivity  {
                                             qrimage = QrCodeGenerator.getQrCodeImage(text,200,200);
                                         }
                                         else {
+                                            System.out.println("into text=enc");
                                             text = enc;
                                             qrimage = QrCodeGenerator.getQrCodeImage(text,200,200);
                                         }
@@ -540,6 +541,7 @@ public class CryptoActivity extends AppCompatActivity  {
 //                                                recyclerView.setVisibility(View.GONE);
                                                 qrimg.setVisibility(View.VISIBLE);
                                                 qrimg.setImageBitmap(qrimage);
+                                                finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
 
                                             }
 
@@ -566,6 +568,7 @@ public class CryptoActivity extends AppCompatActivity  {
                                                 Common.showShortToast(CryptoActivity.this, "No printer found, display QR directly");
                                                 qrimg.setVisibility(View.VISIBLE);
                                                 qrimg.setImageBitmap(qrimage);
+                                                finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
                                             }
                                             showdialog = true;
                                             showSaveDialog();
