@@ -121,8 +121,9 @@ public class RcvModeActivity extends AppCompatActivity {
             Bundle bundle = data.getExtras();
             String qrstring = bundle.getString(Constant.INTENT_EXTRA_KEY_QR_SCAN);
             Logger.d("RcvMode","qrstring="+qrstring);
+            Logger.d("RcvMode","TYPE="+type);
 
-            if (type.equals("CUSTOMER")) {
+          /*  if (type.equals("CUSTOMER")) {
                 if (qrstring.indexOf("N=") == 0) {
                     String N_base64 = qrstring.split("N=")[1].split("&d=")[0];
                     BigInteger N = new BigInteger(Base64Utils.decode(N_base64));
@@ -178,11 +179,15 @@ public class RcvModeActivity extends AppCompatActivity {
                     rcvresponse.setText("QR reading failed, please scan again ");
                 }
             }
+            /*
+           */
 
-            else if (type.equals("MERCHANT")) {
+            if (true) {
                 pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
                 merchant_pk = pref.getString("merchant_pk","");
                 merchant_N = pref.getString("merchant_N","");
+
+                Log.d("rcvmode", "merchant_pk: " + merchant_pk);
 
                 BigInteger pk_exp = new BigInteger(Base64Utils.decode(merchant_pk));
                 BigInteger modulus = new BigInteger(Base64Utils.decode(merchant_N));

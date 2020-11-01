@@ -120,6 +120,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Intent intent_from_login = getIntent();
+        account_id = intent_from_login.getIntExtra("account_id",0);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -136,12 +139,12 @@ public class MainActivity extends AppCompatActivity {
         if(cursor.moveToFirst()){
             do{
                 String addr = cursor.getString(cursor.getColumnIndex("addr"));
-                double amount = cursor.getDouble(cursor.getColumnIndex("amount"));
-                Log.d("MainActivity", "get offline tokens: " + addr + "  " + amount);
+                Double amount = cursor.getDouble(cursor.getColumnIndex("amount"));
+                Log.d("MainActivity", "get offline tokens: " + addr + "  " + amount + "  " + account_id);
 
                 // send to server
                 final String transferRequest = "request=" + URLEncoder.encode("useofflinetoken") + "&to_id=" + URLEncoder.encode(account_id.toString())
-                        + "&amount=" + URLEncoder.encode(String.valueOf(amount)) + "&addr=" + URLEncoder.encode(addr);
+                        + "&amount=" + URLEncoder.encode(amount.toString()) + "&addr=" + URLEncoder.encode(addr);
 
                 new Thread(new Runnable() {
                     @Override
@@ -191,8 +194,8 @@ public class MainActivity extends AppCompatActivity {
 //        scanreturn = (EditText) findViewById(R.id.scan_result);
         request = (Button) findViewById(R.id.request);
         Setting = (Button) findViewById(R.id.setting);
-        Intent intent_from_login = getIntent();
-        account_id = intent_from_login.getIntExtra("account_id",0);
+
+
 //        type = intent_from_login.getStringExtra("type");
 
         crypto.setOnClickListener(new View.OnClickListener() {
