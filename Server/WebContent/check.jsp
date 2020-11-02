@@ -22,6 +22,8 @@
         if(password.equals(rs.getObject("pwd"))){
         	String temp = "success.jsp?paramID=" + username;
             response.sendRedirect(temp);
+            String temp2 = "MoneyTransfer.jsp?paramID=" + username;
+            response.sendRedirect(temp2);
         }
         else{
             out.print("<script language='javaScript'> alert('密码错误');</script>");

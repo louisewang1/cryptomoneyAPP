@@ -39,6 +39,7 @@ if(rs.next())
 </script> 
 
 <input type="button" value="Generate QR code" onClick="location.href='QRcodeInput.jsp'">
+<input type="button" value="Transfer Money" onClick="location.href='transaction.jsp'">
 
 </body>
 </html>
