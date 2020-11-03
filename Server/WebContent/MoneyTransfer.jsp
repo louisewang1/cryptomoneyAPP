@@ -15,7 +15,7 @@
     String receiver=(String)request.getParameter("receiver");
     String paramID = request.getParameter("paramID");//paramID从check.jsp中获取
     out.println("Username: "+paramID+"<br/>");
-	
+/*	
     String sql_receiver="select * from logindb where username="+"'"+receiver+"'";//定义一个查询语句
     ResultSet rs1=db.executeQuery(sql_receiver);//执行查询语句
     
@@ -24,11 +24,11 @@
     
     Integer to_account = (Integer) rs1.getObject("id");
     Integer from_account = (Integer) rs2.getObject("id");
-    double value = Double.valueOf(amount);
+    double value = Double.valueOf(amount); */
     
     //此处需要写一个conn传入transfer函数中
             
-    userv.transfer(conn, from_account, to_account, value);
+    //userv.transfer(conn, from_account, to_account, value);
 %>
 </body>
 </html>

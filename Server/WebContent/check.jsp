@@ -20,7 +20,10 @@
     {
         //将输入的密码与数据库密码相比对，执行相应操作
         if(password.equals(rs.getObject("pwd"))){
-        	String temp = "success.jsp?paramID=" + username;
+        	int id = Integer.parseInt(rs.getObject("id").toString());
+        	String temp = "success.jsp";
+        	session.setAttribute("Id",id);  
+        	session.setAttribute("Username",username);  
             response.sendRedirect(temp);
         }
         else{

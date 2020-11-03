@@ -9,7 +9,10 @@
 <body style="text-align:center">
 <jsp:useBean id="db" class="Bean.DBBean" scope="page"/>
 <h1>Login Success</h1>
-<%String paramID = request.getParameter("paramID"); 
+<%
+int id = Integer.parseInt(session.getAttribute("Id").toString());
+String paramID = session.getAttribute("Username").toString();
+
 out.println("Username: "+paramID+"<br/>");
 
 String sql="select * from accountinfodb where username="+"'"+paramID+"'";//定义一个查询语句
@@ -23,7 +26,6 @@ if(rs.next())
 	out.println("Cellphone: "+rs.getObject("cellphone").toString()+"<br/>");
 	int acc_id = rs.getInt("account_id");
 	out.println(acc_id+"<br/>");
-	String url = "QRcodeInput.jsp?Id=" + acc_id;
 	session.setAttribute("Id",acc_id);  
 
 }
