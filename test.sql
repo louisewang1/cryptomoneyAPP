@@ -2,8 +2,7 @@
 SQLyog Ultimate v12.14 (64 bit)
 MySQL - 5.1.30-community : Database - test
 *********************************************************************
-*/
-
+*/
 
 /*!40101 SET NAMES utf8 */;
 
@@ -15,27 +14,6 @@ MySQL - 5.1.30-community : Database - test
 CREATE DATABASE /*!32312 IF NOT EXISTS*/`test` /*!40100 DEFAULT CHARACTER SET latin1 */;
 
 USE `test`;
-
-/*Table structure for table `logindb` */
-
-CREATE TABLE `logindb` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(50) NOT NULL,
-  `pwd` varchar(100) NOT NULL,
-  `usertype` varchar(10) NOT NULL,
-  `sk` varchar(100) DEFAULT NULL,
-  `N` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
-
-/*Data for the table `logindb` */
-
-insert  into `logindb`(`id`,`username`,`pwd`,`usertype`,`sk`,`N`) values 
-
-(1,'1','1','CUSTOMER','',''),
-
-(2,'KFC','kfc','MERCHANT','Z8wKnfC+u1catc0diHn79u25QuvKYIsHVpsMRmysn+AMmykxXcTNysWCDgS7tTgtmIVAXEwEUIh6ZCwihb+OIQ==','AIQhw/OqPMZF9B7E4OKLntdylSYZg/URRNpD9/3bScUf3jpPGQXsqxSwC3YNdldDzOuKFayjajOhCIv+9U2QVws=');
-
 
 /*Table structure for table `accountinfodb` */
 
@@ -51,10 +29,8 @@ CREATE TABLE `accountinfodb` (
 
 /*Data for the table `accountinfodb` */
 
-insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
-
-(1,'1',88,'',''),
-
+insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
+(1,'1',88,'',''),
 (2,'KFC',112,'','');
 
 /*Table structure for table `contract` */
@@ -102,6 +78,23 @@ CREATE TABLE `cryptotransferdb` (
 
 /*Data for the table `cryptotransferdb` */
 
+/*Table structure for table `logindb` */
+
+CREATE TABLE `logindb` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `pwd` varchar(100) NOT NULL,
+  `usertype` varchar(10) NOT NULL,
+  `sk` varchar(100) DEFAULT NULL,
+  `N` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+
+/*Data for the table `logindb` */
+
+insert  into `logindb`(`id`,`username`,`pwd`,`usertype`,`sk`,`N`) values 
+(1,'1','1','CUSTOMER','',''),
+(2,'KFC','kfc','MERCHANT','Z8wKnfC+u1catc0diHn79u25QuvKYIsHVpsMRmysn+AMmykxXcTNysWCDgS7tTgtmIVAXEwEUIh6ZCwihb+OIQ==','AIQhw/OqPMZF9B7E4OKLntdylSYZg/URRNpD9/3bScUf3jpPGQXsqxSwC3YNdldDzOuKFayjajOhCIv+9U2QVws=');
 
 /*Table structure for table `transactiondb` */
 
