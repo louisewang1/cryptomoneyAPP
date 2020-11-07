@@ -5,9 +5,11 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -23,6 +25,7 @@ import android.widget.Toast;
 
 import com.example.cryptomoney.utils.Base64Utils;
 import com.example.cryptomoney.utils.Constant;
+import com.example.cryptomoney.utils.DBHelper;
 import com.example.cryptomoney.utils.RSAUtils;
 
 import java.math.BigInteger;
@@ -59,8 +62,8 @@ public class RegisterActivity extends AppCompatActivity {
     private int registerMode;
     private String response;
 
-    private SharedPreferences pref;
-    private SharedPreferences.Editor editor;
+//    private SharedPreferences pref;
+//    private SharedPreferences.Editor editor;
 
     private Connection conn = null;
 //    public final static int TYPE_CONN_FAILED = -1;
@@ -81,6 +84,7 @@ public class RegisterActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
         }
+
 
         // 绑定控件
         accountEdit = (EditText) findViewById(R.id.account);
@@ -186,11 +190,21 @@ public class RegisterActivity extends AppCompatActivity {
                             if (response != null && response.indexOf("pk=") == 0) {
                                 String pk_exp = response.split("pk=")[1].split("&N=")[0];
                                 String modulus = response.split("&N=")[1];
-                                pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
-                                editor = pref.edit();
-                                editor.putString("merchant_pk",pk_exp);
-                                editor.putString("merchant_N",modulus);
-                                editor.apply();
+//                                pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
+//                                editor = pref.edit();
+//                                editor.putString("merchant_pk",pk_exp);
+//                                editor.putString("merchant_N",modulus);
+//                                editor.apply();
+                                // store merchant pk in local db
+                                DBHelper dbHelper = new DBHelper(RegisterActivity.this, "test.db", null, 3);
+                                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                ContentValues values = new ContentValues();
+                                values.put("mer_name", username);
+                                values.put("N", modulus);
+                                values.put("pk_exp", pk_exp);
+                                db.insertWithOnConflict("PkList", null, values,SQLiteDatabase.CONFLICT_REPLACE);
+                                values.clear();
+
                                 runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {

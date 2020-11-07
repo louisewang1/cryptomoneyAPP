@@ -207,13 +207,15 @@ public class RcvModeActivity extends AppCompatActivity {
                         Common.showLongToast(RcvModeActivity.this,"amount="+amount+" token address="+token);
                         rcvresponse.setText("amount="+amount+" token address="+token);
 
-                        DBHelper dbHelper = new DBHelper(this, "test.db", null, 1);
+                        DBHelper dbHelper = new DBHelper(this, "test.db", null, 3);
                         SQLiteDatabase db = dbHelper.getWritableDatabase();
                         ContentValues values = new ContentValues();
                         values.put("addr", token);
                         values.put("amount", amount);
-                        db.insert("Tokens", null, values);
-
+//                        db.insert("Tokens", null, values);
+                        db.insertWithOnConflict("Tokens", null, values,SQLiteDatabase.CONFLICT_REPLACE);
+                        db.insertWithOnConflict("TokensAll", null, values,SQLiteDatabase.CONFLICT_REPLACE);
+                        values.clear();
                     }
                     else {
                         Common.showLongToast(RcvModeActivity.this,"invalid token");

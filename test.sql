@@ -30,8 +30,9 @@ CREATE TABLE `accountinfodb` (
 /*Data for the table `accountinfodb` */
 
 insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
-(1,'1',88,'',''),
-(2,'KFC',112,'','');
+(1,'KFC',100,'',''),
+(2,'HM',100,'',''),
+(3,'ZARA',100,'','');
 
 /*Table structure for table `contract` */
 
@@ -57,7 +58,7 @@ CREATE TABLE `contractrecord` (
   PRIMARY KEY (`id`),
   KEY `fk_contractrecord` (`contract_addr`),
   CONSTRAINT `fk_contractrecord` FOREIGN KEY (`contract_addr`) REFERENCES `contract` (`contract_addr`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Data for the table `contractrecord` */
 
@@ -74,7 +75,7 @@ CREATE TABLE `cryptotransferdb` (
   PRIMARY KEY (`id`),
   KEY `fk_cryptotransferdb_id` (`account_id`),
   CONSTRAINT `fk_cryptotransferdb_id` FOREIGN KEY (`account_id`) REFERENCES `logindb` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Data for the table `cryptotransferdb` */
 
@@ -87,14 +88,36 @@ CREATE TABLE `logindb` (
   `usertype` varchar(10) NOT NULL,
   `sk` varchar(100) DEFAULT NULL,
   `N` varchar(100) DEFAULT NULL,
+  `pk` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 
 /*Data for the table `logindb` */
 
-insert  into `logindb`(`id`,`username`,`pwd`,`usertype`,`sk`,`N`) values 
-(1,'1','1','CUSTOMER','',''),
-(2,'KFC','kfc','MERCHANT','Z8wKnfC+u1catc0diHn79u25QuvKYIsHVpsMRmysn+AMmykxXcTNysWCDgS7tTgtmIVAXEwEUIh6ZCwihb+OIQ==','AIQhw/OqPMZF9B7E4OKLntdylSYZg/URRNpD9/3bScUf3jpPGQXsqxSwC3YNdldDzOuKFayjajOhCIv+9U2QVws=');
+insert  into `logindb`(`id`,`username`,`pwd`,`usertype`,`sk`,`N`,`pk`) values 
+(1,'KFC','kfc','MERCHANT','SPks+cV2NxXvAsxkNbzH9bR5bfRhtgarL+A7wValyP1IFpg7bh0BhldO1ffsACY328DsfO++xEeOWeVabt3J+Q==','AJu0RUToEiyXgkCWv+YjK3xy6VdwClrmuyKPIws2qPDwAhiWa47kEe9pGxqlTa9BSuBDFwLV+vHUjEd8cH3mP8M=','AQAB'),
+(2,'HM','hm','MERCHANT','UgeGo9EeWkFgRyEkC15Cmtkg3Ehik7+kQaOKmuNEmEFj2kug5CblNRpZ1mMNkD1w6vybkHr0oyeTM6xIQWG/wQ==','AOVtm/Ye9sWzM5KWoMgAJxSq6T9K5BOaLUnD05Ur9R0AtzP12dyY1p0IpYN903jfjXKXy8BfIT8g8vWwepDSGiM=','AQAB'),
+(3,'ZARA','zara','MERCHANT','FHFmb5UyjyANTDUxBEq5NgBrXobs7QXB9HlZTP+OfOXLaOk7SxfCcwsalvqoUG6NtFbttZwn/oFppRom7lQUgQ==','AOeiS9ERcdnf+XYE1ZN2gaAdzayJ49krgbEvs8yyQbO3NI0KMVBoX7c0XE8RkJuuwvgRbVridMyd6OQGLIMBtXM=','AQAB');
+
+/*Table structure for table `merchant_token` */
+
+CREATE TABLE `merchant_token` (
+  `cus_id` int(11) NOT NULL,
+  `amount` double NOT NULL DEFAULT '0',
+  `crypto_time` datetime NOT NULL,
+  `address` varchar(20) NOT NULL,
+  `N` varchar(100) NOT NULL,
+  `pk` varchar(10) NOT NULL,
+  `mer_id` int(11) NOT NULL,
+  `mer_name` varchar(20) NOT NULL,
+  `ciphertext` varchar(200) NOT NULL,
+  KEY `fk_merchant_token_cus_id` (`cus_id`),
+  KEY `fk_merchant_token_mer_id` (`mer_id`),
+  CONSTRAINT `fk_merchant_token_cus_id` FOREIGN KEY (`cus_id`) REFERENCES `logindb` (`id`),
+  CONSTRAINT `fk_merchant_token_mer_id` FOREIGN KEY (`mer_id`) REFERENCES `logindb` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Data for the table `merchant_token` */
 
 /*Table structure for table `transactiondb` */
 
@@ -116,12 +139,12 @@ CREATE TABLE `transactiondb` (
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `account_register`(IN username_ VARCHAR(50), IN pwd_ VARCHAR(100), IN usertype_ varchar(10), in sk_ varchar(100), in N_ varchar(100), IN email_ VARCHAR(100), IN cellphone_ VARCHAR(100), OUT result INT)
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `account_register`(IN username_ VARCHAR(50), IN pwd_ VARCHAR(100), IN usertype_ VARCHAR(10), IN sk_ VARCHAR(100), in pk_ varchar(100), IN N_ VARCHAR(100), IN email_ VARCHAR(100), IN cellphone_ VARCHAR(100), OUT result INT)
 label:BEGIN
 DECLARE account_id_ INT DEFAULT 0;
 SELECT id INTO account_id_ FROM logindb WHERE username = username_;
 IF account_id_ = 0 THEN 
-    INSERT INTO logindb(username,pwd,usertype,sk,N) VALUES(username_,pwd_,usertype_,sk_,N_);
+    INSERT INTO logindb(username,pwd,usertype,sk,N,pk) VALUES(username_,pwd_,usertype_,sk_,N_,pk_);
     SELECT LAST_INSERT_ID() INTO account_id_;
     INSERT INTO accountinfodb(account_id,username) SELECT id,username FROM logindb WHERE id = account_id_;
     UPDATE accountinfodb SET email = email_, cellphone = cellphone_ WHERE account_id = account_id_ ;
@@ -209,9 +232,11 @@ TRUNCATE logindb;
 TRUNCATE transactiondb;
 TRUNCATE contract;
 TRUNCATE contractrecord;
+truncate merchant_token;
 ALTER TABLE logindb AUTO_INCREMENT=1;
 ALTER TABLE transactiondb AUTO_INCREMENT=1;
-alter table contractrecord auto_increment = 1;
+ALTER TABLE contractrecord AUTO_INCREMENT = 1;
+ALTER TABLE cryptotransferdb AUTO_INCREMENT = 1;
 SET FOREIGN_KEY_CHECKS = 1;
 END */$$
 DELIMITER ;
@@ -257,6 +282,31 @@ IF addr_exist = 0 THEN
     SELECT NOW() INTO time_;
     UPDATE accountinfodb SET balance = balance - value_ WHERE account_id = account_id_;
     INSERT INTO cryptotransferdb(account_id,amount,crypto_time,address,N,pk) VALUES(account_id_,value_,time_,addr_,N_,pk_);
+    SET result = 1;
+ELSE 
+    SET result = 0;
+    LEAVE label;
+END IF;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `crypto_transfer_merchant` */
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `crypto_transfer_merchant`(IN account_id_ INT, IN value_ DOUBLE, IN N_ VARCHAR(100),IN pk_ VARCHAR(10), IN addr_ VARCHAR(100), in merchant_ varchar(20), in ciphertext_ varchar(200), OUT result INT)
+label:BEGIN
+DECLARE time_ DATETIME;
+DECLARE addr_exist1 INT DEFAULT 1;
+DECLARE addr_exist2 INT DEFAULT 1;
+declare mer_id_ int;
+SELECT COUNT(*) INTO addr_exist1 FROM cryptotransferdb WHERE address = addr_;
+SELECT COUNT(*) INTO addr_exist2 FROM merchant_token WHERE address = addr_;
+IF addr_exist1 = 0 and addr_exist2 = 0 THEN
+    SELECT NOW() INTO time_;
+    select account_id into mer_id_ from accountinfodb where username = merchant_;
+    UPDATE accountinfodb SET balance = balance - value_ WHERE account_id = account_id_;
+    INSERT INTO merchant_token(cus_id,amount,crypto_time,address,N,pk,mer_id,mer_name,ciphertext) VALUES(account_id_,value_,time_,addr_,N_,pk_,mer_id_,merchant_,ciphertext_);
     SET result = 1;
 ELSE 
     SET result = 0;
@@ -405,12 +455,22 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `login_check`(IN username_ VARCHAR(50), IN pwd_ varchar(100), OUT account_id_ int)
-label:begin
-SELECT id into account_id_ from logindb where username = username_ and pwd = pwd_;
-if isnull(account_id_) then set account_id_ = 0;
-end if;
-end */$$
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `login_check`(IN username_ VARCHAR(50), IN pwd_ VARCHAR(100), OUT account_id_ INT, OUT type_ varchar(10), out N_ varchar(100), out pk_ varchar(100))
+label:BEGIN
+SELECT id,usertype,N,pk INTO account_id_,type_,N_,pk_ FROM logindb WHERE username = username_ AND pwd = pwd_;
+IF ISNULL(account_id_) THEN SET account_id_ = 0;
+END IF;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `merchanttran_detail` */
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `merchanttran_detail`(IN account_id_ INT)
+label:BEGIN
+SELECT amount,crypto_time,mer_name,ciphertext FROM merchant_token WHERE cus_id = account_id_;
+END */$$
 DELIMITER ;
 
 /* Procedure structure for procedure `merchant_list` */

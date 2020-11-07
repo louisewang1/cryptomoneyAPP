@@ -9,8 +9,27 @@ public class CryptoRecord implements Serializable {
     private double value;
     private String addr;
     private String time;
+    private String merchant;
+    private String ciphertext;
+
 
     public CryptoRecord() { }
+
+    public String getMerchant() {
+        return merchant;
+    }
+
+    public void setMerchant(String merchant) {
+        this.merchant = merchant;
+    }
+
+    public String getCiphertext() {
+        return ciphertext;
+    }
+
+    public void setCiphertext(String ciphertext) {
+        this.ciphertext = ciphertext;
+    }
 
     public Integer getIndex() {
         return index;

@@ -13,7 +13,7 @@ import entity.Record;
 public class UserService {
 	
 	UserDAO userDAO = new UserDAO();
-	public int login(Connection conn,String username, String password) {
+	public String login(Connection conn,String username, String password) {
 		UserInfo userInfo = new UserInfo();
 		//userInfo.setUsername("tom");
 		//userInfo.setPassword("1");		
@@ -47,6 +47,10 @@ public class UserService {
 	   return userDAO.cryptotransfer(conn,account_id,value,modulus,pk_exp);
    }
    
+   public String cryptomoney_merchant(Connection conn, Integer account_id, double value, String modulus, String pk_exp, String merchant) {
+	   return userDAO.cryptotransfer_merchant(conn,account_id,value,modulus,pk_exp,merchant);
+   }
+   
    public List<CryptoRecord> cryptotransaction(Connection conn,int account_id) {
 	   return userDAO.cryptotrandetail(conn,account_id);
    }
@@ -55,8 +59,8 @@ public class UserService {
 	   return userDAO.getcryptomoney(conn,id_enc,addr);
    }
    
-   public int merchantregister(Connection conn,String username, String password, String email,String cellphone, String sk_exp,String modulus) {
-	   return userDAO.merchantregister(conn,username,password,email,cellphone,sk_exp,modulus);
+   public int merchantregister(Connection conn,String username, String password, String email,String cellphone, String sk_exp, String pk_exp, String modulus) {
+	   return userDAO.merchantregister(conn,username,password,email,cellphone,sk_exp,pk_exp,modulus);
    }
    
    public List<String> merchantlist(Connection conn) {
@@ -86,6 +90,12 @@ public class UserService {
    public String offlinetoken(Connection conn, Integer to_id, Double amount, String addr) throws SQLException {
 	   return userDAO.useofflinetoken(conn, to_id, amount, addr);
    }
+   
+   public List<CryptoRecord> merchanttransaction(Connection conn,int account_id) {
+	   return userDAO.merchanttrandetail(conn,account_id);
+   }
+   
+
    
 }
 

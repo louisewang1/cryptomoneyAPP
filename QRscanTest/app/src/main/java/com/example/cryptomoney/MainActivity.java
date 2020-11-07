@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
     private Button qrgenerate;
     private Button crypto_tr;
     private Button crypto;
+    private Button merchant_tr;
 //    private Button execute;
 
     private Button request; //botton for merchants to request money from customers
@@ -131,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
-        DBHelper dbHelper = new DBHelper(this, "test.db", null, 1);
+        DBHelper dbHelper = new DBHelper(this, "test.db", null, 3);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         // get tokens from local db
@@ -194,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
 //        scanreturn = (EditText) findViewById(R.id.scan_result);
         request = (Button) findViewById(R.id.request);
         Setting = (Button) findViewById(R.id.setting);
+        merchant_tr = (Button) findViewById(R.id.merchanttr_detail);
 
 
 //        type = intent_from_login.getStringExtra("type");
@@ -269,6 +271,50 @@ public class MainActivity extends AppCompatActivity {
                                 }
 
                                 Intent intent = new Intent(MainActivity.this,CryptoTransactionActivity.class);
+                                Bundle bundle = new Bundle();
+                                bundle.putSerializable("recordList", (Serializable) recordList);
+                                bundle.putInt("account_id",account_id);
+                                bundle.putString("type",type);
+                                intent.putExtras(bundle);
+                                startActivity(intent);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }).start();
+            }
+        });
+
+        merchant_tr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final String merchanttransactionRequest ="request=" + URLEncoder.encode("merchanttransaction") + "&id="+ URLEncoder.encode(account_id.toString());
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final String response = PostService.Post(merchanttransactionRequest);
+                        if (response != null) {
+
+                            try {
+                                List<CryptoRecord> recordList = new ArrayList<>();
+//                                SimpleDateFormat sdf = new SimpleDateFormat(timePattern);
+                                JSONArray jsonArray = new JSONArray(response);
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    CryptoRecord record = new CryptoRecord();
+                                    record.setIndex(jsonObject.getInt("index"));
+//                                    record.setAddr(jsonObject.getString("cipher"));
+                                    record.setMerchant(jsonObject.getString("merchant"));
+                                    record.setCiphertext(jsonObject.getString( "ciphertext"));
+                                    record.setTime(jsonObject.getString( "time"));
+                                    record.setValue(jsonObject.getDouble("value"));
+                                    recordList.add(record);
+                                }
+
+                                Intent intent = new Intent(MainActivity.this,MerchanttransactionActivity.class);
                                 Bundle bundle = new Bundle();
                                 bundle.putSerializable("recordList", (Serializable) recordList);
                                 bundle.putInt("account_id",account_id);

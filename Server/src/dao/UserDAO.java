@@ -2,7 +2,9 @@ package dao;
 
 import java.math.BigInteger;
 import java.security.KeyFactory;
+import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -35,6 +37,7 @@ public class UserDAO {
     public final static int TYPE_BALANCE_FAILED = -4;
     public final static int TYPE_PK_FAILED = -5;
     public final static int MAX_DECRYPT_BLOCK = 64;
+    public final static int MAX_ENCRYPT_BLOCK = 53;
     
     private static String timePattern = "yyyy-MM-dd HH:mm:ss";
 	
@@ -60,21 +63,33 @@ public class UserDAO {
 //		
 //	}
 	
-	public int logincheck(Connection conn, UserInfo userinfo){  // 若登录成功返回用户id（>0）
+	public String logincheck(Connection conn, UserInfo userinfo){  // 若登录成功返回用户id（>0）
 //		Connection conn = DBUtil.getConn();
-		if (conn == null) return TYPE_CONN_FAILED;
+//		if (conn == null) return TYPE_CONN_FAILED;
+		if (conn == null) return null;
         CallableStatement cs = null;
+        String result = null;
         try {
-            cs =conn.prepareCall("{call login_check(?,?,?)}"); // 调用login_check(in username, in pwd, out account_id)
+            cs =conn.prepareCall("{call login_check(?,?,?,?,?,?)}"); // 调用login_check(in username, in pwd, out account_id)
             cs.setString(1,userinfo.getUsername());
             cs.setString(2,userinfo.getPassword());
-            cs.registerOutParameter(3, Types.INTEGER);
+            cs.registerOutParameter(3, Types.INTEGER);  // account_id
+            cs.registerOutParameter(4, Types.VARCHAR);  // type
+            cs.registerOutParameter(5, Types.VARCHAR);  // N
+            cs.registerOutParameter(6, Types.VARCHAR);  // pk_exp
             cs.execute();
 //            Log.d("LoginActivity","id: " + cs.getInt(3));
-            if (cs.getInt(3) == 0) return TYPE_LOGIN_FAILED;
+            if (cs.getInt(3) == 0) result = "username or password not correct";
             else {
 //            	userinfo.setId(cs.getInt(3));
-            	return cs.getInt(3);
+//            	return cs.getInt(3);
+            	if(cs.getString(4).equals("MERCHANT")) {
+            		// send merchant pk
+            		result = "id="+cs.getInt(3)+"&type=MERCHANT"+"&N="+cs.getString(5)+"&pk="+cs.getString(6);
+            	}
+            	else {
+            		result = "id="+cs.getInt(3)+"&type=CUSTOMER";
+            	}
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -85,7 +100,8 @@ public class UserDAO {
                 e.printStackTrace();
             }
         }
-        return TYPE_CONN_FAILED;
+//        return TYPE_CONN_FAILED;
+        return result;
 	}
 	
 //	public int merchant_logincheck(Connection conn, String username,String password) {
@@ -152,19 +168,20 @@ public class UserDAO {
 		CallableStatement cs = null;
         try {
 //        	Connection conn = DBUtil.getConn();
-            cs =conn.prepareCall("{call account_register(?,?,?,?,?,?,?,?)}");
+            cs =conn.prepareCall("{call account_register(?,?,?,?,?,?,?,?,?)}");
             cs.setString(1, username);
             cs.setString(2, pwd);
             cs.setString(3, "CUSTOMER");
             cs.setString(4, "");
             cs.setString(5, "");
-            cs.setString(6, email);
-            cs.setString(7,cellphone);
+            cs.setString(6, "");
+            cs.setString(7, email);
+            cs.setString(8,cellphone);
 //            cs.setNString(5, pk);
 //            cs.setNString(6, modulus);
-            cs.registerOutParameter(8,Types.INTEGER);
+            cs.registerOutParameter(9,Types.INTEGER);
             cs.execute();
-            if (cs.getInt(8) == 1) return 1;  // success
+            if (cs.getInt(9) == 1) return 1;  // success
         } catch (Exception e){
             e.printStackTrace();
         }if (cs != null) {
@@ -177,21 +194,22 @@ public class UserDAO {
         return 0;  //error
     }
 	
-	 public int merchantregister(Connection conn,String username, String pwd, String email,String cellphone, String sk_exp,String modulus) {
+	 public int merchantregister(Connection conn,String username, String pwd, String email,String cellphone, String sk_exp, String pk_exp, String modulus) {
 		 if (conn == null) return TYPE_CONN_FAILED;
 		 CallableStatement cs = null;
 		 try {
-			 cs =conn.prepareCall("{call account_register(?,?,?,?,?,?,?,?)}");
+			 cs =conn.prepareCall("{call account_register(?,?,?,?,?,?,?,?,?)}");
 	         cs.setString(1, username);
 	         cs.setString(2, pwd);
 	         cs.setString(3, "MERCHANT");
 	         cs.setString(4, sk_exp);
-	         cs.setString(5, modulus);
-	         cs.setString(6,email);
-	         cs.setString(7,cellphone);
-	         cs.registerOutParameter(8,Types.INTEGER);
+	         cs.setString(5, pk_exp);
+	         cs.setString(6, modulus);
+	         cs.setString(7,email);
+	         cs.setString(8,cellphone);
+	         cs.registerOutParameter(9,Types.INTEGER);
 	         cs.execute();
-	         if (cs.getInt(8) == 1) return 1;  // success
+	         if (cs.getInt(9) == 1) return 1;  // success
 	        } catch (Exception e){
 	            e.printStackTrace();
 	        }if (cs != null) {
@@ -298,6 +316,96 @@ public class UserDAO {
 					 cs.execute();
 					 }while (cs.getInt(6) != 1);
 				 return result = addr;
+			 }
+			 else {
+				 result = "not enough balance";
+			 }
+		 } catch (Exception e){
+	            e.printStackTrace();
+	     }if (cs != null) {
+	    	 try {
+	    		 cs.close();
+	    	 } catch (SQLException e) {
+	                e.printStackTrace();
+	         }
+	     }
+	        return result;
+	 }
+	 
+	 public String cryptotransfer_merchant(Connection conn, Integer account_id, Double value, String modulus, String pk_exp, String merchant) {
+		 if (conn == null) return null;
+		 CallableStatement cs = null;
+		 String result = null;
+		 String ciphertext;
+		 try {
+			 cs = conn.prepareCall("{call check_balance(?,?,?)}");
+			 cs.setInt(1, account_id);
+			 cs.setDouble(2, value);
+			 cs.registerOutParameter(3, Types.INTEGER);
+			 cs.execute();
+			 if (cs.getInt(3) == 1) {  // balance enough
+				 String addr;
+				 do {
+					 addr = getRandomString(20);  // token addr
+//					 System.out.println("token address= " + addr);
+					 // construct merchant_specific ciphertext
+					 cs = conn.prepareCall("{call get_merchant_sk_N(?,?,?)}");
+					 cs.setString(1, merchant);
+					 cs.registerOutParameter(2, Types.VARCHAR);  //sk_exp
+					 cs.registerOutParameter(3, Types.VARCHAR);  // N
+					 cs.execute();
+
+					 // encrypt token addr & amount with merchant long-term sk
+					 KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+					 BigInteger d = new BigInteger(Base64Utils.decode(cs.getString(2)));
+					 BigInteger N = new BigInteger(Base64Utils.decode(cs.getString(3)));
+	                 RSAPrivateKeySpec rsaPrivateKeySpec = new RSAPrivateKeySpec(N,d);
+	                 PrivateKey sk = keyFactory.generatePrivate(rsaPrivateKeySpec);
+	                
+	                 Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+                     cipher.init(Cipher.ENCRYPT_MODE,sk);
+                     String enc_str = "amount="+value+"&token="+addr;
+                     byte[]  enc_byte = cipher.doFinal(enc_str.getBytes());
+                     String enc1_base64 = Base64Utils.encode(enc_byte);
+                     System.out.println("enc1_base64= "+enc1_base64.length());
+                     // encrypt enc1_base64 with token public key
+                     BigInteger e = new BigInteger(Base64Utils.decode(pk_exp));
+                     N = new BigInteger(Base64Utils.decode(modulus));
+                     RSAPublicKeySpec rsaPublicKeySpec  = new RSAPublicKeySpec(N,e);
+                     PublicKey pk = keyFactory.generatePublic(rsaPublicKeySpec);
+                     cipher.init(Cipher.ENCRYPT_MODE,pk);
+//                     enc_byte = cipher.doFinal(enc1_base64.getBytes());
+                     // block cipher
+                     int inputLength = enc1_base64.getBytes().length;
+                     int offSet = 0;
+                     byte[] resultBytes = {};
+                     byte[] cache = {};
+                     while (inputLength - offSet > 0) {
+                         if (inputLength - offSet > MAX_ENCRYPT_BLOCK) {
+                             cache = cipher.doFinal(enc1_base64.getBytes(), offSet, MAX_ENCRYPT_BLOCK);
+                             offSet += MAX_ENCRYPT_BLOCK;
+                         } else {
+                             cache = cipher.doFinal(enc1_base64.getBytes(), offSet, inputLength - offSet);
+                             offSet = inputLength;
+                         }
+                         resultBytes = Arrays.copyOf(resultBytes, resultBytes.length + cache.length);
+                         System.arraycopy(cache, 0, resultBytes, resultBytes.length - cache.length, cache.length);
+                     }
+                     ciphertext = Base64Utils.encode(resultBytes);
+                 	 System.out.println("ciphertext length= "+ciphertext.length());
+                     // record merchant_specific token in db
+                     cs = conn.prepareCall("{call crypto_transfer_merchant(?,?,?,?,?,?,?,?)}");
+					 cs.setInt(1, account_id);
+					 cs.setDouble(2, value);
+					 cs.setString(3, modulus);
+					 cs.setString(4, pk_exp);
+					 cs.setString(5, addr);
+					 cs.setString(6, merchant);
+					 cs.setNString(7, ciphertext);
+					 cs.registerOutParameter(8, Types.INTEGER);
+					 cs.execute();
+					 }while (cs.getInt(8) != 1);   // unique token addr
+				 return result = "token="+ciphertext;  
 			 }
 			 else {
 				 result = "not enough balance";
@@ -827,6 +935,41 @@ public class UserDAO {
 	        return result; 
 		 
 	 }
+	 
+	 public List<CryptoRecord> merchanttrandetail(Connection conn, Integer account_id) {
+	        if (conn == null) return null;
+	        List<CryptoRecord> recordList = new ArrayList<>();
+	        SimpleDateFormat sdf = new SimpleDateFormat(timePattern);
+	        CallableStatement cs = null;
+	        ResultSet rs;
+	        try {
+	            cs =conn.prepareCall("{call merchanttran_detail(?)}");
+	            cs.setInt(1,account_id);
+	            cs.execute();
+	            rs = cs.getResultSet();
+	            int index = 1;
+	            while (rs.next()) {
+	            	CryptoRecord record = new CryptoRecord();
+	                record.setIndex(index);
+	                record.setMerchant(rs.getString("mer_name"));
+	                record.setCiphertext(rs.getString("ciphertext"));
+	                record.setTime(sdf.format(rs.getTimestamp("crypto_time")));
+	                record.setValue(rs.getDouble("amount"));
+	                recordList.add(record);
+	                index ++;
+	            }
+
+	        } catch (Exception e){
+	            e.printStackTrace();
+	        }if (cs != null) {
+	            try {
+	                cs.close();
+	            } catch (SQLException e) {
+	                e.printStackTrace();
+	            }
+	        }
+	        return recordList;
+	    }
 	//generate random address
 	 public static String getRandomString(int length){
 	     String str="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

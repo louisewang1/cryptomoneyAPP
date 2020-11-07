@@ -28,7 +28,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".MerchantMainActivity"></activity>
+        <activity android:name=".MerchanttransactionActivity"></activity>
+        <activity android:name=".MerchantMainActivity" />
         <activity android:name=".QRNFCRcvActivity" />
         <activity android:name=".RcvModeActivity" />
         <activity android:name=".QRNFCActivity" />

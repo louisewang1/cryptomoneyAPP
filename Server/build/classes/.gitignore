@@ -1,5 +1,7 @@
-/Bean/
-/StringUtils/
 /com/
+/Bean/
 /util/
 /servlet/
+/service/
+/dao/
+/entity/

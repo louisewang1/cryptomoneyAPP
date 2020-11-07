@@ -3,9 +3,12 @@ package com.example.cryptomoney;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -17,6 +20,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+
+import com.example.cryptomoney.utils.DBHelper;
 
 import java.net.URLEncoder;
 import java.sql.Connection;
@@ -137,27 +142,8 @@ public class LoginActivity extends AppCompatActivity {
 ////                            showResponse("Request Failed");
 ////                        }
                         if (response != null) {
-                            int id = Integer.parseInt(response);
-                            Log.d("LoginActivity","id="+id);
-                            if (id > 0) {  // 登录成功
-                                // 记住密码
-                                editor = pref.edit();
-                                if (rememberPass.isChecked()) {
-                                    editor.putBoolean("remember_password",true);
-                                    editor.putString("account",username);
-                                    editor.putString("pwd",pwd);
-//                                    editor.putString("type","CUSTOMER");
-                                } else {
-                                    editor.clear();
-                                }
-                                editor.apply();
-                                showResponse("id = " +response);
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                intent.putExtra("account_id",id);  //传递account_id
-//                                intent.putExtra("type","CUSTOMER");
-                                startActivity(intent);
-                                finish();
-                            } else {
+                            System.out.println("login response= "+ response);
+                            if (response.equals("username or password not correct"))  {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -165,6 +151,61 @@ public class LoginActivity extends AppCompatActivity {
                                     }
                                 });
                             }
+                            else {
+                                int id = Integer.parseInt(response.split("id=")[1].split("&type=")[0]);
+                                Log.d("LoginActivity","id="+id);
+                                if (id > 0) {  // 登录成功
+                                    // 记住密码
+                                    editor = pref.edit();
+                                    if (rememberPass.isChecked()) {
+                                        editor.putBoolean("remember_password",true);
+                                        editor.putString("account",username);
+                                        editor.putString("pwd",pwd);
+//                                    editor.putString("type","CUSTOMER");
+                                    } else {
+                                        editor.clear();
+                                    }
+                                    editor.apply();
+//                                showResponse("id = " +response);
+                                    if (response.indexOf("type=MERCHANT") != -1) {  //merchant account
+                                        // store merchant pk
+                                        DBHelper dbHelper = new DBHelper(LoginActivity.this, "test.db", null, 3);
+                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+                                        String[] str = {username};
+                                        Cursor cursor = db.query("PkList",null,"mer_name=?",str,null,null,null);
+                                        int cnt = 0;
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                cnt ++;
+                                            }while(cursor.moveToNext());
+                                        }
+                                        cursor.close();
+//                                        System.out.println("cnt= "+cnt);
+                                        if (cnt == 0) {  // no duplicate
+                                            ContentValues values = new ContentValues();
+                                            values.put("mer_name", username);
+                                            values.put("N", response.split("&N=")[1].split("&pk=")[0]);
+                                            values.put("pk_exp", response.split("&pk=")[1]);
+                                            db.insertWithOnConflict("PkList", null, values,SQLiteDatabase.CONFLICT_REPLACE);
+                                            values.clear();
+                                        }
+                                    }
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    intent.putExtra("account_id",id);  //传递account_id
+//                                intent.putExtra("type","CUSTOMER");
+                                    startActivity(intent);
+                                    finish();
+                                 }
+                            }
+//                            else {
+//                                runOnUiThread(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        showResponse("Username or password is incorrect");
+//                                    }
+//                                });
+//                            }
                         } else {
                             response = "failed";
                             showResponse(response);

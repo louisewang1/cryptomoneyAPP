@@ -13,7 +13,7 @@ public class DBUtil{
 //    private static Connection conn;
 	private static Connection conn = null;
 //    private static final String URL = "jdbc:mysql://82.130.102.60:3306/test";
-	private static final String URL = "jdbc:mysql://192.168.1.3:3306/test";
+	private static final String URL = "jdbc:mysql://192.168.1.16:3306/test";
     private static final String USERNAME = "user";
     private static final String PASSWORD = "user";
     static{

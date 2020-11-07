@@ -14,10 +14,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.Manifest;
 import android.app.Dialog;
 import android.bluetooth.BluetoothDevice;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -43,6 +45,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cryptomoney.utils.Base64Utils;
+import com.example.cryptomoney.utils.DBHelper;
 import com.example.cryptomoney.utils.ImgUtils;
 import com.example.cryptomoney.utils.NfcUtils;
 import com.example.cryptomoney.utils.RSAUtils;
@@ -85,8 +88,8 @@ public class CryptoActivity extends AppCompatActivity  {
     private TextView response;
 
     private Integer account_id;
-    private SharedPreferences pref;
-    private SharedPreferences.Editor editor;
+//    private SharedPreferences pref;
+//    private SharedPreferences.Editor editor;
     private String value;
     private String pk_exp;
     private String sk_exp;
@@ -127,6 +130,9 @@ public class CryptoActivity extends AppCompatActivity  {
     private Boolean showdialog = false;
     private Bitmap finalbitmap;
     private Bitmap textbitmap;
+    private DBHelper dbHelper;
+    private SQLiteDatabase db;
+    private ContentValues values;
 
     private final static int REQ_LOC = 10;
     final String AK = "c6a5a445dc25490183f42088f4b78ccf";
@@ -165,6 +171,9 @@ public class CryptoActivity extends AppCompatActivity  {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
         }
+
+        dbHelper = new DBHelper(CryptoActivity.this, "test.db", null, 3);
+        db = dbHelper.getWritableDatabase();
 
 //        GTX.init(getApplicationContext(), AK);  //初始化
 
@@ -483,23 +492,39 @@ public class CryptoActivity extends AppCompatActivity  {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
+                            dbHelper = new DBHelper(CryptoActivity.this, "test.db", null, 3);
+                            db = dbHelper.getWritableDatabase();
+                            ContentValues values = new ContentValues();;
                             final String serverresponse = PostService.Post(cryptoRequest);
+                            System.out.println("serverresponse="+serverresponse);
                             if (serverresponse != null && (serverresponse.indexOf("token=") == 0 || serverresponse.length() == ADDR_LENGTH)) {
-                                // online payment
+                                // online payment/ merchant-specific
                                 if  (serverresponse.indexOf("token=") == 0) {
-                                    addr = serverresponse.split("token=")[1].split("&enc=")[0];
-                                    enc = serverresponse.split("&enc=")[1];
+//                                    addr = serverresponse.split("token=")[1].split("&enc=")[0];
+                                    enc = serverresponse.split("token=")[1];
+                                    values.put("addr", enc);
+                                    values.put("N",modulus);
+                                    System.out.println("modulus for merchant= "+ modulus);
+                                    values.put("sk_exp",sk_exp);
+                                    db.insertWithOnConflict("TokenSk", null, values,SQLiteDatabase.CONFLICT_REPLACE);
+                                    values.clear();
                                 }
                                 // offline payment
                                 else if (serverresponse.length() == ADDR_LENGTH) {
                                     addr = serverresponse;
+                                    values.put("addr",addr);
+                                    values.put("N",modulus);
+                                    System.out.println("modulus for free money= "+ modulus);
+                                    values.put("sk_exp",sk_exp);
+                                    db.insertWithOnConflict("TokenSk", null, values,SQLiteDatabase.CONFLICT_REPLACE);
+                                    values.clear();
                                 }
 
-                                pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
-                                editor = pref.edit();
-                                editor.putString(addr + "_skexp", sk_exp);
-                                editor.putString(addr + "_modulus", modulus);
-                                editor.apply();
+//                                pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
+//                                editor = pref.edit();
+//                                editor.putString(addr + "_skexp", sk_exp);
+//                                editor.putString(addr + "_modulus", modulus);
+//                                editor.apply();
 
                                 Log.d("CryptoActivity", "response= " + serverresponse);
                                 runOnUiThread(new Runnable() {
@@ -513,7 +538,7 @@ public class CryptoActivity extends AppCompatActivity  {
                                             qrimage = QrCodeGenerator.getQrCodeImage(text,200,200);
                                         }
                                         else {
-                                            text = enc;
+                                            text = enc + "&N="+modulus+"&d="+sk_exp;
                                             qrimage = QrCodeGenerator.getQrCodeImage(text,200,200);
                                         }
 
@@ -531,9 +556,9 @@ public class CryptoActivity extends AppCompatActivity  {
 //                                        start printing mone
                                         if (printMode.equals("QR")) {
                                             if (GTX.getConnectDevice() != null) {
+                                                finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
                                                 printQR();
                                                 // merge bitmaps
-                                                finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
                                             }
                                             else {
                                                 Common.showShortToast(CryptoActivity.this, "No printer found, display QR directly");
@@ -557,6 +582,7 @@ public class CryptoActivity extends AppCompatActivity  {
                                         else if (printMode.equals("QRNFC")) {
                                             qrtext = extractodd(text);
                                             nfctext = extracteven(text);
+                                            System.out.println("nfctext length= "+nfctext.length());
                                             if (GTX.getConnectDevice() != null) {
                                                 qrimage = QrCodeGenerator.getQrCodeImage(qrtext,200,200);
                                                 finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
@@ -565,6 +591,7 @@ public class CryptoActivity extends AppCompatActivity  {
                                             }
                                             else {
                                                 Common.showShortToast(CryptoActivity.this, "No printer found, display QR directly");
+                                                qrimage = QrCodeGenerator.getQrCodeImage(qrtext,200,200);
                                                 qrimg.setVisibility(View.VISIBLE);
                                                 qrimg.setImageBitmap(qrimage);
                                                 finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);

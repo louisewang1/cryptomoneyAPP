@@ -67,14 +67,14 @@ import cn.memobird.gtx.listener.OnImageToDitherListener;
 
 import static com.example.cryptomoney.utils.BitmapUtil.StringListtoBitmap;
 
-public class CryptoTransactionActivity extends AppCompatActivity {
+public class MerchanttransactionActivity extends AppCompatActivity {
 
     private List<CryptoRecord> recordList;
     private SwipeRefreshLayout swipeRefresh;
-    private CryptoRecordAdapter adapter;
+    private MerchantRecordAdapter adapter;
     private Integer account_id;
     private RecyclerView recyclerView;
-//    private Spinner spinner = null;
+    //    private Spinner spinner = null;
 //    private ArrayAdapter<String> merchantlistAdapter = null;
 //    private String[] merchantList;
 //    private String merchant_selected;
@@ -98,13 +98,16 @@ public class CryptoTransactionActivity extends AppCompatActivity {
     private String addr;
     private String enc;
     private String value;
-//    private SharedPreferences pref;
+    private SharedPreferences pref;
     private String sk_exp;
     private String modulus;
     private static final int REQUEST_CODE_SAVE_IMG = 3 ;
+    private String merchant;
+    private String ciphertext;
     private DBHelper dbHelper;
     private SQLiteDatabase db;
     private ContentValues values;
+
 
     private final static int REQ_LOC = 10;
     final String AK = "c6a5a445dc25490183f42088f4b78ccf";
@@ -112,7 +115,7 @@ public class CryptoTransactionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_crypto_transaction);
+        setContentView(R.layout.activity_merchanttransaction);
 
         GTX.init(getApplicationContext(), AK);
 
@@ -124,9 +127,9 @@ public class CryptoTransactionActivity extends AppCompatActivity {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 //        spinner = (Spinner)findViewById(R.id.spinner);
-        mDialog = Common.showLoadingDialog(CryptoTransactionActivity.this);
+        mDialog = Common.showLoadingDialog(MerchanttransactionActivity.this);
 
-        dbHelper = new DBHelper(CryptoTransactionActivity.this, "test.db", null, 3);
+        dbHelper = new DBHelper(MerchanttransactionActivity.this, "test.db", null, 3);
         db = dbHelper.getWritableDatabase();
         values = new ContentValues();
 
@@ -137,7 +140,7 @@ public class CryptoTransactionActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new CryptoRecordAdapter(recordList);
+        adapter = new MerchantRecordAdapter(recordList);
         recyclerView.setAdapter(adapter);
         adapter.setid(account_id);
         request = (Button) findViewById(R.id.request);
@@ -148,9 +151,9 @@ public class CryptoTransactionActivity extends AppCompatActivity {
         modegroup = findViewById(R.id.modegroup);
 
         if (GTX.getConnectDevice() == null) {
-            if (ContextCompat.checkSelfPermission(CryptoTransactionActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)  // 检查运行时权限
+            if (ContextCompat.checkSelfPermission(MerchanttransactionActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)  // 检查运行时权限
                     != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(CryptoTransactionActivity.this,
+                ActivityCompat.requestPermissions(MerchanttransactionActivity.this,
                         new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQ_LOC);  // 申请定位权限,MUST BE FINE!
             }else {
                 GTX.searchBluetoothDevices(onBluetoothFindListener,mDialog);
@@ -250,22 +253,26 @@ public class CryptoTransactionActivity extends AppCompatActivity {
 //                a past record selected
                 if (adapter.getselected()) {
 //                    System.out.println("choose a past record");
-                    addr = adapter.getaddr();
+                    merchant = adapter.getMerchant();
+                    ciphertext = adapter.getCiphertext();
                     value = adapter.getvalue();
 //                    pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
 //                    sk_exp = pref.getString(addr + "_skexp", "");
 //                    modulus = pref.getString(addr + "_modulus", "");
-                    String[] str = {addr};
+
+                    String[] str = {ciphertext};
                     Cursor cursor = db.query("TokenSk",null,"addr=?",str,null,null,null);
                     if (cursor.moveToFirst()) {
                         do {
                             modulus = cursor.getString(cursor.getColumnIndex("N"));
                             sk_exp = cursor.getString(cursor.getColumnIndex("sk_exp"));
+//                            System.out.println("modulus= "+modulus);
                         }while(cursor.moveToNext());
                     }
                     cursor.close();
 
-                    text = "N=" + modulus + "&d=" + sk_exp + "&addr=" + addr;
+                    text = "token="+ciphertext+"&N=" + modulus + "&d=" + sk_exp;
+//                    System.out.println("text in merchant= "+text);
                     qrimage = QrCodeGenerator.getQrCodeImage(text, 200, 200);
 
                     // convert string to bitmap
@@ -274,7 +281,7 @@ public class CryptoTransactionActivity extends AppCompatActivity {
                     ArrayList<StringBitmapParameter> tobitmap = new ArrayList<StringBitmapParameter>();
                     tobitmap.add(valuebitpic);
                     tobitmap.add(merchantpic);
-                    Bitmap textbitmap = StringListtoBitmap(CryptoTransactionActivity.this,tobitmap);
+                    Bitmap textbitmap = StringListtoBitmap(MerchanttransactionActivity.this,tobitmap);
 
 //                        requestPermission();
 
@@ -285,17 +292,17 @@ public class CryptoTransactionActivity extends AppCompatActivity {
                             finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
                             printQR();
                         } else {
-                            Common.showShortToast(CryptoTransactionActivity.this, "No printer found, display QR directly");
+                            Common.showShortToast(MerchanttransactionActivity.this, "No printer found, display QR directly");
                             qrimg.setVisibility(View.VISIBLE);
                             qrimg.setImageBitmap(qrimage);
                             finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
 
                         }
                         // save to album
-                        if (ContextCompat.checkSelfPermission(CryptoTransactionActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)  // 检查运行时权限
-                                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(CryptoTransactionActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)  // 检查运行时权限
+                        if (ContextCompat.checkSelfPermission(MerchanttransactionActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)  // 检查运行时权限
+                                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(MerchanttransactionActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)  // 检查运行时权限
                                 != PackageManager.PERMISSION_GRANTED) {
-                            ActivityCompat.requestPermissions(CryptoTransactionActivity.this,
+                            ActivityCompat.requestPermissions(MerchanttransactionActivity.this,
                                     new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_SAVE_IMG);  // 申请定位权限,MUST BE FINE!
                         }else {
                             saveImage();
@@ -310,7 +317,7 @@ public class CryptoTransactionActivity extends AppCompatActivity {
                             finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
                             printQR();
                         } else {
-                            Common.showShortToast(CryptoTransactionActivity.this, "No printer found, display QR directly");
+                            Common.showShortToast(MerchanttransactionActivity.this, "No printer found, display QR directly");
                             qrimage = QrCodeGenerator.getQrCodeImage(qrtext, 200, 200);
                             qrimg.setVisibility(View.VISIBLE);
                             qrimg.setImageBitmap(qrimage);
@@ -319,10 +326,10 @@ public class CryptoTransactionActivity extends AppCompatActivity {
                         showdialog = true;
                         showSaveDialog();
                         // save to album
-                        if (ContextCompat.checkSelfPermission(CryptoTransactionActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)  // 检查运行时权限
-                                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(CryptoTransactionActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)  // 检查运行时权限
+                        if (ContextCompat.checkSelfPermission(MerchanttransactionActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)  // 检查运行时权限
+                                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(MerchanttransactionActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)  // 检查运行时权限
                                 != PackageManager.PERMISSION_GRANTED) {
-                            ActivityCompat.requestPermissions(CryptoTransactionActivity.this,
+                            ActivityCompat.requestPermissions(MerchanttransactionActivity.this,
                                     new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_SAVE_IMG);  // 申请定位权限,MUST BE FINE!
                         }else {
                             saveImage();
@@ -410,8 +417,8 @@ public class CryptoTransactionActivity extends AppCompatActivity {
 //                        }).start();
 
 
-                    }
                 }
+            }
         });
     }
 
@@ -450,12 +457,12 @@ public class CryptoTransactionActivity extends AppCompatActivity {
 
     public void refreshcryptotransaction() {
         adapter.setSelectedIndex(-1);
-        final String cryptotransactionRequest ="request=" + URLEncoder.encode("cryptotransaction") + "&id="+ URLEncoder.encode(account_id.toString());
+        final String merchanttransactionRequest ="request=" + URLEncoder.encode("merchanttransaction") + "&id="+ URLEncoder.encode(account_id.toString());
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                final String response = PostService.Post(cryptotransactionRequest);
+                final String response = PostService.Post(merchanttransactionRequest);
                 if (response != null) {
 
                     try {
@@ -467,7 +474,8 @@ public class CryptoTransactionActivity extends AppCompatActivity {
                             JSONObject jsonObject = jsonArray.getJSONObject(i);
                             CryptoRecord record = new CryptoRecord();
                             record.setIndex(jsonObject.getInt("index"));
-                            record.setAddr(jsonObject.getString("address"));
+                            record.setMerchant(jsonObject.getString("merchant"));
+                            record.setCiphertext(jsonObject.getString( "ciphertext"));
                             record.setTime(jsonObject.getString( "time"));
                             record.setValue(jsonObject.getDouble("value"));
                             recordList.add(record);
@@ -529,10 +537,10 @@ public class CryptoTransactionActivity extends AppCompatActivity {
         public void returnResult(String base64ImageString, Bitmap bitmap, int taskCode) {
             if (taskCode == GTXKey.RESULT.COMMON_SUCCESS && base64ImageString != null) {
 //                Log.d("QRgeneratorActivity","String in Ditherlistener: "+base64ImageString);
-                CryptoTransactionActivity.this.base64ImageString = base64ImageString;
+                MerchanttransactionActivity.this.base64ImageString = base64ImageString;
             } else {
 //                Log.d("QRgeneratorActivity","Dither failed");
-                Common.showShortToast(CryptoTransactionActivity.this, "Error " + taskCode);
+                Common.showShortToast(MerchanttransactionActivity.this, "Error " + taskCode);
             }
         }
     };
@@ -576,12 +584,12 @@ public class CryptoTransactionActivity extends AppCompatActivity {
 //                lvDevices.setVisibility(View.VISIBLE);
             } else if (taskCode == GTXKey.RESULT.FIND_DEVICE_FINISH_TASK) {     //搜索任务正常结束
                 if (devices.size() == 0) {
-                    Common.showShortToast(CryptoTransactionActivity.this, "No MEMOBIRD device available");
+                    Common.showShortToast(MerchanttransactionActivity.this, "No MEMOBIRD device available");
                 } else {
 //                    Common.showShortToast(CryptoActivity.this, "device searching finished");
                 }
             } else {                                                            //其它异常
-                Common.showShortToast(CryptoTransactionActivity.this, "Error " + taskCode);
+                Common.showShortToast(MerchanttransactionActivity.this, "Error " + taskCode);
             }
         }
 
@@ -595,16 +603,16 @@ public class CryptoTransactionActivity extends AppCompatActivity {
                 mDialog.cancel();
             if (taskCode == GTXKey.RESULT.COMMON_SUCCESS) {              //成功连接设备
 //                lvDevices.setVisibility(View.GONE);
-                Common.showShortToast(CryptoTransactionActivity.this,"connected to a printer successfully");
+                Common.showShortToast(MerchanttransactionActivity.this,"connected to a printer successfully");
                 if (GTX.getConnectDevice().getName().contains("G4")) {
                     Common.DEFAULT_IMAGE_WIDTH = Common.SIZE_576;
                 } else {
                     Common.DEFAULT_IMAGE_WIDTH = Common.SIZE_384;
                 }
             } else if (taskCode == GTXKey.RESULT.COMMON_FAIL) {
-                Common.showShortToast(CryptoTransactionActivity.this, "connection failed");
+                Common.showShortToast(MerchanttransactionActivity.this, "connection failed");
             } else {
-                Common.showShortToast(CryptoTransactionActivity.this, "Error " + taskCode);
+                Common.showShortToast(MerchanttransactionActivity.this, "Error " + taskCode);
             }
         }
     };
@@ -617,7 +625,7 @@ public class CryptoTransactionActivity extends AppCompatActivity {
 //                Common.showShortToast(CryptoActivity.this, "successfully printed");
             } else {
                 Log.d("QRgeneratorActivity","taskCode="+taskCode);
-                Common.showShortToast(CryptoTransactionActivity.this, "Error " + taskCode);
+                Common.showShortToast(MerchanttransactionActivity.this, "Error " + taskCode);
             }
         }
     };
@@ -716,11 +724,11 @@ public class CryptoTransactionActivity extends AppCompatActivity {
     //保存图片
     private void saveImage() {
         Bitmap bitmap = finalbitmap;
-        boolean isSaveSuccess = ImgUtils.saveImageToGallery(CryptoTransactionActivity.this, bitmap);
+        boolean isSaveSuccess = ImgUtils.saveImageToGallery(MerchanttransactionActivity.this, bitmap);
         if (isSaveSuccess) {
-            Toast.makeText(CryptoTransactionActivity.this, "save to system album successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MerchanttransactionActivity.this, "save to system album successfully", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(CryptoTransactionActivity.this, "save to system album failed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MerchanttransactionActivity.this, "save to system album failed", Toast.LENGTH_SHORT).show();
         }
     }
 }
