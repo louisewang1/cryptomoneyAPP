@@ -132,7 +132,7 @@ public class CryptoActivity extends AppCompatActivity  {
     private Bitmap textbitmap;
     private DBHelper dbHelper;
     private SQLiteDatabase db;
-    private ContentValues values;
+//    private ContentValues values;
 
     private final static int REQ_LOC = 10;
     final String AK = "c6a5a445dc25490183f42088f4b78ccf";
@@ -169,7 +169,7 @@ public class CryptoActivity extends AppCompatActivity  {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)  {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(true);
         }
 
         dbHelper = new DBHelper(CryptoActivity.this, "test.db", null, 3);
@@ -538,7 +538,7 @@ public class CryptoActivity extends AppCompatActivity  {
                                             qrimage = QrCodeGenerator.getQrCodeImage(text,200,200);
                                         }
                                         else {
-                                            text = enc + "&N="+modulus+"&d="+sk_exp;
+                                            text = "token="+enc + "&N="+modulus+"&d="+sk_exp;
                                             qrimage = QrCodeGenerator.getQrCodeImage(text,200,200);
                                         }
 

@@ -30,9 +30,9 @@ CREATE TABLE `accountinfodb` (
 /*Data for the table `accountinfodb` */
 
 insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
-(1,'KFC',100,'',''),
-(2,'HM',100,'',''),
-(3,'ZARA',100,'','');
+(1,'COOP',100,'',''),
+(2,'User',41,'',''),
+(3,'KFC',139,'','');
 
 /*Table structure for table `contract` */
 
@@ -95,9 +95,9 @@ CREATE TABLE `logindb` (
 /*Data for the table `logindb` */
 
 insert  into `logindb`(`id`,`username`,`pwd`,`usertype`,`sk`,`N`,`pk`) values 
-(1,'KFC','kfc','MERCHANT','SPks+cV2NxXvAsxkNbzH9bR5bfRhtgarL+A7wValyP1IFpg7bh0BhldO1ffsACY328DsfO++xEeOWeVabt3J+Q==','AJu0RUToEiyXgkCWv+YjK3xy6VdwClrmuyKPIws2qPDwAhiWa47kEe9pGxqlTa9BSuBDFwLV+vHUjEd8cH3mP8M=','AQAB'),
-(2,'HM','hm','MERCHANT','UgeGo9EeWkFgRyEkC15Cmtkg3Ehik7+kQaOKmuNEmEFj2kug5CblNRpZ1mMNkD1w6vybkHr0oyeTM6xIQWG/wQ==','AOVtm/Ye9sWzM5KWoMgAJxSq6T9K5BOaLUnD05Ur9R0AtzP12dyY1p0IpYN903jfjXKXy8BfIT8g8vWwepDSGiM=','AQAB'),
-(3,'ZARA','zara','MERCHANT','FHFmb5UyjyANTDUxBEq5NgBrXobs7QXB9HlZTP+OfOXLaOk7SxfCcwsalvqoUG6NtFbttZwn/oFppRom7lQUgQ==','AOeiS9ERcdnf+XYE1ZN2gaAdzayJ49krgbEvs8yyQbO3NI0KMVBoX7c0XE8RkJuuwvgRbVridMyd6OQGLIMBtXM=','AQAB');
+(1,'COOP','coop','MERCHANT','KOFY00g4bVLQmZBC5yyJ8Gp4ApMl1d/pHhEwDcSkGezYOjgQ9cwmam0A5U7lNRC036MsVLXl1u1dwTy/8R8vcQ==','ANJtk4QpvGRHDlLbftKMIG5vUeVclH1Cp2iupnak6dqMCRjpk2mPIOG/3i2k4t75XeMXwyRuyZVuC4us4XDh+pE=','AQAB'),
+(2,'User','user','CUSTOMER','','',''),
+(3,'KFC','kfc','MERCHANT','MWCwtXx+BBbuyT69H1TjypaHPAokYeUQG/cFVMxJLNxT5P+OL6QpO/hoP7fB/cNc1DS9qH3bvAvDkl0RkCcu9Q==','AKB6tqllPQiU0zNfJ9nwk6oon2IwoNL2fcW3ush6j0sXpjwrQHdONNvda8K74KAFkHNq+wd4Lw+kftZwTeRMi5k=','AQAB');
 
 /*Table structure for table `merchant_token` */
 
@@ -110,7 +110,7 @@ CREATE TABLE `merchant_token` (
   `pk` varchar(10) NOT NULL,
   `mer_id` int(11) NOT NULL,
   `mer_name` varchar(20) NOT NULL,
-  `ciphertext` varchar(200) NOT NULL,
+  `ciphertext` varchar(300) NOT NULL,
   KEY `fk_merchant_token_cus_id` (`cus_id`),
   KEY `fk_merchant_token_mer_id` (`mer_id`),
   CONSTRAINT `fk_merchant_token_cus_id` FOREIGN KEY (`cus_id`) REFERENCES `logindb` (`id`),
@@ -118,6 +118,12 @@ CREATE TABLE `merchant_token` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Data for the table `merchant_token` */
+
+insert  into `merchant_token`(`cus_id`,`amount`,`crypto_time`,`address`,`N`,`pk`,`mer_id`,`mer_name`,`ciphertext`) values 
+(2,11,'2020-11-08 18:26:15','IWdbNMnk28NDhPHIUFY0','AM/b7Gt760Bl/ohCF6MzGw2lDAdD4714bvLDEkOt5lkOsisyr2/gNqKAlXrDklV88Rz569DqSAFdN/DNFM7+Ab8=','AQAB',1,'COOP','Yhi0ZXkKt/9aTy05PTWtlaQ+LjxSXvQJPg5bIlhvPUKcfgdadgc9xIZNVSwEqVGgZ7HRPNInJ6CY5ciVtBTOx8JJb94N2Z2yi1ZKc8yBd+vbGcrEuXyHDNQSkwp5uEQoVyq0b2rS9wwOg0s2qhb2gNPHQeHJIkNMY0v+5UwHwdQ='),
+(2,3,'2020-11-08 18:26:21','ORqorJG6FyrqyOT2OeU9','AI08JMVdp9yl90z60pvN0m2igD0sKS0pVbWzRq50kRRnOB55K/TydIL4E41PdR4Vy3xnnKyeVhZfywC9u9Y61HE=','AQAB',3,'KFC','PWEcSe0zivJWKtZbADQgNEa3GwnH0jAYME5EGDqGnlEMtJqGo9hZJ8Wt3no6a/C/HfPAFZ5fZx5RNJHuVNApxg+oqAe4JSGI8DNNCphki9DG3MqPkC5yWBiEDeabHzvLrpK305R+ApMLSXrfWqrOrORcvTDJGbKIXZX+2q2Ffpg='),
+(2,5,'2020-11-08 18:26:24','7lsAeI0S8zGYsaUyuJlP','AJLFYywTxrNy/yRfKfmAZr6GEg2820Uh4/xmYL2kg+O+W+nGUAOrf+hu4bmZiB9sLa3YPxYDnZQTDX+c0HRalac=','AQAB',3,'KFC','JEQeYl2ecFYNSfxENfxL9pKPleHYPrUTZngD+oRvtCUUHWIjy+a4kDlHhEalTGo+yu54fwM8kGkcTsqC09ZUDy5HR6yTbeALuXDH4qz0PPmb59KTfNEJbN64pZs/9jFPAzcseYQa5W7cc6LvPTpRkHbSMlpWqI8g4TGkn7VIEIc='),
+(2,1,'2020-11-08 18:27:33','fxTxklisxfIGxzhT9V6I','AL7bE+G6YwUkOcA6BznVVMESBewheJzzwh0CtXM2sE7wtT5i3v1oRgRoy+VzKaIihgHmi73c6HlxO+yskWp5+e0=','AQAB',1,'COOP','dCjlOyiObjEoUlSVOJDRu2jIkdyCMf7AaRhYigTWdjj7fr8Gr0BLcy4zFpYu4FhOdPKaJ+kOiQhe2FVGAsIf0TNvWotnZ5YWXQPhCS2ALD3OU/mfpAKnBH50BiEBnRgTMSFEvQNxmDgmvDMM+H5kSv2/i69lN3wFfqsSNuhQf2g=');
 
 /*Table structure for table `transactiondb` */
 
@@ -161,12 +167,12 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `addr_to_id`(IN addr_ varchar(50), OUT result int)
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `addr_to_id`(IN addr_ VARCHAR(50), OUT result INT)
 label:BEGIN
-Declare account_id_ int default 0;
-select account_id into account_id_ from cryptotransferdb where address = addr_;
-set result = account_id_;
-end */$$
+DECLARE account_id_ INT DEFAULT 0;
+SELECT cus_id INTO account_id_ FROM merchant_token WHERE address = addr_;
+SET result = account_id_;
+END */$$
 DELIMITER ;
 
 /* Procedure structure for procedure `add_new_token` */
@@ -294,7 +300,7 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `crypto_transfer_merchant`(IN account_id_ INT, IN value_ DOUBLE, IN N_ VARCHAR(100),IN pk_ VARCHAR(10), IN addr_ VARCHAR(100), in merchant_ varchar(20), in ciphertext_ varchar(200), OUT result INT)
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `crypto_transfer_merchant`(IN account_id_ INT, IN value_ DOUBLE, IN N_ VARCHAR(100),IN pk_ VARCHAR(10), IN addr_ VARCHAR(100), in merchant_ varchar(20), in ciphertext_ varchar(300), OUT result INT)
 label:BEGIN
 DECLARE time_ DATETIME;
 DECLARE addr_exist1 INT DEFAULT 1;
@@ -329,12 +335,18 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `exe_crypto`(In to_id_ int, In addr_ VARCHAR(50), OUT amount_ double)
-label:begin
-select amount into amount_ from cryptotransferdb where address = addr_;
-update accountinfodb set balance = balance + amount_ where account_id = to_id_;
-delete from cryptotransferdb where address = addr_;
-end */$$
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `exe_crypto`(IN to_id_ INT, IN addr_ VARCHAR(50), OUT amount_ DOUBLE)
+label:BEGIN
+declare mer_id_ int;
+SELECT amount INTO amount_ FROM merchant_token WHERE address = addr_;
+select mer_id into mer_id_ from merchant_token where address = addr_;
+if mer_id_ = to_id_ then
+    UPDATE accountinfodb SET balance = balance + amount_ WHERE account_id = to_id_;
+    DELETE FROM merchant_token WHERE address = addr_;
+else 
+    set amount_ = -1;
+end if;
+END */$$
 DELIMITER ;
 
 /* Procedure structure for procedure `exe_transaction` */
@@ -430,10 +442,10 @@ DELIMITER ;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `get_pk_N`(IN addr_ varchar(100), OUT pk_ VARCHAR(10), OUT N_ VARCHAR(1000))
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `get_pk_N`(IN addr_ VARCHAR(50), OUT pk_ VARCHAR(10), OUT N_ VARCHAR(100))
 label:BEGIN
-SELECT pk INTO pk_ FROM cryptotransferdb WHERE address = addr_;
-SELECT N INTO N_ FROM cryptotransferdb WHERE address = addr_;
+SELECT pk INTO pk_ FROM merchant_token WHERE address = addr_;
+SELECT N INTO N_ FROM merchant_token WHERE address = addr_;
 END */$$
 DELIMITER ;
 

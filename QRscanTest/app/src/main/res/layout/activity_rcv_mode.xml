@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:layout_gravity="center_vertical">
 
     <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
@@ -13,69 +14,62 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Please choose a receive mode first:"
-        android:textSize="20sp" />
-
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Offline verification merchant:"
+            android:textSize="18sp" >
+        </TextView>
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:scrollbarSize="@dimen/cardview_default_elevation"/>
+    </LinearLayout>
+
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="center" >
+        android:layout_gravity="center"
+        android:text="Verify"
+        android:id="@+id/verify"
+        android:layout_margin="20dp" >
+    </Button>
 
-        <Button
-            android:id="@+id/QR"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="QR"
-            android:textSize="25sp"
-            android:layout_margin="20dp"/>
-
-        <Button
-            android:id="@+id/QRNFC"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="QR AND NFC"
-            android:layout_margin="20dp"
-            android:textSize="25sp" />
-
-        <Button
-            android:id="@+id/NFC"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="NFC"
-            android:layout_margin="20dp"
-            android:textSize="25sp" />
-
-        <Button
-            android:id="@+id/finish"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Finish"
-            android:layout_margin="20dp"
-            android:textSize="25sp" />
-
-    </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Response:"
-            android:textSize="20sp" />
+            android:text="Response: "
+            android:textSize="20sp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="10dp" ></TextView>
 
         <TextView
-            android:layout_width="fill_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/vrf_response"
+            android:maxLines="10"
             android:textSize="20sp"
-            android:id="@+id/response"/>
+            android:layout_gravity="bottom"/>
     </LinearLayout>
+
 </LinearLayout>
+
+
+
+
+

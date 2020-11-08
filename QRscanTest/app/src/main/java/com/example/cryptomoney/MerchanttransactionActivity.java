@@ -124,7 +124,7 @@ public class MerchanttransactionActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)  {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(true);
         }
 //        spinner = (Spinner)findViewById(R.id.spinner);
         mDialog = Common.showLoadingDialog(MerchanttransactionActivity.this);
@@ -277,7 +277,7 @@ public class MerchanttransactionActivity extends AppCompatActivity {
 
                     // convert string to bitmap
                     StringBitmapParameter valuebitpic = new StringBitmapParameter(value);
-                    StringBitmapParameter merchantpic = new StringBitmapParameter("None");
+                    StringBitmapParameter merchantpic = new StringBitmapParameter(merchant);
                     ArrayList<StringBitmapParameter> tobitmap = new ArrayList<StringBitmapParameter>();
                     tobitmap.add(valuebitpic);
                     tobitmap.add(merchantpic);

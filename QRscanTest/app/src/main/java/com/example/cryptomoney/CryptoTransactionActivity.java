@@ -121,7 +121,7 @@ public class CryptoTransactionActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)  {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(true);
         }
 //        spinner = (Spinner)findViewById(R.id.spinner);
         mDialog = Common.showLoadingDialog(CryptoTransactionActivity.this);

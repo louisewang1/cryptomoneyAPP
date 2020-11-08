@@ -7,10 +7,12 @@ import android.widget.Toast;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    public static final String CREATE_BOOK = "create table Tokens("  // offline received, not sent to server
+    public static final String CREATE_BOOK = "create table Tokens("  // offline received, not sent to server yet
             + "id integer primary key autoincrement, "
             + "addr text, "
-            + "amount real)";
+            + "amount real,"
+            + "N text,"
+            + "sk_exp text)";
 
     public static final String CREATE_TOKENS_ALL = "create table TokensAll("   //all token addrs seen so far
             + "id integer primary key autoincrement, "

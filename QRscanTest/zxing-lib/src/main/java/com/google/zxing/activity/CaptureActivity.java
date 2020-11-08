@@ -60,12 +60,13 @@ public class CaptureActivity extends AppCompatActivity implements Callback, Back
 
     private static final int REQUEST_CODE_SCAN_GALLERY = 100;
     private static final int RESULT_CHANGED = 2 ;
-
+    private static final int RESULT_PASSED = 3 ;
     private CaptureActivityHandler handler;
     private ViewfinderView viewfinderView;
     private ImageButton back;
     private ImageButton btnFlash;
     private Button btnAlbum; // 相册
+    private Button btnnext;
     private boolean isFlashOn = false;
     private boolean hasSurface;
     private Vector<BarcodeFormat> decodeFormats;
@@ -83,6 +84,7 @@ public class CaptureActivity extends AppCompatActivity implements Callback, Back
     private String contract_addr;
     private String contract_sk_exp;
     private String contract_modulus;
+    private String fromActivity;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -119,16 +121,17 @@ public class CaptureActivity extends AppCompatActivity implements Callback, Back
 
         btnAlbum = (Button) findViewById(R.id.btn_album);
         btnAlbum.setOnClickListener(albumOnClick);
-
+        btnnext = (Button) findViewById(R.id.btn_next);
+        btnnext.setOnClickListener(nextOnClick);
         hasSurface = false;
         inactivityTimer = new InactivityTimer(this);
 
         Intent intent_from_requst = getIntent();
+        fromActivity = intent_from_requst.getStringExtra("from");
         contract_addr = intent_from_requst.getStringExtra("contract_addr");
         contract_sk_exp = intent_from_requst.getStringExtra("contract_sk_exp");
         contract_modulus = intent_from_requst.getStringExtra("contract_modulus");
-        System.out.println("conract addr in captureactivity= "+contract_addr);
-
+//        System.out.println("conract addr in captureactivity= "+contract_addr);
     }
 
     private View.OnClickListener albumOnClick = new View.OnClickListener() {
@@ -138,6 +141,15 @@ public class CaptureActivity extends AppCompatActivity implements Callback, Back
             Intent innerIntent = new Intent(Intent.ACTION_GET_CONTENT); //"android.intent.action.GET_CONTENT"
             innerIntent.setType("image/*");
             startActivityForResult(innerIntent, REQUEST_CODE_SCAN_GALLERY);
+        }
+    };
+
+    private  View.OnClickListener nextOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Intent resultIntent = new Intent();
+            CaptureActivity.this.setResult(RESULT_PASSED, resultIntent);
+            finish();
         }
     };
 
@@ -415,7 +427,8 @@ public class CaptureActivity extends AppCompatActivity implements Callback, Back
     @Override
     public void onBackPressed() {
 //        super.onBackPressed();
-        showBackDialog();
+        if(fromActivity.equals("request")) showBackDialog();
+        else super.onBackPressed();
     }
 
     private void showBackDialog() {

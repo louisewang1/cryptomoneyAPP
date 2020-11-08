@@ -23,23 +23,23 @@
         android:textSize="15sp"
         android:layout_margin="10dp"/>
 
-    <Button
-        android:id="@+id/transfer"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="P2P transfer"
-        android:textSize="15sp"
-        android:layout_margin="10dp"/>
+<!--    <Button-->
+<!--        android:id="@+id/transfer"-->
+<!--        android:layout_width="250dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="center_horizontal"-->
+<!--        android:text="P2P transfer"-->
+<!--        android:textSize="15sp"-->
+<!--        android:layout_margin="10dp"/>-->
 
-    <Button
-        android:id="@+id/tr_detail"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="p2p transaction history"
-        android:textSize="15sp"
-        android:layout_margin="10dp"></Button>
+<!--    <Button-->
+<!--        android:id="@+id/tr_detail"-->
+<!--        android:layout_width="250dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="center_horizontal"-->
+<!--        android:text="p2p transaction history"-->
+<!--        android:textSize="15sp"-->
+<!--        android:layout_margin="10dp"></Button>-->
 
     <Button
         android:id="@+id/crypto"
@@ -73,7 +73,7 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Receive money"
+        android:text="Receive Merchant money"
         android:textSize="15sp"
         android:layout_margin="10dp"></Button>
 
@@ -93,6 +93,15 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="Setting"
+        android:textSize="15sp"
+        android:layout_margin="10dp"></Button>
+
+    <Button
+        android:id="@+id/logout"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="logout"
         android:textSize="15sp"
         android:layout_margin="10dp"></Button>
 

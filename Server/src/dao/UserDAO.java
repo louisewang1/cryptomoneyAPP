@@ -37,7 +37,7 @@ public class UserDAO {
     public final static int TYPE_BALANCE_FAILED = -4;
     public final static int TYPE_PK_FAILED = -5;
     public final static int MAX_DECRYPT_BLOCK = 64;
-    public final static int MAX_ENCRYPT_BLOCK = 53;
+    public final static int MAX_ENCRYPT_BLOCK = 52;
     
     private static String timePattern = "yyyy-MM-dd HH:mm:ss";
 	
@@ -524,7 +524,7 @@ public class UserDAO {
 					 cs.registerOutParameter(3, Types.DOUBLE);
 					 cs.execute();
 					 Double amount = cs.getDouble(3);
-					 result = amount.toString() + "received";
+					 result = amount.toString() + " received";
 				 }
 				 else {
 					 result = "decryption failed";

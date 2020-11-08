@@ -28,31 +28,31 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".MerchanttransactionActivity"></activity>
-        <activity android:name=".MerchantMainActivity" />
+        <activity android:name=".MerchanttransactionActivity" android:label="Available Merchant Money"> </activity>
+<!--        <activity android:name=".MerchantMainActivity" />-->
         <activity android:name=".QRNFCRcvActivity" />
-        <activity android:name=".RcvModeActivity" />
+        <activity android:name=".ReceiveActivity" android:label="Receive Merchant Money"> </activity>
         <activity android:name=".QRNFCActivity" />
         <activity android:name=".CryptoModeActivity" />
-        <activity android:name=".CryptoTransactionActivity" />
-        <activity android:name=".CryptoActivity" />
+        <activity android:name=".CryptoTransactionActivity" android:label="Available Free Money"> </activity>
+        <activity android:name=".CryptoActivity" android:label="Print Money"> </activity>
         <activity android:name=".RSATestActivity" />
         <activity android:name=".QRgeneratorActivity" />
-        <activity android:name=".RegisterActivity" />
+        <activity android:name=".RegisterActivity" android:label="Register"> </activity>
         <activity android:name=".TransactionActivity" />
         <activity android:name=".TransferActivity" />
-        <activity android:name=".RequestActivity" />
-        <activity android:name=".RequestMoney" />
-        <activity android:name=".AccountActivity" />
-        <activity android:name=".SettingActivity" />
-        <activity android:name=".LoginActivity">
+        <activity android:name=".RequestActivity" android:label="Receive Free Money"> </activity>
+<!--        <activity android:name=".RequestMoney" />-->
+        <activity android:name=".AccountActivity" android:label="Account Info"> </activity>
+        <activity android:name=".SettingActivity" android:label="Settings"> </activity>
+        <activity android:name=".LoginActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name=".MainActivity" android:label="Menu"> </activity>
         <activity android:name=".NFCRWActivity" />
 
         <service

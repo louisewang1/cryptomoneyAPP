@@ -4,9 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
+import android.Manifest;
+import android.app.DownloadManager;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.nfc.FormatException;
 import android.os.Bundle;
 import android.util.Log;
@@ -48,6 +53,7 @@ import static java.lang.Math.min;
 public class RequestActivity extends AppCompatActivity{
 
     private static final int RESULT_CHANGED = 2;
+    private static final int RESULT_PASSSED = 3;
     private Button request;
     private Integer account_id;
     private Connection conn = null;
@@ -85,7 +91,7 @@ public class RequestActivity extends AppCompatActivity{
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(true);
         }
 
         request = (Button) findViewById(R.id.request);
@@ -145,7 +151,13 @@ public class RequestActivity extends AppCompatActivity{
                                         System.out.println("contract addr= "+contract_addr);
 //                                        Common.showShortToast(RequestActivity.this,"new constract established, start receiving first token");
 //                                        showSaveDialog();
-                                        openCamera();
+                                        if (ContextCompat.checkSelfPermission(RequestActivity.this, Manifest.permission.CAMERA)
+                                                != PackageManager.PERMISSION_GRANTED) {
+                                            ActivityCompat.requestPermissions(RequestActivity.this,
+                                                    new String[] {Manifest.permission.CAMERA}, Constant.REQ_PERM_CAMERA);
+                                        }else {
+                                            openCamera();
+                                        }
                                     }
                                 });
                             }
@@ -170,6 +182,19 @@ public class RequestActivity extends AppCompatActivity{
 //            showSaveDialog();
 //        }
 //    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == Constant.REQ_PERM_CAMERA && grantResults.length > 0 &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            openCamera();
+        }
+        else {
+            Toast.makeText(this,"Permission denied",Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
@@ -182,6 +207,12 @@ public class RequestActivity extends AppCompatActivity{
         if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_CHANGED) {
             value = Double.parseDouble(data.getStringExtra("new_amount"));
             openCamera();
+        }
+
+        if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_PASSSED) {
+            qrstring = "";
+            showDialog = true;
+            showSaveDialog();
         }
 
         if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_OK) {
@@ -293,6 +324,7 @@ public class RequestActivity extends AppCompatActivity{
     private void openCamera() {
         try {
             Intent intent = new Intent(RequestActivity.this, CaptureActivity.class);
+            intent.putExtra("from","request");
             intent.putExtra("contract_addr",contract_addr);
             intent.putExtra("contract_sk_exp",contract_sk_exp);
             intent.putExtra("contract_modulus",contract_modulus);

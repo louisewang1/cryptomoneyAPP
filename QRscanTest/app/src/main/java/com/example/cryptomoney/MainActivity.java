@@ -100,6 +100,9 @@ public class MainActivity extends AppCompatActivity {
     private Button crypto_tr;
     private Button crypto;
     private Button merchant_tr;
+    private String addr;
+    private SQLiteDatabase db;
+    private Button logout;
 //    private Button execute;
 
     private Button request; //botton for merchants to request money from customers
@@ -129,65 +132,101 @@ public class MainActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)  {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(true);
+
         }
 
         DBHelper dbHelper = new DBHelper(this, "test.db", null, 3);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
+        db = dbHelper.getWritableDatabase();
         // get tokens from local db
         Cursor cursor = db.query("Tokens",null,null,null,null,null,null);
         if(cursor.moveToFirst()){
             do{
-                String addr = cursor.getString(cursor.getColumnIndex("addr"));
+                addr = cursor.getString(cursor.getColumnIndex("addr"));
                 Double amount = cursor.getDouble(cursor.getColumnIndex("amount"));
+                String token_sk_exp = cursor.getString(cursor.getColumnIndex("sk_exp"));
+                String token_modulus = cursor.getString(cursor.getColumnIndex("N"));
                 Log.d("MainActivity", "get offline tokens: " + addr + "  " + amount + "  " + account_id);
+                try {
+                    Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+                    KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+                    BigInteger token_N = new BigInteger(Base64Utils.decode(token_modulus));
+                    BigInteger token_d = new BigInteger(Base64Utils.decode(token_sk_exp));
+                    RSAPrivateKeySpec rsaPrivateKeySpec = new RSAPrivateKeySpec(token_N, token_d);
+                    PrivateKey token_sk = keyFactory.generatePrivate(rsaPrivateKeySpec);
 
-                // send to server
-                final String transferRequest = "request=" + URLEncoder.encode("useofflinetoken") + "&to_id=" + URLEncoder.encode(account_id.toString())
-                        + "&amount=" + URLEncoder.encode(amount.toString()) + "&addr=" + URLEncoder.encode(addr);
+                    cipher.init(Cipher.ENCRYPT_MODE, token_sk);
+                    String rcver_id = "ACCOUNT=" + account_id.toString();
+                    byte[] enc_bytes = cipher.doFinal(rcver_id.getBytes());
+                    String enc_id = Base64Utils.encode(enc_bytes);
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final String response = PostService.Post(transferRequest);
-                        if (response != null) {
-                            switch (response) {
-                                case "connection failed":
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Common.showShortToast(MainActivity.this, "Connection Error");
-                                            finish();
-                                        }
-                                    });
-                                    break;
-                                default:
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Common.showShortToast(MainActivity.this, "Offline token added successful." + response);
-                                        }
-                                    });
-                                    break;
+                    // send addr, enc_id to server
+                    final String cryptomoneyinRequest ="request=" + URLEncoder.encode("getencrypto") +
+                            "&id_enc="+ URLEncoder.encode(enc_id)+"&addr="+ URLEncoder.encode(addr);
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            final String response = PostService.Post(cryptomoneyinRequest);
+                            if (response != null && response.indexOf("received") != -1 && !response.equals("-1.0 received")) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // not delete token until it has been successfully received by the right account
+                                        Common.showShortToast(MainActivity.this,response);
+                                        db.delete("Tokens","addr=?",new String[] {addr});
+                                    }
+                                });
                             }
                         }
+                    }).start();
 
-                    }
-                }).start();
-
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }while(cursor.moveToNext());
-            db.execSQL("Delete from Tokens");
+//            db.execSQL("Delete from Tokens");
         }
-
         cursor.close();
-
+                //
+//                // send to server
+//                final String transferRequest = "request=" + URLEncoder.encode("useofflinetoken") + "&to_id=" + URLEncoder.encode(account_id.toString())
+//                        + "&amount=" + URLEncoder.encode(amount.toString()) + "&addr=" + URLEncoder.encode(addr);
+//
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        final String response = PostService.Post(transferRequest);
+//                        if (response != null) {
+//                            switch (response) {
+//                                case "connection failed":
+//                                    runOnUiThread(new Runnable() {
+//                                        @Override
+//                                        public void run() {
+//                                            Common.showShortToast(MainActivity.this, "Connection Error");
+//                                            finish();
+//                                        }
+//                                    });
+//                                    break;
+//                                default:
+//                                    runOnUiThread(new Runnable() {
+//                                        @Override
+//                                        public void run() {
+//                                            Common.showShortToast(MainActivity.this, "Offline token added successful." + response);
+//                                        }
+//                                    });
+//                                    break;
+//                            }
+//                        }
+//
+//                    }
+//                }).start();
 
         qrscan = (Button) findViewById(R.id.qrscan);
 //        NFC_read = (Button) findViewById(R.id.nfctag);
         account = (Button)  findViewById(R.id.account_info);
-        transfer = (Button) findViewById(R.id.transfer);
-        transaction = (Button) findViewById(R.id.tr_detail);
+//        transfer = (Button) findViewById(R.id.transfer);
+//        transaction = (Button) findViewById(R.id.tr_detail);
 //        qrgenerate = (Button) findViewById(R.id.qrgenerate);
         crypto = (Button) findViewById(R.id.crypto);
         crypto_tr = (Button) findViewById(R.id.cryptotr_detail);
@@ -196,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
         request = (Button) findViewById(R.id.request);
         Setting = (Button) findViewById(R.id.setting);
         merchant_tr = (Button) findViewById(R.id.merchanttr_detail);
-
+        logout = (Button) findViewById(R.id.logout);
 
 //        type = intent_from_login.getStringExtra("type");
 
@@ -338,15 +377,23 @@ public class MainActivity extends AppCompatActivity {
 //                startActivity(new Intent(MainActivity.this, QRgeneratorActivity.class));
 //            }
 //        });
+        logout.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         qrscan.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
 
-                Intent intent_to_mode = new Intent(MainActivity.this,RcvModeActivity.class);
+                Intent intent_to_mode = new Intent(MainActivity.this,ReceiveActivity.class);
                 intent_to_mode.putExtra("account_id",account_id);
-                intent_to_mode.putExtra("type",type);
                 startActivity(intent_to_mode);
 
             }
@@ -399,58 +446,58 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        transfer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,TransferActivity.class); // 启动TransferActivity,传入account_id
-                intent.putExtra("account_id",account_id);
-                startActivity(intent);
-            }
-        });
+//        transfer.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent(MainActivity.this,TransferActivity.class); // 启动TransferActivity,传入account_id
+//                intent.putExtra("account_id",account_id);
+//                startActivity(intent);
+//            }
+//        });
 
-        transaction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                final String transactionRequest ="request=" + URLEncoder.encode("transaction") + "&id="+ URLEncoder.encode(account_id.toString());
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final String response = PostService.Post(transactionRequest);
-                        if (response != null) {
-
-                            try {
-                                List<Record> recordList = new ArrayList<>();
-                                SimpleDateFormat sdf = new SimpleDateFormat(timePattern);
-                                JSONArray jsonArray = new JSONArray(response);
-                                for (int i = 0; i < jsonArray.length(); i++) {
-                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    Record record = new Record();
-                                    record.setIndex(jsonObject.getInt("index"));
-                                    record.setFrom(jsonObject.getInt("from_account"));
-                                    record.setTo(jsonObject.getInt("to_account"));
-                                    record.setTime(jsonObject.getString( "time"));
-                                    record.setValue(jsonObject.getDouble("value"));
-                                    recordList.add(record);
-                                }
-
-                                Intent intent = new Intent(MainActivity.this,TransactionActivity.class);
-                                Bundle bundle = new Bundle();
-                                bundle.putSerializable("recordList", (Serializable) recordList);
-                                bundle.putInt("account_id",account_id);
-                                intent.putExtras(bundle);
-                                startActivity(intent);
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }).start();
-
-            }
-        });
+//        transaction.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                final String transactionRequest ="request=" + URLEncoder.encode("transaction") + "&id="+ URLEncoder.encode(account_id.toString());
+//
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        final String response = PostService.Post(transactionRequest);
+//                        if (response != null) {
+//
+//                            try {
+//                                List<Record> recordList = new ArrayList<>();
+//                                SimpleDateFormat sdf = new SimpleDateFormat(timePattern);
+//                                JSONArray jsonArray = new JSONArray(response);
+//                                for (int i = 0; i < jsonArray.length(); i++) {
+//                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                                    Record record = new Record();
+//                                    record.setIndex(jsonObject.getInt("index"));
+//                                    record.setFrom(jsonObject.getInt("from_account"));
+//                                    record.setTo(jsonObject.getInt("to_account"));
+//                                    record.setTime(jsonObject.getString( "time"));
+//                                    record.setValue(jsonObject.getDouble("value"));
+//                                    recordList.add(record);
+//                                }
+//
+//                                Intent intent = new Intent(MainActivity.this,TransactionActivity.class);
+//                                Bundle bundle = new Bundle();
+//                                bundle.putSerializable("recordList", (Serializable) recordList);
+//                                bundle.putInt("account_id",account_id);
+//                                intent.putExtras(bundle);
+//                                startActivity(intent);
+//
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                    }
+//                }).start();
+//
+//            }
+//        });
 
         request.setOnClickListener(new View.OnClickListener() {
             @Override

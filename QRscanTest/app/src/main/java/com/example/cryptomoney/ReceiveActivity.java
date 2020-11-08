@@ -18,6 +18,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -58,17 +59,9 @@ import static com.example.cryptomoney.RegisterActivity.MERCHANT_MODE;
 import static java.lang.Math.min;
 
 
-public class LoginActivity extends AppCompatActivity {
+public class ReceiveActivity extends AppCompatActivity {
 
-    private static final int RESULT_PASSSED = 3 ;
-    // 定义控件和全局变量初始化
-    private EditText accountEdit;  // input username
-    private EditText passwordEdit;  // input pwd
-    private Button login;  // click login button
-    private Connection conn = null; // connection to mysql
-    private Button register;
-    private TextView showResponse;
-    private CheckBox rememberPass;
+    private static final int RESULT_PASSSED = 3;
     private Spinner spinner = null;
     private ArrayAdapter<String> spinneradapter = null;
     private String[] merchantList;
@@ -87,25 +80,19 @@ public class LoginActivity extends AppCompatActivity {
     private String merchant_pk_exp;
     public final static int MAX_DECRYPT_BLOCK = 64;
     public TextView verify_resp;
-//    private RadioGroup group;
-//    private RadioButton customer, merchant;
-//    private int loginMode;
+    private Integer account_id;
+    private String addr;
+    private String response;
+    private Boolean notified = false;
 
-    public final static int TYPE_CONN_FAILED = -1;  // identify different error
-    public final static int TYPE_LOGIN_FAILED = 0;
-    public final static int REG_CODE = 2;
-    final String AK = "c6a5a445dc25490183f42088f4b78ccf";
-
-    // 本地存储记住密码
-    private SharedPreferences pref;
-    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_rcv_mode);
 
-        GTX.init(getApplicationContext(), AK);  //初始化
+        Intent intent_from_login = getIntent();
+        account_id = intent_from_login.getIntExtra("account_id",0);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -115,50 +102,40 @@ public class LoginActivity extends AppCompatActivity {
             actionBar.setDisplayShowTitleEnabled(true);
         }
 
-        // 绑定控件
-        accountEdit = (EditText) findViewById(R.id.account);
-        passwordEdit = (EditText) findViewById(R.id.password);
-        login = (Button) findViewById(R.id.login);
-        register = (Button) findViewById(R.id.register);
         verify = (Button) findViewById(R.id.verify);
         verify_resp = (TextView) findViewById(R.id.vrf_response);
-//        group = (RadioGroup) findViewById(R.id.group);
-//        customer = (RadioButton) findViewById(R.id.customer);
-//        merchant = (RadioButton) findViewById(R.id.merchant);
+
 
         nfcUtils = new NfcUtils(this);
+        spinner = (Spinner) findViewById(R.id.spinner);
 
-        showResponse = (TextView) findViewById(R.id.tv_show_response);
-        spinner = (Spinner)findViewById(R.id.spinner);
-
-        dbHelper = new DBHelper(LoginActivity.this, "test.db", null, 3);
+        dbHelper = new DBHelper(ReceiveActivity.this, "test.db", null, 3);
         db = dbHelper.getWritableDatabase();
-        Cursor cursor = db.query("PkList",null,null,null,null,null,null);
+        Cursor cursor = db.query("PkList", null, null, null, null, null, null);
         int cnt = 0;
         if (cursor.moveToFirst()) {
             do {
-               cnt ++; // count size
-            }while(cursor.moveToNext());
+                cnt++; // count size
+            } while (cursor.moveToNext());
         }
         cursor.close();
         merchantList = new String[cnt];
-        cursor = db.query("PkList",null,null,null,null,null,null);
+        cursor = db.query("PkList", null, null, null, null, null, null);
         int i = 0;
         if (cursor.moveToFirst()) {
             do {
                 merchantList[i] = cursor.getString(cursor.getColumnIndex("mer_name"));
-                i ++; // count size
-            }while(cursor.moveToNext());
+                i++; // count size
+            } while (cursor.moveToNext());
         }
-        spinneradapter = new ArrayAdapter<String>(LoginActivity.this,android.R.layout.simple_spinner_item,merchantList);
+        spinneradapter = new ArrayAdapter<String>(ReceiveActivity.this, android.R.layout.simple_spinner_item, merchantList);
         spinneradapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinneradapter);
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                merchant_selected = (String) ((TextView)view).getText();
-                System.out.println("selected merchant= "+merchant_selected);
+                merchant_selected = (String) ((TextView) view).getText();
             }
 
             @Override
@@ -170,129 +147,14 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!merchant_selected.equals("None")) {
-                    if (ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.CAMERA)
+                    if (ContextCompat.checkSelfPermission(ReceiveActivity.this, Manifest.permission.CAMERA)
                             != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(LoginActivity.this,
-                                new String[] {Manifest.permission.CAMERA}, Constant.REQ_PERM_CAMERA);
-                    }else {
+                        ActivityCompat.requestPermissions(ReceiveActivity.this,
+                                new String[]{Manifest.permission.CAMERA}, Constant.REQ_PERM_CAMERA);
+                    } else {
                         openCamera();
                     }
                 }
-
-            }
-        });
-
-        // 记住密码
-//        pref = PreferenceManager.getDefaultSharedPreferences(this);
-        pref = getSharedPreferences("cryptomoneyAPP", Context.MODE_PRIVATE);
-        rememberPass = (CheckBox) findViewById(R.id.remember_pass);
-        boolean isRemember = pref.getBoolean("remember_password",false);
-        if (isRemember) {
-            // 自动填充
-            String account = pref.getString("account","");
-            String password = pref.getString("pwd","");
-//            String type = pref.getString("type","");
-//            if (type.equals("CUSTOMER")) customer.setChecked(true);
-//            else if (type.equals("MERCHANT")) {
-//                merchant.setChecked(true);
-//            }
-            accountEdit.setText(account);
-            passwordEdit.setText(password);
-            rememberPass.setChecked(true);
-        }
-
-        register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent_to_register = new Intent(LoginActivity.this,RegisterActivity.class);
-                startActivityForResult(intent_to_register,REG_CODE);
-            }
-        });
-
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // 获取输入字符串
-                        final String username = accountEdit.getText().toString();
-                        final String pwd = passwordEdit.getText().toString();
-                        final String loginRequest = "request="+ URLEncoder.encode("login")+ "&username="+ URLEncoder.encode(username)+"&password=" +URLEncoder.encode(pwd);
-
-//                        final String  response = PostService.loginByPost(username,pwd);
-                        String response = PostService.Post(loginRequest);
-                        if (response != null) {
-                            System.out.println("login response= "+ response);
-                            if (response.equals("username or password not correct"))  {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        showResponse("Username or password is incorrect");
-                                    }
-                                });
-                            }
-                            else {
-                                int id = Integer.parseInt(response.split("id=")[1].split("&type=")[0]);
-                                Log.d("LoginActivity","id="+id);
-                                if (id > 0) {  // 登录成功
-                                    // 记住密码
-                                    editor = pref.edit();
-                                    if (rememberPass.isChecked()) {
-                                        editor.putBoolean("remember_password",true);
-                                        editor.putString("account",username);
-                                        editor.putString("pwd",pwd);
-//                                    editor.putString("type","CUSTOMER");
-                                    } else {
-                                        editor.clear();
-                                    }
-                                    editor.apply();
-//                                showResponse("id = " +response);
-                                    if (response.indexOf("type=MERCHANT") != -1) {  //merchant account
-                                        // store merchant pk
-                                        DBHelper dbHelper = new DBHelper(LoginActivity.this, "test.db", null, 3);
-                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-                                        String[] str = {username};
-                                        Cursor cursor = db.query("PkList",null,"mer_name=?",str,null,null,null);
-                                        int cnt = 0;
-                                        if (cursor.moveToFirst()) {
-                                            do {
-                                                cnt ++;
-                                            }while(cursor.moveToNext());
-                                        }
-                                        cursor.close();
-//                                        System.out.println("cnt= "+cnt);
-                                        if (cnt == 0) {  // no duplicate
-                                            ContentValues values = new ContentValues();
-                                            values.put("mer_name", username);
-                                            values.put("N", response.split("&N=")[1].split("&pk=")[0]);
-                                            values.put("pk_exp", response.split("&pk=")[1]);
-                                            db.insertWithOnConflict("PkList", null, values,SQLiteDatabase.CONFLICT_REPLACE);
-                                            values.clear();
-                                        }
-                                    }
-                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                    intent.putExtra("account_id",id);  //传递account_id
-//                                intent.putExtra("type","CUSTOMER");
-                                    startActivity(intent);
-                                    finish();
-                                 }
-                            }
-//                            else {
-//                                runOnUiThread(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        showResponse("Username or password is incorrect");
-//                                    }
-//                                });
-//                            }
-                        } else {
-                            response = "failed";
-                            showResponse(response);
-                        }
-                    }
-                }).start();
             }
         });
     }
@@ -310,7 +172,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void openCamera() {
         try {
-            Intent intent = new Intent(LoginActivity.this, CaptureActivity.class);
+            Intent intent = new Intent(ReceiveActivity.this, CaptureActivity.class);
             intent.putExtra("from","login");
             startActivityForResult(intent, Constant.REQ_QR_CODE);
         } catch (SecurityException e) {
@@ -318,23 +180,14 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void showResponse(final  String response) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                showResponse.setText(response);
-            }
-        });
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REG_CODE && resultCode == RESULT_OK) {  // 注册结果回调
-            accountEdit.setText(data.getStringExtra("username"));
-            passwordEdit.setText(data.getStringExtra("pwd"));
+        if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_PASSSED) {
+            qrstring = "";
+            showDialog = true;
+            showSaveDialog();
         }
-
         if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_OK) {
             Bundle bundle = data.getExtras();
             qrstring = bundle.getString(Constant.INTENT_EXTRA_KEY_QR_SCAN);
@@ -354,15 +207,9 @@ public class LoginActivity extends AppCompatActivity {
             }
 //
             else {
-                Common.showShortToast(LoginActivity.this, "Invalid message,scan again");
+                Common.showShortToast(ReceiveActivity.this, "Invalid message,scan again");
                 openCamera();
             }
-        }
-
-        if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_PASSSED) {
-            qrstring = "";
-            showDialog = true;
-            showSaveDialog();
         }
     }
 
@@ -455,7 +302,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (dec.indexOf("amount=") == 0 && dec.indexOf("&token") != -1) {
                     // check if the token is expired
                     double amount = Double.parseDouble(dec.split("amount=")[1].split("&token=")[0]);
-                    String addr = dec.split("&token=")[1];
+                    addr = dec.split("&token=")[1];
                     String[] str1 = {addr};
                     cursor = db.query("TokensAll", null, "addr=?", str1, null, null, null);
                     int cnt1 = 0;
@@ -475,6 +322,52 @@ public class LoginActivity extends AppCompatActivity {
                         values.put("sk_exp",token_d_base64);
                         db.insertWithOnConflict("Tokens", null, values,SQLiteDatabase.CONFLICT_REPLACE);
                         verify_resp.setText("amount= "+amount);
+
+                        cursor = db.query("Tokens",null,null,null,null,null,null);
+                        if(cursor.moveToFirst()){
+                            do{
+                                addr = cursor.getString(cursor.getColumnIndex("addr"));
+                                cipher.init(Cipher.ENCRYPT_MODE, token_sk);
+                                String rcver_id = "ACCOUNT=" + account_id.toString();
+                                byte[] enc_bytes = cipher.doFinal(rcver_id.getBytes());
+                                String enc_id = Base64Utils.encode(enc_bytes);
+
+                                // send addr, enc_id to server
+                                final String cryptomoneyinRequest ="request=" + URLEncoder.encode("getencrypto") +
+                                        "&id_enc="+ URLEncoder.encode(enc_id)+"&addr="+ URLEncoder.encode(addr);
+
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        response = PostService.Post(cryptomoneyinRequest);
+                                        if (response != null && response.indexOf("received") != -1 && !response.equals("-1.0 received")) {
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    // not delete token until it has been successfully received by the right account
+                                                    Common.showShortToast(ReceiveActivity.this,response);
+                                                    db.delete("Tokens","addr=?",new String[] {addr});
+                                                }
+                                            });
+                                        }
+                                        else {
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    if (notified == false) {
+                                                        Common.showShortToast(ReceiveActivity.this,"Not correct account to receive this money");
+                                                        notified = true;
+                                                    }
+
+                                                }
+                                            });
+
+                                        }
+                                    }
+                                }).start();
+                            }while(cursor.moveToNext());
+                        }
+                        cursor.close();
                     }
                     else {
                         verify_resp.setText("expired token");
@@ -483,6 +376,7 @@ public class LoginActivity extends AppCompatActivity {
                 else {
                     verify_resp.setText("invalid token");
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
                 verify_resp.setText("invalid token");
@@ -504,7 +398,6 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        System.out.println("into resume");
         super.onResume();
         nfcUtils.enableForegroundDispatch();
     }
@@ -521,6 +414,16 @@ public class LoginActivity extends AppCompatActivity {
                 NFCDialog.getDialog().isShowing()) {
             NFCDialog.dismiss();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+            default:
+        }
+        return true;
     }
 
 }
