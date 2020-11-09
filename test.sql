@@ -15,6 +15,30 @@ CREATE DATABASE /*!32312 IF NOT EXISTS*/`test` /*!40100 DEFAULT CHARACTER SET la
 
 USE `test`;
 
+
+/*Table structure for table `logindb` */
+
+CREATE TABLE `logindb` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `pwd` varchar(100) NOT NULL,
+  `usertype` varchar(10) NOT NULL,
+  `sk` varchar(100) DEFAULT NULL,
+  `N` varchar(100) DEFAULT NULL,
+  `pk` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+
+/*Data for the table `logindb` */
+
+insert  into `logindb`(`id`,`username`,`pwd`,`usertype`,`sk`,`N`,`pk`) values 
+
+(1,'COOP','coop','MERCHANT','KOFY00g4bVLQmZBC5yyJ8Gp4ApMl1d/pHhEwDcSkGezYOjgQ9cwmam0A5U7lNRC036MsVLXl1u1dwTy/8R8vcQ==','ANJtk4QpvGRHDlLbftKMIG5vUeVclH1Cp2iupnak6dqMCRjpk2mPIOG/3i2k4t75XeMXwyRuyZVuC4us4XDh+pE=','AQAB'),
+
+(2,'User','user','CUSTOMER','','',''),
+
+(3,'KFC','kfc','MERCHANT','MWCwtXx+BBbuyT69H1TjypaHPAokYeUQG/cFVMxJLNxT5P+OL6QpO/hoP7fB/cNc1DS9qH3bvAvDkl0RkCcu9Q==','AKB6tqllPQiU0zNfJ9nwk6oon2IwoNL2fcW3ush6j0sXpjwrQHdONNvda8K74KAFkHNq+wd4Lw+kftZwTeRMi5k=','AQAB');
+
 /*Table structure for table `accountinfodb` */
 
 CREATE TABLE `accountinfodb` (
@@ -79,25 +103,8 @@ CREATE TABLE `cryptotransferdb` (
 
 /*Data for the table `cryptotransferdb` */
 
-/*Table structure for table `logindb` */
 
-CREATE TABLE `logindb` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(50) NOT NULL,
-  `pwd` varchar(100) NOT NULL,
-  `usertype` varchar(10) NOT NULL,
-  `sk` varchar(100) DEFAULT NULL,
-  `N` varchar(100) DEFAULT NULL,
-  `pk` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 
-/*Data for the table `logindb` */
-
-insert  into `logindb`(`id`,`username`,`pwd`,`usertype`,`sk`,`N`,`pk`) values 
-(1,'COOP','coop','MERCHANT','KOFY00g4bVLQmZBC5yyJ8Gp4ApMl1d/pHhEwDcSkGezYOjgQ9cwmam0A5U7lNRC036MsVLXl1u1dwTy/8R8vcQ==','ANJtk4QpvGRHDlLbftKMIG5vUeVclH1Cp2iupnak6dqMCRjpk2mPIOG/3i2k4t75XeMXwyRuyZVuC4us4XDh+pE=','AQAB'),
-(2,'User','user','CUSTOMER','','',''),
-(3,'KFC','kfc','MERCHANT','MWCwtXx+BBbuyT69H1TjypaHPAokYeUQG/cFVMxJLNxT5P+OL6QpO/hoP7fB/cNc1DS9qH3bvAvDkl0RkCcu9Q==','AKB6tqllPQiU0zNfJ9nwk6oon2IwoNL2fcW3ush6j0sXpjwrQHdONNvda8K74KAFkHNq+wd4Lw+kftZwTeRMi5k=','AQAB');
 
 /*Table structure for table `merchant_token` */
 
