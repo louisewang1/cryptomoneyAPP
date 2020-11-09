@@ -91,8 +91,8 @@ public class PostService {
 
     public static String Post(String data){
         try {
-//            String path = "http://82.130.102.60:8080/WebServer/UserServlet"; //ur server ip
-            String path = "http://192.168.1.16:8080/WebServer/UserServlet";
+            String path = "http://82.130.102.183:8080/WebServer/UserServlet"; //ur server ip
+            //String path = "http://192.168.1.16:8080/WebServer/UserServlet";
             URL url = new URL(path);
             HttpURLConnection conn =  (HttpURLConnection) url.openConnection();
             conn.setConnectTimeout(8000);
