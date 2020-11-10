@@ -14,8 +14,8 @@ public class DBUtil{
 	private static Connection conn = null;
     private static final String URL = "jdbc:mysql://127.0.0.1:3306/test";
 //	private static final String URL = "jdbc:mysql://192.168.1.16:3306/test";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "Root1234!";
+    private static final String USERNAME = "user1";
+    private static final String PASSWORD = "User1234!";
     static{
         try{
             Class.forName("com.mysql.jdbc.Driver");

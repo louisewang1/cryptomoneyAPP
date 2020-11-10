@@ -3,8 +3,8 @@ import java.sql.*;
 public class DBBean {
     private String driverStr = "com.mysql.jdbc.Driver";
     private String connStr = "jdbc:mysql://127.0.0.1:3306/test";
-    private String dbusername = "root";
-    private String dbpassword = "Root1234!";
+    private String dbusername = "user1";
+    private String dbpassword = "User1234!";
     private Connection conn = null;
     private Statement stmt = null;
 
@@ -18,7 +18,7 @@ public class DBBean {
         } 
         catch (Exception ex) {
             System.out.println(ex.getMessage());
-            System.out.println("数据连接失败！");
+            System.out.println("connection fail");
         } 
 
     }
