@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Insert title here</title>
+<title>QRcode Page</title>
 </head>
 <body style="text-align:center">
 
@@ -64,6 +64,7 @@ f.mkdir();
 %>
 
 <input type="button" value="Generate Again" onClick="window.location.href='QRcodeInput.jsp'">
+<input type="button" value="Print QRcode" onClick=window.print()>
 <input type="button" value="Back" onClick="location.href='success.jsp'">
 
 </body>
