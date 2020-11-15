@@ -19,7 +19,7 @@ public class SettingActivity extends AppCompatActivity {
     private Button large;
     private Button medium;
 
-    private Button logout;
+//    private Button logout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +38,7 @@ public class SettingActivity extends AppCompatActivity {
         medium = (Button) findViewById(R.id.Medium);
         large = (Button) findViewById(R.id.Large);
 
-        logout = (Button) findViewById(R.id.logout);
+//        logout = (Button) findViewById(R.id.logout);
 
         small.setOnClickListener(new View.OnClickListener() {
 
@@ -71,16 +71,16 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
 
-        logout.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-
-                Intent intent = new Intent(SettingActivity.this,LoginActivity.class); // 启动TransferActivity,传入account_id
-                startActivity(intent);
-
-            }
-        });
+//        logout.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View view) {
+//
+//                Intent intent = new Intent(SettingActivity.this,LoginActivity.class); // 启动TransferActivity,传入account_id
+//                startActivity(intent);
+//
+//            }
+//        });
     }
 
     private void initFontScale(double ratio) {

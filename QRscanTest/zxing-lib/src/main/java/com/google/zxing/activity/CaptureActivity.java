@@ -101,7 +101,7 @@ public class CaptureActivity extends AppCompatActivity implements Callback, Back
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)  {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(true);
         }
 
         CameraManager.init(getApplication());

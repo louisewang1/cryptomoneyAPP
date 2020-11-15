@@ -2,8 +2,7 @@
 SQLyog Ultimate v12.14 (64 bit)
 MySQL - 5.1.30-community : Database - test
 *********************************************************************
-*/
-
+*/
 /*!40101 SET NAMES utf8 */;
 
 /*!40101 SET SQL_MODE=''*/;
@@ -15,136 +14,113 @@ CREATE DATABASE /*!32312 IF NOT EXISTS*/`test` /*!40100 DEFAULT CHARACTER SET la
 
 USE `test`;
 
-
 /*Table structure for table `logindb` */
 
 CREATE TABLE `logindb` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(50) NOT NULL,
-  `pwd` varchar(100) NOT NULL,
-  `usertype` varchar(10) NOT NULL,
-  `sk` varchar(100) DEFAULT NULL,
-  `N` varchar(100) DEFAULT NULL,
-  `pk` varchar(100) DEFAULT NULL,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(50) NOT NULL,
+  `pwd` VARCHAR(100) NOT NULL,
+  `usertype` VARCHAR(10) NOT NULL,
+  `sk` VARCHAR(100) DEFAULT NULL,
+  `N` VARCHAR(100) DEFAULT NULL,
+  `pk` VARCHAR(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=INNODB DEFAULT CHARSET=latin1;
 
 /*Data for the table `logindb` */
-
-insert  into `logindb`(`id`,`username`,`pwd`,`usertype`,`sk`,`N`,`pk`) values 
-
-(1,'COOP','coop','MERCHANT','KOFY00g4bVLQmZBC5yyJ8Gp4ApMl1d/pHhEwDcSkGezYOjgQ9cwmam0A5U7lNRC036MsVLXl1u1dwTy/8R8vcQ==','ANJtk4QpvGRHDlLbftKMIG5vUeVclH1Cp2iupnak6dqMCRjpk2mPIOG/3i2k4t75XeMXwyRuyZVuC4us4XDh+pE=','AQAB'),
-
-(2,'User','user','CUSTOMER','','',''),
-
-(3,'KFC','kfc','MERCHANT','MWCwtXx+BBbuyT69H1TjypaHPAokYeUQG/cFVMxJLNxT5P+OL6QpO/hoP7fB/cNc1DS9qH3bvAvDkl0RkCcu9Q==','AKB6tqllPQiU0zNfJ9nwk6oon2IwoNL2fcW3ush6j0sXpjwrQHdONNvda8K74KAFkHNq+wd4Lw+kftZwTeRMi5k=','AQAB');
 
 /*Table structure for table `accountinfodb` */
 
 CREATE TABLE `accountinfodb` (
-  `account_id` int(11) NOT NULL,
-  `username` varchar(50) NOT NULL,
-  `balance` double NOT NULL DEFAULT '100',
-  `email` varchar(100) DEFAULT NULL,
-  `cellphone` varchar(100) DEFAULT NULL,
+  `account_id` INT(11) NOT NULL,
+  `username` VARCHAR(50) NOT NULL,
+  `balance` DOUBLE NOT NULL DEFAULT '100',
+  `email` VARCHAR(100) DEFAULT NULL,
+  `cellphone` VARCHAR(100) DEFAULT NULL,
   PRIMARY KEY (`account_id`),
   CONSTRAINT `fk_accountinfo_id` FOREIGN KEY (`account_id`) REFERENCES `logindb` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=INNODB DEFAULT CHARSET=latin1;
 
 /*Data for the table `accountinfodb` */
-
-insert  into `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) values 
-(1,'COOP',100,'',''),
-(2,'User',41,'',''),
-(3,'KFC',139,'','');
 
 /*Table structure for table `contract` */
 
 CREATE TABLE `contract` (
-  `contract_addr` varchar(20) NOT NULL,
-  `contract_N` varchar(100) NOT NULL,
-  `contract_pk` varchar(100) NOT NULL,
-  `rcver_id` int(11) NOT NULL,
-  `contract_value` double NOT NULL,
-  `current_value` double NOT NULL,
+  `contract_addr` VARCHAR(20) NOT NULL,
+  `contract_N` VARCHAR(100) NOT NULL,
+  `contract_pk` VARCHAR(100) NOT NULL,
+  `rcver_id` INT(11) NOT NULL,
+  `contract_value` DOUBLE NOT NULL,
+  `current_value` DOUBLE NOT NULL,
   PRIMARY KEY (`contract_addr`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=INNODB DEFAULT CHARSET=latin1;
 
 /*Data for the table `contract` */
 
 /*Table structure for table `contractrecord` */
 
 CREATE TABLE `contractrecord` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `contract_addr` varchar(20) DEFAULT NULL,
-  `sender_id` int(11) NOT NULL,
-  `amount` double NOT NULL,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `contract_addr` VARCHAR(20) DEFAULT NULL,
+  `sender_id` INT(11) NOT NULL,
+  `amount` DOUBLE NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_contractrecord` (`contract_addr`),
   CONSTRAINT `fk_contractrecord` FOREIGN KEY (`contract_addr`) REFERENCES `contract` (`contract_addr`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=INNODB DEFAULT CHARSET=latin1;
 
 /*Data for the table `contractrecord` */
 
 /*Table structure for table `cryptotransferdb` */
 
 CREATE TABLE `cryptotransferdb` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `account_id` int(11) NOT NULL,
-  `amount` double NOT NULL DEFAULT '0',
-  `crypto_time` datetime NOT NULL,
-  `address` varchar(100) NOT NULL,
-  `N` varchar(100) NOT NULL,
-  `pk` varchar(10) NOT NULL,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `account_id` INT(11) NOT NULL,
+  `amount` DOUBLE NOT NULL DEFAULT '0',
+  `crypto_time` DATETIME NOT NULL,
+  `address` VARCHAR(100) NOT NULL,
+  `N` VARCHAR(100) NOT NULL,
+  `pk` VARCHAR(10) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_cryptotransferdb_id` (`account_id`),
   CONSTRAINT `fk_cryptotransferdb_id` FOREIGN KEY (`account_id`) REFERENCES `logindb` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=INNODB DEFAULT CHARSET=latin1;
 
 /*Data for the table `cryptotransferdb` */
-
-
-
 
 /*Table structure for table `merchant_token` */
 
 CREATE TABLE `merchant_token` (
-  `cus_id` int(11) NOT NULL,
-  `amount` double NOT NULL DEFAULT '0',
-  `crypto_time` datetime NOT NULL,
-  `address` varchar(20) NOT NULL,
-  `N` varchar(100) NOT NULL,
-  `pk` varchar(10) NOT NULL,
-  `mer_id` int(11) NOT NULL,
-  `mer_name` varchar(20) NOT NULL,
-  `ciphertext` varchar(300) NOT NULL,
+  `cus_id` INT(11) NOT NULL,
+  `amount` DOUBLE NOT NULL DEFAULT '0',
+  `crypto_time` DATETIME NOT NULL,
+  `address` VARCHAR(20) NOT NULL,
+  `N` VARCHAR(100) NOT NULL,
+  `pk` VARCHAR(10) NOT NULL,
+  `mer_id` INT(11) NOT NULL,
+  `mer_name` VARCHAR(20) NOT NULL,
+  `ciphertext` VARCHAR(300) NOT NULL,
   KEY `fk_merchant_token_cus_id` (`cus_id`),
   KEY `fk_merchant_token_mer_id` (`mer_id`),
   CONSTRAINT `fk_merchant_token_cus_id` FOREIGN KEY (`cus_id`) REFERENCES `logindb` (`id`),
   CONSTRAINT `fk_merchant_token_mer_id` FOREIGN KEY (`mer_id`) REFERENCES `logindb` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=INNODB DEFAULT CHARSET=latin1;
 
 /*Data for the table `merchant_token` */
-
-insert  into `merchant_token`(`cus_id`,`amount`,`crypto_time`,`address`,`N`,`pk`,`mer_id`,`mer_name`,`ciphertext`) values 
-(2,11,'2020-11-08 18:26:15','IWdbNMnk28NDhPHIUFY0','AM/b7Gt760Bl/ohCF6MzGw2lDAdD4714bvLDEkOt5lkOsisyr2/gNqKAlXrDklV88Rz569DqSAFdN/DNFM7+Ab8=','AQAB',1,'COOP','Yhi0ZXkKt/9aTy05PTWtlaQ+LjxSXvQJPg5bIlhvPUKcfgdadgc9xIZNVSwEqVGgZ7HRPNInJ6CY5ciVtBTOx8JJb94N2Z2yi1ZKc8yBd+vbGcrEuXyHDNQSkwp5uEQoVyq0b2rS9wwOg0s2qhb2gNPHQeHJIkNMY0v+5UwHwdQ='),
-(2,3,'2020-11-08 18:26:21','ORqorJG6FyrqyOT2OeU9','AI08JMVdp9yl90z60pvN0m2igD0sKS0pVbWzRq50kRRnOB55K/TydIL4E41PdR4Vy3xnnKyeVhZfywC9u9Y61HE=','AQAB',3,'KFC','PWEcSe0zivJWKtZbADQgNEa3GwnH0jAYME5EGDqGnlEMtJqGo9hZJ8Wt3no6a/C/HfPAFZ5fZx5RNJHuVNApxg+oqAe4JSGI8DNNCphki9DG3MqPkC5yWBiEDeabHzvLrpK305R+ApMLSXrfWqrOrORcvTDJGbKIXZX+2q2Ffpg='),
-(2,5,'2020-11-08 18:26:24','7lsAeI0S8zGYsaUyuJlP','AJLFYywTxrNy/yRfKfmAZr6GEg2820Uh4/xmYL2kg+O+W+nGUAOrf+hu4bmZiB9sLa3YPxYDnZQTDX+c0HRalac=','AQAB',3,'KFC','JEQeYl2ecFYNSfxENfxL9pKPleHYPrUTZngD+oRvtCUUHWIjy+a4kDlHhEalTGo+yu54fwM8kGkcTsqC09ZUDy5HR6yTbeALuXDH4qz0PPmb59KTfNEJbN64pZs/9jFPAzcseYQa5W7cc6LvPTpRkHbSMlpWqI8g4TGkn7VIEIc='),
-(2,1,'2020-11-08 18:27:33','fxTxklisxfIGxzhT9V6I','AL7bE+G6YwUkOcA6BznVVMESBewheJzzwh0CtXM2sE7wtT5i3v1oRgRoy+VzKaIihgHmi73c6HlxO+yskWp5+e0=','AQAB',1,'COOP','dCjlOyiObjEoUlSVOJDRu2jIkdyCMf7AaRhYigTWdjj7fr8Gr0BLcy4zFpYu4FhOdPKaJ+kOiQhe2FVGAsIf0TNvWotnZ5YWXQPhCS2ALD3OU/mfpAKnBH50BiEBnRgTMSFEvQNxmDgmvDMM+H5kSv2/i69lN3wFfqsSNuhQf2g=');
 
 /*Table structure for table `transactiondb` */
 
 CREATE TABLE `transactiondb` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `account_id` int(11) NOT NULL,
-  `tr_from_account` int(11) NOT NULL,
-  `tr_to_account` int(11) NOT NULL,
-  `tr_time` datetime NOT NULL,
-  `tr_value` double NOT NULL DEFAULT '0',
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `account_id` INT(11) NOT NULL,
+  `tr_from_account` INT(11) NOT NULL,
+  `tr_to_account` INT(11) NOT NULL,
+  `tr_time` DATETIME NOT NULL,
+  `tr_value` DOUBLE NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `fk_transactiondb_id` (`account_id`),
   CONSTRAINT `fk_transactiondb_id` FOREIGN KEY (`account_id`) REFERENCES `logindb` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=INNODB DEFAULT CHARSET=latin1;
 
 /*Data for the table `transactiondb` */
 
@@ -161,10 +137,10 @@ IF account_id_ = 0 THEN
     SELECT LAST_INSERT_ID() INTO account_id_;
     INSERT INTO accountinfodb(account_id,username) SELECT id,username FROM logindb WHERE id = account_id_;
     UPDATE accountinfodb SET email = email_, cellphone = cellphone_ WHERE account_id = account_id_ ;
-    SET result = 1; # 注册成功
+    SET result = 1; # 娉ㄥ唽鎴愬姛
     LEAVE label;
 ELSE 
-    SET result = 0; # 用户名已存在 
+    SET result = 0; # 鐢ㄦ埛鍚嶅凡瀛樺湪 
     LEAVE label;
 END IF;
 END */$$
@@ -209,7 +185,7 @@ label:begin
 DECLARE balance_ DOUBLE DEFAULT 0.0;
 SELECT balance INTO balance_ FROM accountinfodb WHERE account_id = account_id_;
 IF balance_ < value_ THEN 
-    SET result = 0; # 余额不足
+    SET result = 0; # 浣欓涓嶈冻
 else 
     set result = 1;
 END IF;   
@@ -367,24 +343,24 @@ DECLARE balance_ DOUBLE DEFAULT 0.0;
 DECLARE tr_time_ DATETIME;
 select COUNT(*) into id_exist from accountinfodb where account_id = to_account_id;
 if id_exist = 0 then 
-    set result = -1; # 账户不存在
+    set result = -1; # 璐︽埛涓嶅瓨鍦?
     Leave label;
 end if;
 if from_account_id = to_account_id then 
-    set result = -2; # 转给自己
+    set result = -2; # 杞粰鑷繁
     leave label;
 end if;
 select now() into tr_time_;
 select balance into balance_ from accountinfodb where account_id = from_account_id;
 if balance_ < tr_value then 
-    set result = 0; # 余额不足
+    set result = 0; # 浣欓涓嶈冻
     leave label;
 END IF;   
 update accountinfodb set balance = balance - tr_value where account_id = from_account_id;
 UPDATE accountinfodb SET balance = balance + tr_value WHERE account_id = to_account_id;
 insert into transactiondb(account_id,tr_from_account,tr_to_account,tr_time,tr_value) values(from_account_id,from_account_id,to_account_id,tr_time_,tr_value);
 INSERT INTO transactiondb(account_id,tr_from_account,tr_to_account,tr_time,tr_value) vALUES(to_account_id,from_account_id,to_account_id,tr_time_,tr_value);
-set result = 1; # 转账成功
+set result = 1; # 杞处鎴愬姛
 end */$$
 DELIMITER ;
 
@@ -417,6 +393,18 @@ ELSE
     DELETE FROM contractrecord WHERE contract_addr = contract_addr_;
     SET result = 1;
 end if;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `freemoney_addr_to_id` */
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `freemoney_addr_to_id`(IN addr_ VARCHAR(50), OUT result INT)
+label:BEGIN
+DECLARE account_id_ INT DEFAULT 0;
+SELECT account_id INTO account_id_ FROM cryptotransferdb WHERE address = addr_;
+SET result = account_id_;
 END */$$
 DELIMITER ;
 

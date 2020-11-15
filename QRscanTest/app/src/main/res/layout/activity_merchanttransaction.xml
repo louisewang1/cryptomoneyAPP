@@ -92,7 +92,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Step2: pick a past record to print (swipe to refresh or unpick)"
+        android:text="Step2: pick a past record to print"
         android:textSize="15sp"
         android:layout_marginLeft="20dp"/>
 

@@ -288,7 +288,7 @@ public class LoginActivity extends AppCompatActivity {
 //                                });
 //                            }
                         } else {
-                            response = "failed";
+                            response = "connection failed";
                             showResponse(response);
                         }
                     }

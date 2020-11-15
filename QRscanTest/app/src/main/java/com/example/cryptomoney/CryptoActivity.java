@@ -305,7 +305,11 @@ public class CryptoActivity extends AppCompatActivity  {
             public void onClick(View view) {
                 qrimg.setVisibility(View.GONE);
                 amountgroup.clearCheck();
+                modegroup.check(R.id.QR);
+                printMode = "QR";
 //                recordadapter.setSelectedIndex(-1);
+                merchant_selected = "None";
+                spinner.setAdapter(adapter);
                 amount.setText("");
             }
         });

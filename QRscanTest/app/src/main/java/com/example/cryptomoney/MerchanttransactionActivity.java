@@ -243,7 +243,10 @@ public class MerchanttransactionActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 qrimg.setVisibility(View.GONE);
-//                recordadapter.setSelectedIndex(-1);
+                modegroup.check(R.id.QR);
+                printMode = "QR";
+                adapter.setSelectedIndex(-1);
+                adapter.notifyDataSetChanged();
             }
         });
 

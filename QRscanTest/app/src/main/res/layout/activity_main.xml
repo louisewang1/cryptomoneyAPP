@@ -16,7 +16,7 @@
 
     <Button
         android:id="@+id/account_info"
-        android:layout_width="250dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="Account Info"
@@ -43,7 +43,7 @@
 
     <Button
         android:id="@+id/crypto"
-        android:layout_width="250dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="print new money"
@@ -52,7 +52,7 @@
 
     <Button
         android:id="@+id/cryptotr_detail"
-        android:layout_width="250dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="print past free money"
@@ -61,7 +61,7 @@
 
     <Button
         android:id="@+id/merchanttr_detail"
-        android:layout_width="250dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="print past merchant money"
@@ -70,7 +70,7 @@
 
     <Button
         android:id="@+id/qrscan"
-        android:layout_width="250dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="Receive Merchant money"
@@ -79,7 +79,7 @@
 
     <Button
         android:id="@+id/request"
-        android:layout_width="250dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="Request Money"
@@ -89,7 +89,7 @@
 
     <Button
         android:id="@+id/setting"
-        android:layout_width="250dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="Setting"
@@ -98,7 +98,7 @@
 
     <Button
         android:id="@+id/logout"
-        android:layout_width="250dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="logout"

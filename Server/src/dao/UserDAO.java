@@ -643,11 +643,12 @@ public class UserDAO {
 			 String enc_id = dec.split("&ENC_ID=")[1];
 			 
 			 // check if token addr is valid
-			 cs = conn.prepareCall("{call addr_to_id(?,?)}");
+			 cs = conn.prepareCall("{call freemoney_addr_to_id(?,?)}");
 			 cs.setString(1, token_addr);
 			 cs.registerOutParameter(2,Types.INTEGER);
 			 cs.execute();
 			 int from_id = cs.getInt(2);
+			 System.out.println("from_id= "+from_id);
 			 if (from_id > 0) {  // from_id exists
 				 // get token_pk from token_addr and delete this token
 				 cs = conn.prepareCall("{call get_token_detail(?,?,?,?,?)}");

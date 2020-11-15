@@ -12,52 +12,48 @@
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="100dp"
             android:layout_centerInParent="true"
             android:layout_margin="20dp"
             android:gravity="center"
-            android:hint="Please choose an operation \n(touch outside to cancel)"
+            android:hint="Please near a new NFC tag"
             android:textColor="@android:color/black"
             android:textSize="16sp" />
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
+            android:layout_marginHorizontal="20dp"
             android:hint="Input new amount here"
             android:textSize="20sp"
-            android:singleLine="true"
             android:maxLines="1"
             android:id="@+id/new_amount"/>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
-
+            android:orientation="horizontal"
+            android:layout_gravity="center">
             <Button
-                android:id="@+id/cancel"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:id="@+id/btn_write_nfc_cancle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:layout_margin="20dp"
+                android:layout_margin="10dp"
                 android:text="Cancel contract"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
 
             <Button
                 android:id="@+id/change_amount"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:layout_margin="20dp"
+                android:layout_margin="10dp"
                 android:text="Change amount"
-                android:textSize="13sp" />
-
+                android:singleLine="true"
+                android:textSize="14sp" />
 
         </LinearLayout>
-
 
 
     </LinearLayout>

@@ -240,6 +240,10 @@ public class CryptoTransactionActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 qrimg.setVisibility(View.GONE);
+                modegroup.check(R.id.QR);
+                printMode = "QR";
+                adapter.setSelectedIndex(-1);
+                adapter.notifyDataSetChanged();
 //                recordadapter.setSelectedIndex(-1);
             }
         });

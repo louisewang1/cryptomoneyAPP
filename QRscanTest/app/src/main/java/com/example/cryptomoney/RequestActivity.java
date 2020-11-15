@@ -16,6 +16,7 @@ import android.nfc.FormatException;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,8 +27,10 @@ import com.example.cryptomoney.utils.Base64Utils;
 import com.example.cryptomoney.utils.Logger;
 import com.example.cryptomoney.utils.NfcUtils;
 import com.example.cryptomoney.utils.RSAUtils;
+import com.example.cryptomoney.utils.ReadDialog;
 import com.example.cryptomoney.utils.WriteDialog;
 import com.google.zxing.activity.CaptureActivity;
+import com.google.zxing.util.BackDialog;
 import com.google.zxing.util.Constant;
 
 import java.io.IOException;
@@ -50,7 +53,7 @@ import javax.crypto.Cipher;
 
 import static java.lang.Math.min;
 
-public class RequestActivity extends AppCompatActivity{
+public class RequestActivity extends AppCompatActivity implements ReadDialog.MsgListener{
 
     private static final int RESULT_CHANGED = 2;
     private static final int RESULT_PASSSED = 3;
@@ -60,7 +63,7 @@ public class RequestActivity extends AppCompatActivity{
 
     private Double value;
     private NfcUtils nfcUtils;
-    private WriteDialog NFCDialog;
+    private ReadDialog NFCDialog;
     private String qrstring;
     private String nfcstring;
     private String fullstring;
@@ -368,8 +371,13 @@ public class RequestActivity extends AppCompatActivity{
     private void showSaveDialog() {
 //        System.out.println("into showsavedialog");
         if (getSupportFragmentManager().findFragmentByTag("mWriteDialog") == null) {
-            NFCDialog = new WriteDialog();
+            NFCDialog = new ReadDialog();
             System.out.println(NFCDialog);
+            Bundle bundle = new Bundle();
+            bundle.putString("contract_addr",contract_addr);
+            bundle.putString("contract_sk_exp",contract_sk_exp);
+            bundle.putString("contract_modulus",contract_modulus);
+            NFCDialog.setArguments(bundle);
             NFCDialog.show(getSupportFragmentManager(), "mWriteDialog");
 //            System.out.println("show nfcdialog");
         }
@@ -494,5 +502,29 @@ public class RequestActivity extends AppCompatActivity{
 
         }
 
+    }
+
+    @Override
+    public void cancelresult(Boolean iscancel) {
+        if (iscancel) {
+            finish();
+        }
+    }
+
+    @Override
+    public void finishresult(Boolean isfinish) {
+        if(isfinish) {
+            finish();
+        }
+    }
+
+    //
+    @Override
+    public void changeamount(Boolean ischange, String new_amount) {
+        if (ischange) {
+            value = Double.parseDouble(new_amount);
+//            System.out.println("value in request: "+value);
+//            openCamera();
+        }
     }
 }
