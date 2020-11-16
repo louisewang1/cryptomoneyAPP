@@ -267,7 +267,7 @@ public class CryptoActivity extends AppCompatActivity  {
                             array.add(jsonObject.getString("username"));
                         }
                         merchantList = new String[array.size()+1];
-                        merchantList[0] = "None";
+                        merchantList[0] = " ";
                         for (int i=1;i<array.size()+1;i++) {
                             merchantList[i] = array.get(i-1);
                         }
@@ -308,7 +308,7 @@ public class CryptoActivity extends AppCompatActivity  {
                 modegroup.check(R.id.QR);
                 printMode = "QR";
 //                recordadapter.setSelectedIndex(-1);
-                merchant_selected = "None";
+                merchant_selected = " ";
                 spinner.setAdapter(adapter);
                 amount.setText("");
             }
@@ -537,7 +537,7 @@ public class CryptoActivity extends AppCompatActivity  {
 //                                        response.setText("token address: " + addr);
 //                                        Toast.makeText(CryptoActivity.this, "start printing money....", Toast.LENGTH_SHORT).show();
 
-                                        if (merchant_selected.equals("None")) {
+                                        if (merchant_selected.equals(" ")) {
                                             text = "N="+modulus+"&d="+sk_exp+"&addr="+addr;
                                             qrimage = QrCodeGenerator.getQrCodeImage(text,200,200);
                                         }

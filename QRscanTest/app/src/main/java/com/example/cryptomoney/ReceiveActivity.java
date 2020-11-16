@@ -237,9 +237,11 @@ public class ReceiveActivity extends AppCompatActivity {
             nfcstring = nfcUtils.readMessage(intent);
             dissDialog();
 //            Common.showShortToast(this, "NFC reading successfully.");
-            fullstring = getfullstring(qrstring,nfcstring);
+            if (qrstring.equals("")) fullstring = nfcstring;
+            else fullstring = getfullstring(qrstring,nfcstring);
             scanfinish = true;
             showDialog = false;
+            Common.showShortToast(this, "Read NFC successfully.");
             verifytoken();
         }
     }

@@ -174,7 +174,7 @@ public class UserServlet extends HttpServlet {
 			
 //				System.out.println("transferresult="+transferresult);
 //				System.out.println(merchant.equals("None"));
-				if (merchant.equals("None")){
+				if (merchant.equals(" ")){
 					String transferresult = userService.cryptomoney(conn, id2, value2, modulus1,pk_exp2);
 					System.out.println("token addr= "+transferresult);
 					response.getOutputStream().write(transferresult.getBytes("utf-8"));

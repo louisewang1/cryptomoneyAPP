@@ -274,7 +274,7 @@ public class CryptoTransactionActivity extends AppCompatActivity {
 
                     // convert string to bitmap
                     StringBitmapParameter valuebitpic = new StringBitmapParameter(value);
-                    StringBitmapParameter merchantpic = new StringBitmapParameter("None");
+                    StringBitmapParameter merchantpic = new StringBitmapParameter(" ");
                     ArrayList<StringBitmapParameter> tobitmap = new ArrayList<StringBitmapParameter>();
                     tobitmap.add(valuebitpic);
                     tobitmap.add(merchantpic);
