@@ -482,6 +482,7 @@ public class UserDAO {
         return merchantList;
 	 }
 	 
+	 // receive merchant-specific money
 	 public String getcryptomoney(Connection conn,String id_enc, String addr) {
 		 if (conn == null) return null;
 		 CallableStatement cs = null;
@@ -531,7 +532,77 @@ public class UserDAO {
 				 }
 			 }
 			 else {
-				 result = "expired transaction";
+				 result = "expired token";
+			 }
+		 } catch (Exception e){
+	            e.printStackTrace();
+	            result = "decryption failed";
+	        }if (cs != null) {
+	            try {
+	                cs.close();
+	            } catch (SQLException e) {
+	                e.printStackTrace();
+	            }
+	        }
+	        return result;
+	 }
+	 
+	 public String getfreecryptomoney(Connection conn, String id_enc, String addr) {
+		 if (conn == null) return null;
+		 CallableStatement cs = null;
+		 String result = null;
+		 try {
+			 cs = conn.prepareCall("{call freemoney_addr_to_id(?,?)}");
+			 cs.setString(1, addr);
+			 cs.registerOutParameter(2,Types.INTEGER);
+			 cs.execute();
+			 Integer from_id = cs.getInt(2);
+			 if (from_id > 0) {  // from_id exists
+				 System.out.println("from_id= "+from_id);
+				// get token_pk from token_addr and delete this token
+				 cs = conn.prepareCall("{call get_free_token_detail(?,?,?,?,?)}");
+				 cs.setString(1, addr);
+				 cs.registerOutParameter(2,Types.VARCHAR); // pk_exp
+				 cs.registerOutParameter(3,Types.VARCHAR); // N
+				 cs.registerOutParameter(4,Types.INTEGER); // sender_id
+				 cs.registerOutParameter(5,Types.DOUBLE); // send_amount
+				 
+				 cs.execute();
+				 
+				 int sender_id = cs.getInt(4);
+				 double send_amount = cs.getDouble(5);	
+				 BigInteger pk_exp = new BigInteger(Base64Utils.decode(cs.getString(2)));
+				 BigInteger modulus = new BigInteger(Base64Utils.decode(cs.getString(3)));
+				 System.out.println("token_pk_exp= "+pk_exp);
+				 System.out.println("token_modulus= "+modulus);
+				 System.out.println("id_enc= "+id_enc);
+				 
+				 Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+			     KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+                 RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(modulus,pk_exp);
+                 PublicKey pk = keyFactory.generatePublic(rsaPublicKeySpec);
+                 
+				 cipher.init(Cipher.DECRYPT_MODE,pk);
+				 String id_dec = new String(cipher.doFinal(Base64Utils.decode(id_enc)));
+				 System.out.println("id_dec= "+id_dec);
+				 
+				 if (id_dec.startsWith("ACCOUNT=")) {
+//					 result = "successfully decrypted";
+					 Integer to_id = Integer.parseInt(id_dec.split("=")[1]);
+					 cs = conn.prepareCall("{call exe_free_crypto(?,?,?)}");
+					 cs.setInt(1, to_id);
+					 cs.setString(2,addr);
+					 cs.registerOutParameter(3, Types.DOUBLE);
+					 cs.execute();
+					 Double amount = cs.getDouble(3);
+					 result = amount.toString() + " received";
+				 }
+				 else {
+					 result = "decryption failed";
+				 }
+			 }
+			 else {
+				 result = "expired token";
 			 }
 		 } catch (Exception e){
 	            e.printStackTrace();

@@ -241,7 +241,7 @@ public class ReceiveActivity extends AppCompatActivity {
             else fullstring = getfullstring(qrstring,nfcstring);
             scanfinish = true;
             showDialog = false;
-            Common.showShortToast(this, "Read NFC successfully.");
+//            Common.showShortToast(this, "Read NFC successfully.");
             verifytoken();
         }
     }

@@ -366,7 +366,7 @@ public class RequestActivity extends AppCompatActivity implements ReadDialog.Msg
             System.out.println("full string after NFC= "+ fullstring);
             scanfinish = true;
             showDialog = false;
-            Common.showShortToast(this, "Read NFC successfully.");
+//            Common.showShortToast(this, "Read NFC successfully.");
             sendtokenaddr();
         }
     }

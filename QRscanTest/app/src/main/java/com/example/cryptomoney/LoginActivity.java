@@ -169,6 +169,7 @@ public class LoginActivity extends AppCompatActivity {
         verify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                System.out.println("merchant_selected=" + merchant_selected);
                 if (!merchant_selected.equals("None")) {
                     if (ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.CAMERA)
                             != PackageManager.PERMISSION_GRANTED) {

@@ -1,7 +1,8 @@
-/com/
 /Bean/
-/util/
-/servlet/
-/service/
+/StringUtils/
+/com/
 /dao/
 /entity/
+/service/
+/servlet/
+/util/

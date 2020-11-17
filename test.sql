@@ -25,9 +25,11 @@ CREATE TABLE `logindb` (
   `N` VARCHAR(100) DEFAULT NULL,
   `pk` VARCHAR(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=INNODB DEFAULT CHARSET=latin1;
+) ENGINE=INNODB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 /*Data for the table `logindb` */
+
+INSERT  INTO `logindb`(`id`,`username`,`pwd`,`usertype`,`sk`,`N`,`pk`) VALUES (1,'User','user','CUSTOMER','','','');
 
 /*Table structure for table `accountinfodb` */
 
@@ -42,6 +44,8 @@ CREATE TABLE `accountinfodb` (
 ) ENGINE=INNODB DEFAULT CHARSET=latin1;
 
 /*Data for the table `accountinfodb` */
+
+INSERT  INTO `accountinfodb`(`account_id`,`username`,`balance`,`email`,`cellphone`) VALUES (1,'User',43,'','');
 
 /*Table structure for table `contract` */
 
@@ -84,9 +88,12 @@ CREATE TABLE `cryptotransferdb` (
   PRIMARY KEY (`id`),
   KEY `fk_cryptotransferdb_id` (`account_id`),
   CONSTRAINT `fk_cryptotransferdb_id` FOREIGN KEY (`account_id`) REFERENCES `logindb` (`id`)
-) ENGINE=INNODB DEFAULT CHARSET=latin1;
+) ENGINE=INNODB AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
 
 /*Data for the table `cryptotransferdb` */
+
+INSERT  INTO `cryptotransferdb`(`id`,`account_id`,`amount`,`crypto_time`,`address`,`N`,`pk`) VALUES (15,1,15,'2020-11-17 15:24:01','CdvAzxlZ6zkBfQOzja8k','ANwCPjDJDyK5G8Nrn8BVi6pp2bDBh9uMH6tx2SZeMTCABtVFLCtthcLYx+vkKXJ2hW4ewSjc7QqrZu6+lTW0VpU=','AQAB');
+
 
 /*Table structure for table `merchant_token` */
 
@@ -332,6 +339,18 @@ end if;
 END */$$
 DELIMITER ;
 
+/* Procedure structure for procedure `exe_free_crypto` */
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `exe_free_crypto`(IN to_id_ INT, IN addr_ VARCHAR(50), OUT amount_ DOUBLE)
+label:BEGIN
+SELECT amount INTO amount_ FROM cryptotransferdb WHERE address = addr_;
+UPDATE accountinfodb SET balance = balance + amount_ WHERE account_id = to_id_;
+DELETE FROM cryptotransferdb WHERE address = addr_;
+END */$$
+DELIMITER ;
+
 /* Procedure structure for procedure `exe_transaction` */
 
 DELIMITER $$
@@ -419,6 +438,19 @@ SELECT contract_N INTO N_ FROM contract WHERE contract_addr = addr_;
 SELECT rcver_id INTO id_ FROM contract WHERE contract_addr = addr_;
 SELECT contract_value INTO value_ FROM contract WHERE contract_addr = addr_;
 SELECT current_value INTO value2_ FROM contract WHERE contract_addr = addr_;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `get_free_token_detail` */
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `get_free_token_detail`(IN addr_ VARCHAR(20), OUT pk_ VARCHAR(100), OUT N_ VARCHAR(100), OUT id_ INT, OUT value_ DOUBLE)
+label:BEGIN
+SELECT pk INTO pk_ FROM cryptotransferdb WHERE address = addr_;
+SELECT N INTO N_ FROM cryptotransferdb WHERE address = addr_;
+SELECT account_id INTO id_ FROM cryptotransferdb WHERE address = addr_;
+SELECT amount INTO value_ FROM cryptotransferdb WHERE address = addr_;
 END */$$
 DELIMITER ;
 

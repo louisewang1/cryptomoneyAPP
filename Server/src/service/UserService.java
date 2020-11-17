@@ -59,6 +59,10 @@ public class UserService {
 	   return userDAO.getcryptomoney(conn,id_enc,addr);
    }
    
+   public String getfreecryptomoney(Connection conn, String id_enc,String addr) {
+	   return userDAO.getfreecryptomoney(conn,id_enc,addr);
+   }
+   
    public int merchantregister(Connection conn,String username, String password, String email,String cellphone, String sk_exp, String pk_exp, String modulus) {
 	   return userDAO.merchantregister(conn,username,password,email,cellphone,sk_exp,pk_exp,modulus);
    }

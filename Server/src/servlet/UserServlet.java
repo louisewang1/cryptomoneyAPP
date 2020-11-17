@@ -304,6 +304,12 @@ public class UserServlet extends HttpServlet {
 				String addr = request.getParameter("addr");
 				response.getOutputStream().write(userService.getcryptomoney(conn, id_enc, addr).getBytes("utf-8"));
 				break;
+				
+			case "getfreeencrypto":
+				String id_enc6 = request.getParameter("id_enc");
+				String addr6 = request.getParameter("addr");
+				response.getOutputStream().write(userService.getfreecryptomoney(conn, id_enc6, addr6).getBytes("utf-8"));
+				break;
 			
 //			case "addmoney":
 //				int to_id = Integer.parseInt(request.getParameter("to_account"));

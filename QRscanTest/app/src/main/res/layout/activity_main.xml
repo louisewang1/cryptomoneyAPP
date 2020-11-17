@@ -69,6 +69,15 @@
         android:layout_margin="10dp"></Button>
 
     <Button
+        android:id="@+id/rcv_free"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Receive Free Money"
+        android:textSize="15sp"
+        android:layout_margin="10dp"></Button>
+
+    <Button
         android:id="@+id/qrscan"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
@@ -82,7 +91,7 @@
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Request Money"
+        android:text="Request Free Money"
         android:textSize="15sp"
         android:layout_margin="10dp"></Button>
 
