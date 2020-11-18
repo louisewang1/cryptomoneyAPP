@@ -27,13 +27,13 @@
             response.sendRedirect(temp);
         }
         else{
-            out.print("<script language='javaScript'> alert('密码错误');</script>");
+            out.print("<script language='javaScript'> alert('Wrong Password');</script>");
             response.setHeader("refresh", "0;url=login.jsp");
         }
     }
     else 
     {
-        out.print("<script language='javaScript'> alert('用户名错误，请重新输入');</script>");
+        out.print("<script language='javaScript'> alert('Username does not exist. Please try again.');</script>");
         response.setHeader("refresh", "0;url=login.jsp");
     }
 

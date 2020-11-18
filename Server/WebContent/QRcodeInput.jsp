@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>QRcodeGenerator</title>
+<title>QRcode Generator</title>
 </head>
 <body style="text-align:center">
 <h1>

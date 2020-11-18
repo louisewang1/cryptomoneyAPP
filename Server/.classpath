@@ -12,6 +12,7 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/json-20200518.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-lang3-3.11.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-lang3-3.11-sources.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/user-guide-2.0.pdf"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
