@@ -23,8 +23,9 @@
             <br>
                 <input type="submit" value="Login">
             </form>
-            
-        <a href="user-guide-2.0.pdf" download>
+                  <br>
+         <br>   
+        <a href="user-guide.pdf" download>
     			Full User Guide
 		</a>
     </center>
