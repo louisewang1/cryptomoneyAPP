@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>Insert title here</title>
+<title>Crypto Money - Login</title>
 </head>
 <body>
     <center>
@@ -23,6 +23,12 @@
             <br>
                 <input type="submit" value="Login">
             </form>
+            
+        <a href="user-guide-2.0.pdf" download>
+    			Full User Guide
+		</a>
     </center>
+    
+
 </body>
 </html>

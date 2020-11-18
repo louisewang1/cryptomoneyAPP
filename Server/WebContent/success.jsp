@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
+<title>My Account</title>
 </head>
 <body style="text-align:center">
 <jsp:useBean id="db" class="Bean.DBBean" scope="page"/>
@@ -34,11 +34,6 @@ if(rs.next())
 
 %>
 <p/>
-<script>    
-    function redirect (){     
-    	window.location.href="QRcodeInput.jsp?Id="+acc_id;      
-    }    
-</script> 
 
 <input type="button" value="Generate QR code" onClick="location.href='QRcodeInput.jsp'">
 <input type="button" value="Transfer Money" onClick="location.href='transaction.jsp'">
