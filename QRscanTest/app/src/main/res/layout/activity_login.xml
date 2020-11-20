@@ -14,205 +14,218 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:layout_gravity="left"
-            android:text="Account:   " />
-
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/account"
-            android:maxLines="1"
-            android:singleLine="true" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:layout_gravity="left"
-            android:text="Password:" />
-
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/password"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:password="true"/>
-    </LinearLayout>
-
-<!--    <LinearLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:orientation="horizontal"-->
-<!--        android:layout_margin="10dp">-->
-
-<!--        <RadioGroup-->
-<!--            android:id="@+id/group"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="horizontal">-->
-
-<!--            <RadioButton-->
-<!--                android:id="@+id/customer"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginRight="5dp"-->
-<!--                android:layout_weight="1"-->
-<!--                android:gravity="center"-->
-<!--                android:text="I am a customer"-->
-<!--                android:textAllCaps="false"-->
-<!--                android:textSize="17sp"-->
-<!--                android:checked="true"/>-->
-
-<!--            <RadioButton-->
-<!--                android:id="@+id/merchant"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_weight="1"-->
-<!--                android:gravity="center"-->
-<!--                android:text="I am a merchant"-->
-<!--                android:textAllCaps="false"-->
-<!--                android:textSize="17sp" />-->
-
-<!--        </RadioGroup>-->
-<!--    </LinearLayout>-->
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp" >
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <CheckBox
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_gravity="left"
+                    android:text="Account:   " />
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:id="@+id/account"
+                    android:maxLines="1"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_gravity="left"
+                    android:text="Password:" />
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:id="@+id/password"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:password="true"/>
+            </LinearLayout>
+
+            <!--    <LinearLayout-->
+            <!--        android:layout_width="match_parent"-->
+            <!--        android:layout_height="wrap_content"-->
+            <!--        android:orientation="horizontal"-->
+            <!--        android:layout_margin="10dp">-->
+
+            <!--        <RadioGroup-->
+            <!--            android:id="@+id/group"-->
+            <!--            android:layout_width="match_parent"-->
+            <!--            android:layout_height="wrap_content"-->
+            <!--            android:orientation="horizontal">-->
+
+            <!--            <RadioButton-->
+            <!--                android:id="@+id/customer"-->
+            <!--                android:layout_width="0dp"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginRight="5dp"-->
+            <!--                android:layout_weight="1"-->
+            <!--                android:gravity="center"-->
+            <!--                android:text="I am a customer"-->
+            <!--                android:textAllCaps="false"-->
+            <!--                android:textSize="17sp"-->
+            <!--                android:checked="true"/>-->
+
+            <!--            <RadioButton-->
+            <!--                android:id="@+id/merchant"-->
+            <!--                android:layout_width="0dp"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_weight="1"-->
+            <!--                android:gravity="center"-->
+            <!--                android:text="I am a merchant"-->
+            <!--                android:textAllCaps="false"-->
+            <!--                android:textSize="17sp" />-->
+
+            <!--        </RadioGroup>-->
+            <!--    </LinearLayout>-->
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/remember_pass" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        android:text="Remember password" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/remember_pass" />
+                android:orientation="horizontal"
+                android:layout_gravity="center_horizontal">
 
-            <TextView
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/login"
+                    android:layout_gravity="center_horizontal"
+                    android:text="Login" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/register"
+                    android:layout_gravity="center_horizontal"
+                    android:text="Register" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_margin="20dp">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="Response: "
+                    android:textSize="20sp"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:id="@+id/tv_show_response"
+                    android:maxLines="10" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginLeft="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Offline verification merchant:"
+                    android:textSize="18sp" >
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/spinner"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbarSize="@dimen/cardview_default_elevation"/>
+            </LinearLayout>
+
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:text="Remember password" />
+                android:layout_gravity="center"
+                android:text="Verify"
+                android:id="@+id/verify"
+                android:layout_margin="20dp" >
+            </Button>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Response: "
+                    android:textSize="20sp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="10dp" ></TextView>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:id="@+id/vrf_response"
+                    android:maxLines="10"
+                    android:textSize="20sp"
+                    android:layout_gravity="bottom"/>
+            </LinearLayout>
+
         </LinearLayout>
+    </ScrollView>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="center_horizontal">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/login"
-            android:layout_gravity="center_horizontal"
-            android:text="Login" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/register"
-            android:layout_gravity="center_horizontal"
-            android:text="Register" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="20dp">
-
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="Response: "
-            android:textSize="20sp"/>
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/tv_show_response"
-            android:maxLines="10" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginLeft="20dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Offline verification merchant:"
-            android:textSize="18sp" >
-        </TextView>
-
-        <Spinner
-            android:id="@+id/spinner"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:scrollbarSize="@dimen/cardview_default_elevation"/>
-    </LinearLayout>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Verify"
-        android:id="@+id/verify"
-        android:layout_margin="20dp" >
-    </Button>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Response: "
-            android:textSize="20sp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="10dp" ></TextView>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/vrf_response"
-            android:maxLines="10"
-            android:textSize="20sp"
-            android:layout_gravity="bottom"/>
-    </LinearLayout>
 
 </LinearLayout>
 

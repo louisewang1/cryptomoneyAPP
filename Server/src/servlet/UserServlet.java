@@ -166,22 +166,24 @@ public class UserServlet extends HttpServlet {
 				break;
 				
 			case "crypto":
+//				System.out.println("hahahahaha");
 				int id2 = Integer.parseInt(request.getParameter("id"));
 				double value2 = Double.parseDouble(request.getParameter("value"));
 				String merchant = request.getParameter("merchant");
 				String modulus1 = request.getParameter("N");
 				String pk_exp2 = request.getParameter("pk");
+				int no = Integer.parseInt(request.getParameter("no"));
 			
 //				System.out.println("transferresult="+transferresult);
 //				System.out.println(merchant.equals("None"));
 				if (merchant.equals(" ")){
-					String transferresult = userService.cryptomoney(conn, id2, value2, modulus1,pk_exp2);
+					String transferresult = userService.cryptomoney(conn, id2, value2, modulus1,pk_exp2,no);
 					System.out.println("token addr= "+transferresult);
 					response.getOutputStream().write(transferresult.getBytes("utf-8"));
 				}
 				
 				else {
-					String transferresult = userService.cryptomoney_merchant(conn, id2, value2, modulus1,pk_exp2,merchant);
+					String transferresult = userService.cryptomoney_merchant(conn, id2, value2, modulus1,pk_exp2,merchant,no);
 					System.out.println("ciphertext= "+transferresult);
 					response.getOutputStream().write(transferresult.getBytes("utf-8"));
 				}

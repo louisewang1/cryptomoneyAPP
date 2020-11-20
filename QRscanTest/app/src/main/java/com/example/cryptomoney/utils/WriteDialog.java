@@ -1,6 +1,7 @@
 package com.example.cryptomoney.utils;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -27,6 +28,7 @@ public class WriteDialog extends DialogFragment {
 //    private Button btnCancle;
 //    private MsgListener msgListener;
     private Button btnCancle;
+    private MsgListener msgListener;
 
 
     @Override
@@ -64,6 +66,7 @@ public class WriteDialog extends DialogFragment {
         btnCancle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                msgListener.cancelresult(true);
                 dismiss();
                 //todo: send cancel message to server
             }
@@ -90,11 +93,11 @@ public class WriteDialog extends DialogFragment {
     }
 
 
-//    @Override
-//    public void onAttach(Context context) {
-//        super.onAttach(context);
-//        msgListener = (MsgListener) context;
-//    }
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        msgListener = (MsgListener) context;
+    }
 
     @Override
     public void onDestroy() {
@@ -111,5 +114,11 @@ public class WriteDialog extends DialogFragment {
 //
 //        void dissMiss();
 //    }
+
+    public interface MsgListener {
+        //        void result(String msg);
+        void cancelresult(Boolean iscancel);
+//        void dissMiss();
+    }
 
 }

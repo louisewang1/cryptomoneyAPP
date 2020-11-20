@@ -284,10 +284,11 @@ public class UserDAO {
 	        return recordList;
 	    }
 	 
-	 public String cryptotransfer(Connection conn, Integer account_id, Double value,String modulus,String pk_exp) {
+	 public String cryptotransfer(Connection conn, Integer account_id, Double value,String modulus,String pk_exp,int no) {
 		 if (conn == null) return null;
 		 CallableStatement cs = null;
 		 String result = null;
+//		 System.out.println("hahahahha");
 		 try {
 //			 cs = conn.prepareCall("{call check_modulus(?,?,?)}");
 //			 cs.setInt(1, account_id);
@@ -298,7 +299,8 @@ public class UserDAO {
 //			 if (cs.getInt(3) == 1) {  // modulus matches
 			 cs = conn.prepareCall("{call check_balance(?,?,?)}");
 			 cs.setInt(1, account_id);
-			 cs.setDouble(2, value);
+//			 System.out.println("no="+no);
+			 cs.setDouble(2, value * no);
 			 cs.registerOutParameter(3, Types.INTEGER);
 			 cs.execute();
 			 if (cs.getInt(3) == 1) {  // balance enough
@@ -332,7 +334,7 @@ public class UserDAO {
 	        return result;
 	 }
 	 
-	 public String cryptotransfer_merchant(Connection conn, Integer account_id, Double value, String modulus, String pk_exp, String merchant) {
+	 public String cryptotransfer_merchant(Connection conn, Integer account_id, Double value, String modulus, String pk_exp, String merchant,int no) {
 		 if (conn == null) return null;
 		 CallableStatement cs = null;
 		 String result = null;
@@ -340,7 +342,7 @@ public class UserDAO {
 		 try {
 			 cs = conn.prepareCall("{call check_balance(?,?,?)}");
 			 cs.setInt(1, account_id);
-			 cs.setDouble(2, value);
+			 cs.setDouble(2, value*no);
 			 cs.registerOutParameter(3, Types.INTEGER);
 			 cs.execute();
 			 if (cs.getInt(3) == 1) {  // balance enough

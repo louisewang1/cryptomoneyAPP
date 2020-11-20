@@ -176,6 +176,27 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:text="Step4: Choose number:"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:layout_marginLeft="20dp"/>
+
+        <Spinner
+            android:id="@+id/spinner_no"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:scrollbarSize="@dimen/cardview_default_elevation"/>
+
+    </LinearLayout>
+
+
 <!--    <TextView-->
 <!--        android:text="or choose a past reccord (swipe to refresh or unselect):"-->
 <!--        android:layout_width="wrap_content"-->
@@ -261,7 +282,7 @@
             android:layout_gravity="center"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="30dp">
 
             <Button
                 android:layout_width="wrap_content"

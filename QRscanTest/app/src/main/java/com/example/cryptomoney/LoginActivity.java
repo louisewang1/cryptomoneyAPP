@@ -223,6 +223,7 @@ public class LoginActivity extends AppCompatActivity {
 
 //                        final String  response = PostService.loginByPost(username,pwd);
                         String response = PostService.Post(loginRequest);
+                        System.out.println("login response= "+ response);
                         if (response != null) {
                             System.out.println("login response= "+ response);
                             if (response.equals("username or password not correct"))  {

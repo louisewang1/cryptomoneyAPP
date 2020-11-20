@@ -10,109 +10,121 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:id="@+id/toolbar"
-        android:layout_marginBottom="20dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <Button
-        android:id="@+id/account_info"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Account Info"
-        android:textSize="15sp"
-        android:layout_margin="10dp"/>
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
 
-<!--    <Button-->
-<!--        android:id="@+id/transfer"-->
-<!--        android:layout_width="250dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_gravity="center_horizontal"-->
-<!--        android:text="P2P transfer"-->
-<!--        android:textSize="15sp"-->
-<!--        android:layout_margin="10dp"/>-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+            <Button
+                android:id="@+id/account_info"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Account Info"
+                android:textSize="15sp"
+                android:layout_margin="15dp"/>
 
-<!--    <Button-->
-<!--        android:id="@+id/tr_detail"-->
-<!--        android:layout_width="250dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_gravity="center_horizontal"-->
-<!--        android:text="p2p transaction history"-->
-<!--        android:textSize="15sp"-->
-<!--        android:layout_margin="10dp"></Button>-->
+<!--                <Button-->
+<!--                    android:id="@+id/transfer"-->
+<!--                    android:layout_width="250dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_gravity="center_horizontal"-->
+<!--                    android:text="P2P transfer"-->
+<!--                    android:textSize="15sp"-->
+<!--                    android:layout_margin="10dp"/>-->
 
-    <Button
-        android:id="@+id/crypto"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="print new money"
-        android:textSize="15sp"
-        android:layout_margin="10dp"></Button>
+<!--                <Button-->
+<!--                    android:id="@+id/tr_detail"-->
+<!--                    android:layout_width="250dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_gravity="center_horizontal"-->
+<!--                    android:text="p2p transaction history"-->
+<!--                    android:textSize="15sp"-->
+<!--                    android:layout_margin="10dp"></Button>-->
 
-    <Button
-        android:id="@+id/cryptotr_detail"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="print past free money"
-        android:textSize="15sp"
-        android:layout_margin="10dp"></Button>
+            <Button
+                android:id="@+id/crypto"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="print new money"
+                android:textSize="15sp"
+                android:layout_margin="15dp"></Button>
 
-    <Button
-        android:id="@+id/merchanttr_detail"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="print past merchant money"
-        android:textSize="15sp"
-        android:layout_margin="10dp"></Button>
+            <Button
+                android:id="@+id/cryptotr_detail"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="print past free money"
+                android:textSize="15sp"
+                android:layout_margin="15dp"></Button>
 
-    <Button
-        android:id="@+id/rcv_free"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Receive Free Money"
-        android:textSize="15sp"
-        android:layout_margin="10dp"></Button>
+            <Button
+                android:id="@+id/merchanttr_detail"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="print past merchant money"
+                android:textSize="15sp"
+                android:layout_margin="15dp"></Button>
 
-    <Button
-        android:id="@+id/qrscan"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Receive Merchant money"
-        android:textSize="15sp"
-        android:layout_margin="10dp"></Button>
+            <Button
+                android:id="@+id/rcv_free"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Receive Free Money"
+                android:textSize="15sp"
+                android:layout_margin="15dp"></Button>
 
-    <Button
-        android:id="@+id/request"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Request Free Money"
-        android:textSize="15sp"
-        android:layout_margin="10dp"></Button>
+            <Button
+                android:id="@+id/qrscan"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Receive Merchant money"
+                android:textSize="15sp"
+                android:layout_margin="15dp"></Button>
+
+            <Button
+                android:id="@+id/request"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Request Free Money"
+                android:textSize="15sp"
+                android:layout_margin="15dp"></Button>
 
 
-    <Button
-        android:id="@+id/setting"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Setting"
-        android:textSize="15sp"
-        android:layout_margin="10dp"></Button>
+            <Button
+                android:id="@+id/setting"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Setting"
+                android:textSize="15sp"
+                android:layout_margin="15dp"></Button>
 
-    <Button
-        android:id="@+id/logout"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="logout"
-        android:textSize="15sp"
-        android:layout_margin="10dp"></Button>
+            <Button
+                android:id="@+id/logout"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="logout"
+                android:textSize="15sp"
+                android:layout_margin="15dp"></Button>
+        </LinearLayout>
+
+
+
+    </ScrollView>
 
 
 

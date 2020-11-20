@@ -43,12 +43,12 @@ public class UserService {
 	   return userDAO.trandetail(conn,account_id);
    }
    
-   public String cryptomoney(Connection conn,int account_id,double value,String modulus,String pk_exp) {
-	   return userDAO.cryptotransfer(conn,account_id,value,modulus,pk_exp);
+   public String cryptomoney(Connection conn,int account_id,double value,String modulus,String pk_exp,int no) {
+	   return userDAO.cryptotransfer(conn,account_id,value,modulus,pk_exp,no);
    }
    
-   public String cryptomoney_merchant(Connection conn, Integer account_id, double value, String modulus, String pk_exp, String merchant) {
-	   return userDAO.cryptotransfer_merchant(conn,account_id,value,modulus,pk_exp,merchant);
+   public String cryptomoney_merchant(Connection conn, Integer account_id, double value, String modulus, String pk_exp, String merchant,int no) {
+	   return userDAO.cryptotransfer_merchant(conn,account_id,value,modulus,pk_exp,merchant,no);
    }
    
    public List<CryptoRecord> cryptotransaction(Connection conn,int account_id) {
