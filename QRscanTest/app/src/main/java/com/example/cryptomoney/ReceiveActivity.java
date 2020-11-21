@@ -59,7 +59,7 @@ import static com.example.cryptomoney.RegisterActivity.MERCHANT_MODE;
 import static java.lang.Math.min;
 
 
-public class ReceiveActivity extends AppCompatActivity {
+public class ReceiveActivity extends AppCompatActivity implements WriteDialog.MsgListener{
 
     private static final int RESULT_PASSSED = 3;
     private Spinner spinner = null;
@@ -426,6 +426,12 @@ public class ReceiveActivity extends AppCompatActivity {
             default:
         }
         return true;
+    }
+
+    @Override
+    public void cancelresult(Boolean iscancel) {
+        if (iscancel) {
+        }
     }
 
 }

@@ -460,7 +460,8 @@ public class CryptoActivity extends AppCompatActivity implements WriteDialog.Msg
                                                         qrimg.setVisibility(View.VISIBLE);
                                                         qrimg.setImageBitmap(qrimage);
                                                         finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
-
+                                                        QRok = true;
+                                                        NFCok = true;
                                                     }
 
                                                     // save to album
@@ -484,11 +485,13 @@ public class CryptoActivity extends AppCompatActivity implements WriteDialog.Msg
                                                         printQR();
                                                     }
                                                     else {
-                                                        Common.showShortToast(CryptoActivity.this, "No printer found, display QR directly");
+//                                                        System.out.println("into no printer");
+//                                                        Common.showShortToast(CryptoActivity.this, "No printer found, display QR directly");
                                                         qrimage = QrCodeGenerator.getQrCodeImage(qrtext,200,200);
                                                         qrimg.setVisibility(View.VISIBLE);
                                                         qrimg.setImageBitmap(qrimage);
                                                         finalbitmap = mergeBitmap_TB(textbitmap,qrimage,true);
+                                                        QRok = true;
                                                     }
                                                     showdialog = true;
                                                     showSaveDialog();

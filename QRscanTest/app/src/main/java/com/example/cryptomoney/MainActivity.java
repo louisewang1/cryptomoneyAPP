@@ -93,7 +93,7 @@ import static java.sql.Types.DOUBLE;
 import static java.sql.Types.INTEGER;
 import static java.sql.Types.VARCHAR;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements WriteDialog.MsgListener {
 
     private static final int RESULT_PASSSED = 3;
     private NfcUtils nfcUtils;
@@ -750,6 +750,12 @@ public class MainActivity extends AppCompatActivity {
                 Common.showShortToast(MainActivity.this, "Invalid message,scan again");
             }
 
+        }
+    }
+
+    @Override
+    public void cancelresult(Boolean iscancel) {
+        if (iscancel) {
         }
     }
 

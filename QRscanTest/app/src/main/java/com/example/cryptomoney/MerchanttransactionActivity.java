@@ -67,7 +67,7 @@ import cn.memobird.gtx.listener.OnImageToDitherListener;
 
 import static com.example.cryptomoney.utils.BitmapUtil.StringListtoBitmap;
 
-public class MerchanttransactionActivity extends AppCompatActivity {
+public class MerchanttransactionActivity extends AppCompatActivity implements WriteDialog.MsgListener {
 
     private List<CryptoRecord> recordList;
     private SwipeRefreshLayout swipeRefresh;
@@ -732,6 +732,13 @@ public class MerchanttransactionActivity extends AppCompatActivity {
             Toast.makeText(MerchanttransactionActivity.this, "save to system album successfully", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(MerchanttransactionActivity.this, "save to system album failed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    @Override
+    public void cancelresult(Boolean iscancel) {
+        if (iscancel) {
         }
     }
 }
