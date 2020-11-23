@@ -58,7 +58,7 @@ import static com.example.cryptomoney.RegisterActivity.MERCHANT_MODE;
 import static java.lang.Math.min;
 
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements WriteDialog.MsgListener {
 
     private static final int RESULT_PASSSED = 3 ;
     // 定义控件和全局变量初始化
@@ -522,6 +522,12 @@ public class LoginActivity extends AppCompatActivity {
                 NFCDialog.getDialog() != null &&
                 NFCDialog.getDialog().isShowing()) {
             NFCDialog.dismiss();
+        }
+    }
+
+    @Override
+    public void cancelresult(Boolean iscancel) {
+        if (iscancel) {
         }
     }
 
