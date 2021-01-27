@@ -41,7 +41,7 @@
         <activity android:name=".RegisterActivity" android:label="Register"> </activity>
         <activity android:name=".TransactionActivity" />
         <activity android:name=".TransferActivity" />
-        <activity android:name=".RequestActivity" android:label="Receive Free Money"> </activity>
+        <activity android:name=".RequestActivity" android:label="Request Free Money"> </activity>
 <!--        <activity android:name=".RequestMoney" />-->
         <activity android:name=".AccountActivity" android:label="Account Info"> </activity>
         <activity android:name=".SettingActivity" android:label="Settings"> </activity>

@@ -392,7 +392,9 @@ public class LoginActivity extends AppCompatActivity implements WriteDialog.MsgL
             nfcstring = nfcUtils.readMessage(intent);
             dissDialog();
 //            Common.showShortToast(this, "NFC reading successfully.");
-            fullstring = getfullstring(qrstring,nfcstring);
+            if (qrstring.equals("")) fullstring = nfcstring;
+            else fullstring = getfullstring(qrstring,nfcstring);
+//            fullstring = getfullstring(qrstring,nfcstring);
             scanfinish = true;
             showDialog = false;
             verifytoken();
